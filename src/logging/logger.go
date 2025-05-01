@@ -8,7 +8,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func NewLogger(source, serverType, logFormat string, logLevel int) *LoggerWrapper {
+type Format string
+
+const (
+	FormatJSON Format = "json"
+	FormatText Format = "text"
+)
+
+// Creates a new logger instance with the specified source, server type, log format and log level.
+func NewLogger(source, serverType, logFormat Format, logLevel int) *LoggerWrapper {
 	logger := logrus.New()
 	logger.SetReportCaller(false)
 
@@ -30,9 +38,9 @@ func NewLogger(source, serverType, logFormat string, logLevel int) *LoggerWrappe
 	}
 
 	switch logFormat {
-	case "json":
+	case FormatJSON:
 		logger.Formatter = &logrus.JSONFormatter{CallerPrettyfier: CallerPrettyfier}
-	case "text":
+	case FormatText:
 		logger.Formatter = &logrus.TextFormatter{
 			CallerPrettyfier: CallerPrettyfier,
 			DisableTimestamp: true,
