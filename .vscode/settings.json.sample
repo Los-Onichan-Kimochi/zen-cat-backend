@@ -1,0 +1,46 @@
+{
+    // So that they don't appear in the explorer
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+
+     // So that they don't appear in the explorer
+     "files.exclude": {
+        "**/.venv": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/node_modules": true,
+        "**/.serverless": true
+    },
+
+    // So that their contents don't appear when searching across files
+    "search.exclude": {
+        "**/.venv": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/node_modules": true,
+        "**/.serverless": true
+    },
+
+    // Use old merge conflict editor
+    "git.mergeEditor": false,
+
+    // go settings
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.rulers": [100]
+    },
+    "go.useLanguageServer": true,
+    "gopls": {
+        "formatting.gofumpt": true
+    },
+    // go formatter
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.go$",
+                "cmd": "golines -w -m 100 ${file}"
+            }
+        ]
+    }
+}

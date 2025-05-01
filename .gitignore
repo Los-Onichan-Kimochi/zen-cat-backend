@@ -1,0 +1,15 @@
+# IDE
+**/.vscode/settings.json
+**.log
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+postgres-data/
+redis-data/
+
+# Environments
+**/.env
+**/.venv
+
+# Serverless
+.serverless
