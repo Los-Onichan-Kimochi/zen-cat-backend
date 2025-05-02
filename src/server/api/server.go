@@ -3,16 +3,18 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"onichankimochi.com/zen_cat_backend/src/logging"
+	"onichankimochi.com/zen_cat_backend/src/server/bll/controller"
 	"onichankimochi.com/zen_cat_backend/src/server/schemas"
 )
 
 type Api struct {
-	Logger logging.Logger
-	// BllController *controller.ControllerCollection
-	EnvSettings *schemas.EnvSettings
-	Echo        *echo.Echo
+	Logger        logging.Logger
+	BllController *controller.ControllerCollection
+	EnvSettings   *schemas.EnvSettings
+	Echo          *echo.Echo
 }
 
+// TODO: Stablish a connection to the ZenCat database
 /*
 Creates a new api server with
 - Logger provided by input
@@ -23,7 +25,7 @@ func NewApi(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
 ) *Api {
-	// bllController, levelsPsqlDB := controller.NewControllerCollection(logger, envSettings)
+	// bllController, zenCatPsqlDB := controller.NewControllerCollection(logger, envSettings)
 
 	return &Api{
 		Logger: logger,
@@ -38,6 +40,6 @@ func NewApi(
 // @description ZenCat API sample for clients
 // @BasePath /
 func RunService(envSettings *schemas.EnvSettings, logger logging.Logger) {
-	// api, _ := NewApi(logger, envSettings)
-	// api.RunApi(envSettings)
+	api := NewApi(logger, envSettings)
+	api.RunApi(envSettings)
 }

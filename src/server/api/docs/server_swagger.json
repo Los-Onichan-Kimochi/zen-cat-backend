@@ -1,0 +1,35 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "ZenCat API sample for clients",
+        "title": "ZenCat API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/health-check/": {
+            "get": {
+                "description": "Verify connection in swagger",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health Check"
+                ],
+                "summary": "Health Check",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
