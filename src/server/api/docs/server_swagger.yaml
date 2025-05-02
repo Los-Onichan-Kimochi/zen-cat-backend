@@ -1,0 +1,23 @@
+basePath: /
+info:
+  contact: {}
+  description: ZenCat API sample for clients
+  title: ZenCat API
+  version: "1.0"
+paths:
+  /health-check/:
+    get:
+      consumes:
+      - application/json
+      description: Verify connection in swagger
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Health Check
+      tags:
+      - Health Check
+swagger: "2.0"
