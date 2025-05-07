@@ -4,7 +4,7 @@ import (
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/zen_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	"onichankimochi.com/astro_cat_backend/src/server/utils/psql"
 )

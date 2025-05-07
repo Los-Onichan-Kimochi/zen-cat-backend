@@ -1,7 +1,7 @@
 package adapter
 
 import (
-	daoPostgresql "onichankimochi.com/astro_cat_backend/src/server/dao/zen_cat_psql/controller"
+	daoPostgresql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )

@@ -13,5 +13,5 @@ type Community struct {
 }
 
 func (Community) TableName() string {
-	return "zen_cat_community"
+	return "astro_cat_community"
 }
