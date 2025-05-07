@@ -2,9 +2,9 @@ package controller
 
 import (
 	"gorm.io/gorm"
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	"onichankimochi.com/zen_cat_backend/src/server/bll/adapter"
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 type ControllerCollection struct {
@@ -18,7 +18,7 @@ func NewControllerCollection(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
 ) (*ControllerCollection, *gorm.DB) {
-	bllAdapter, zenCatPsqlDB := adapter.NewAdapterCollection(
+	bllAdapter, astroCatPsqlDB := adapter.NewAdapterCollection(
 		logger,
 		envSettings,
 	)
@@ -28,5 +28,5 @@ func NewControllerCollection(
 		Logger:      logger,
 		EnvSettings: envSettings,
 		Community:   community,
-	}, zenCatPsqlDB
+	}, astroCatPsqlDB
 }

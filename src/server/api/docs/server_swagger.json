@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "ZenCat API sample for clients",
-        "title": "ZenCat API",
+        "description": "AstroCat API sample for clients",
+        "title": "AstroCat API",
         "contact": {},
         "version": "1.0"
     },

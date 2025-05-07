@@ -2,7 +2,7 @@ package controller
 
 import (
 	"gorm.io/gorm"
-	"onichankimochi.com/zen_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
 type Community struct {

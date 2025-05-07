@@ -7,8 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
-	_ "onichankimochi.com/zen_cat_backend/src/server/api/docs" // Import generated swagger docs
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
+	_ "onichankimochi.com/astro_cat_backend/src/server/api/docs" // Import generated swagger docs
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 // HealthCheck 			godoc
@@ -44,6 +44,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	// avatar.GET("/:gameId/:playerId/", a.GetAvatar)
 
 	// Start the server
-	a.Logger.Infoln(fmt.Sprintf("ZenCat server running on port %s", a.EnvSettings.MainPort))
+	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
 	a.Logger.Fatal(a.Echo.Start(fmt.Sprintf(":%s", a.EnvSettings.MainPort)))
 }

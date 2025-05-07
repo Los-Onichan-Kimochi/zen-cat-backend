@@ -1,3 +1,3 @@
-# Zen-Cat-Backend
+# Astro-Cat-Backend
 
-Backend for ZenCat, a platform for managing memberships and services.
+Backend for AstroCat, a platform for managing memberships and services.

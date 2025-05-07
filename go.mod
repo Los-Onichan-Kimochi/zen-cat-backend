@@ -1,4 +1,4 @@
-module onichankimochi.com/zen_cat_backend
+module onichankimochi.com/astro_cat_backend
 
 go 1.23
 

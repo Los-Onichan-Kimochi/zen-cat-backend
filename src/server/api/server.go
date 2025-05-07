@@ -2,9 +2,9 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	"onichankimochi.com/zen_cat_backend/src/server/bll/controller"
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/server/bll/controller"
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 type Api struct {
@@ -14,7 +14,7 @@ type Api struct {
 	Echo          *echo.Echo
 }
 
-// TODO: Stablish a connection to the ZenCat database
+// TODO: Stablish a connection to the AstroCat database
 /*
 Creates a new api server with
 - Logger provided by input
@@ -25,7 +25,7 @@ func NewApi(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
 ) *Api {
-	// bllController, zenCatPsqlDB := controller.NewControllerCollection(logger, envSettings)
+	// bllController, astroCatPsqlDB := controller.NewControllerCollection(logger, envSettings)
 
 	return &Api{
 		Logger: logger,
@@ -35,9 +35,9 @@ func NewApi(
 	}
 }
 
-// @title ZenCat API
+// @title AstroCat API
 // @version 1.0
-// @description ZenCat API sample for clients
+// @description AstroCat API sample for clients
 // @BasePath /
 func RunService(envSettings *schemas.EnvSettings, logger logging.Logger) {
 	api := NewApi(logger, envSettings)

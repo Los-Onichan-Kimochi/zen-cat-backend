@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	bllAdapter "onichankimochi.com/zen_cat_backend/src/server/bll/adapter"
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 type Community struct {

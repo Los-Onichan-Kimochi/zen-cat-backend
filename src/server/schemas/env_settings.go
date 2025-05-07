@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	"onichankimochi.com/zen_cat_backend/src/server/utils/env"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/server/utils/env"
 )
 
 type EnvSettings struct {
@@ -19,12 +19,12 @@ type EnvSettings struct {
 	// Ports
 	MainPort string
 
-	// ZenCat DB
-	ZenCatPostgresHost     string
-	ZenCatPostgresPort     string
-	ZenCatPostgresUser     string
-	ZenCatPostgresPassword string
-	ZenCatPostgresName     string
+	// AstroCat DB
+	AstroCatPostgresHost     string
+	AstroCatPostgresPort     string
+	AstroCatPostgresUser     string
+	AstroCatPostgresPassword string
+	AstroCatPostgresName     string
 }
 
 // Create a new env settings defined on .env file
@@ -50,11 +50,11 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 
 	mainPort := os.Getenv("MAIN_PORT")
 
-	zenCatPostgresHost := os.Getenv("ZEN_CAT_POSTGRES_HOST")
-	zenCatPostgresPort := os.Getenv("ZEN_CAT_POSTGRES_PORT")
-	zenCatPostgresUser := os.Getenv("ZEN_CAT_POSTGRES_USER")
-	zenCatPostgresPassword := os.Getenv("ZEN_CAT_POSTGRES_PASSWORD")
-	zenCatPostgresName := os.Getenv("ZEN_CAT_POSTGRES_NAME")
+	astroCatPostgresHost := os.Getenv("ASTRO_CAT_POSTGRES_HOST")
+	astroCatPostgresPort := os.Getenv("ASTRO_CAT_POSTGRES_PORT")
+	astroCatPostgresUser := os.Getenv("ASTRO_CAT_POSTGRES_USER")
+	astroCatPostgresPassword := os.Getenv("ASTRO_CAT_POSTGRES_PASSWORD")
+	astroCatPostgresName := os.Getenv("ASTRO_CAT_POSTGRES_NAME")
 
 	return &EnvSettings{
 		EnableSqlLogs: enableSqlLogs,
@@ -63,10 +63,10 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 
 		MainPort: mainPort,
 
-		ZenCatPostgresHost:     zenCatPostgresHost,
-		ZenCatPostgresPort:     zenCatPostgresPort,
-		ZenCatPostgresUser:     zenCatPostgresUser,
-		ZenCatPostgresPassword: zenCatPostgresPassword,
-		ZenCatPostgresName:     zenCatPostgresName,
+		AstroCatPostgresHost:     astroCatPostgresHost,
+		AstroCatPostgresPort:     astroCatPostgresPort,
+		AstroCatPostgresUser:     astroCatPostgresUser,
+		AstroCatPostgresPassword: astroCatPostgresPassword,
+		AstroCatPostgresName:     astroCatPostgresName,
 	}
 }

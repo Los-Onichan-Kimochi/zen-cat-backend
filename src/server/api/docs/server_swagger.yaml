@@ -1,8 +1,8 @@
 basePath: /
 info:
   contact: {}
-  description: ZenCat API sample for clients
-  title: ZenCat API
+  description: AstroCat API sample for clients
+  title: AstroCat API
   version: "1.0"
 paths:
   /health-check/:

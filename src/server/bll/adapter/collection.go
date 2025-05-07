@@ -1,11 +1,11 @@
 package adapter
 
 import (
-	daoPostgresql "onichankimochi.com/zen_cat_backend/src/server/dao/zen_cat_psql/controller"
+	daoPostgresql "onichankimochi.com/astro_cat_backend/src/server/dao/zen_cat_psql/controller"
 
 	"gorm.io/gorm"
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 type AdapterCollection struct {
@@ -18,9 +18,9 @@ func NewAdapterCollection(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
 ) (*AdapterCollection, *gorm.DB) {
-	daoZenCatPsql, zenCatPsqlDB := daoPostgresql.NewZenCatPsqlCollection(logger, envSettings)
+	daoAstroCatPsql, astroCatPsqlDB := daoPostgresql.NewAstroCatPsqlCollection(logger, envSettings)
 
 	return &AdapterCollection{
-		Community: NewCommunityAdapter(logger, daoZenCatPsql),
-	}, zenCatPsqlDB
+		Community: NewCommunityAdapter(logger, daoAstroCatPsql),
+	}, astroCatPsqlDB
 }

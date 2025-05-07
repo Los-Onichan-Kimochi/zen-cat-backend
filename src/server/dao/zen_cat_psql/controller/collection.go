@@ -3,36 +3,36 @@ package controller
 import (
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/gorm"
-	"onichankimochi.com/zen_cat_backend/src/logging"
-	"onichankimochi.com/zen_cat_backend/src/server/dao/zen_cat_psql/model"
-	"onichankimochi.com/zen_cat_backend/src/server/schemas"
-	"onichankimochi.com/zen_cat_backend/src/server/utils/psql"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/zen_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils/psql"
 )
 
-type ZenCatPsqlCollection struct {
+type AstroCatPsqlCollection struct {
 	Logger    logging.Logger
 	Community *Community
 }
 
 // Create dao controller collection
-func NewZenCatPsqlCollection(
+func NewAstroCatPsqlCollection(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
-) (*ZenCatPsqlCollection, *gorm.DB) {
+) (*AstroCatPsqlCollection, *gorm.DB) {
 	postgresqlDB, err := psql.CreateConnection(
-		envSettings.ZenCatPostgresHost,
-		envSettings.ZenCatPostgresUser,
-		envSettings.ZenCatPostgresPassword,
-		envSettings.ZenCatPostgresName,
-		envSettings.ZenCatPostgresPort,
+		envSettings.AstroCatPostgresHost,
+		envSettings.AstroCatPostgresUser,
+		envSettings.AstroCatPostgresPassword,
+		envSettings.AstroCatPostgresName,
+		envSettings.AstroCatPostgresPort,
 		envSettings.EnableSqlLogs,
 	)
 	if err != nil {
-		logger.Panicln("Failed to connect to ZenCat Postgresql database")
+		logger.Panicln("Failed to connect to AstroCat Postgresql database")
 	}
 
 	if err := postgresqlDB.Use(otelgorm.NewPlugin()); err != nil {
-		logger.Panicln("Failed to instrument ZenCat Postgresql database")
+		logger.Panicln("Failed to instrument AstroCat Postgresql database")
 	}
 
 	// Create Community table
@@ -40,7 +40,7 @@ func NewZenCatPsqlCollection(
 		panic(err)
 	}
 
-	return &ZenCatPsqlCollection{
+	return &AstroCatPsqlCollection{
 		Logger:    logger,
 		Community: NewCommunityController(logger, postgresqlDB),
 	}, postgresqlDB
