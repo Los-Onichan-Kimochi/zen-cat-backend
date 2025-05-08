@@ -1,4 +1,4 @@
-package schemas
+package errors
 
 import (
 	"net/http"
@@ -24,19 +24,26 @@ var (
 	}
 
 	// For 422 Unprocessable Entity errors
-	UnprocessableEntityError = struct{}{}
+	UnprocessableEntityError = struct {
+		InvalidCommunityId Error
+		InvalidRequestBody Error
+	}{
+		InvalidRequestBody: Error{
+			Code:    "REQUEST_ERROR_001",
+			Message: "Invalid body request",
+		},
+		InvalidCommunityId: Error{
+			Code:    "COMMUNITY_ERROR_004",
+			Message: "Invalid community id",
+		},
+	}
 
 	// For 400 Bad Request errors
 	BadRequestError = struct {
-		InvalidRequest        Error
 		InvalidUpdatedByValue Error
 		CommunityNotCreated   Error
 		CommunityNotUpdated   Error
 	}{
-		InvalidRequest: Error{
-			Code:    "REQUEST_ERROR_001",
-			Message: "Invalid request error",
-		},
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
 			Message: "Invalid updated by value error",
