@@ -39,9 +39,11 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck.GET("/", a.HealthCheck)
 
 	// Add new endpoint groups here...
-	// avatar := a.Echo.Group("/avatar")
-	// avatar.POST("/save/", a.SaveAvatar)
-	// avatar.GET("/:gameId/:playerId/", a.GetAvatar)
+	community := a.Echo.Group("/community")
+	community.GET("/:communityId/", a.GetCommunity)
+	community.GET("/", a.FetchCommunities)
+	community.PUT("/", a.CreateCommunity)
+	community.PATCH("/:communityId/", a.UpdateCommunity)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
