@@ -15,7 +15,8 @@ type Error struct {
 var (
 	// For 404 Not Found errors
 	ObjectNotFoundError = struct {
-		CommunityNotFound Error
+		CommunityNotFound   Error
+		ReservationNotFound Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
