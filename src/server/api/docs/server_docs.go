@@ -15,6 +15,131 @@ const docTemplateserver = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/community/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all communities, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Fetch Communities.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Communities"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Create the community information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Create Community.",
+                "parameters": [
+                    {
+                        "description": "Create Community Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Community"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/community/{communityId}/": {
             "get": {
                 "security": [
@@ -32,7 +157,7 @@ const docTemplateserver = `{
                 "tags": [
                     "Community"
                 ],
-                "summary": "Get Community",
+                "summary": "Get Community.",
                 "parameters": [
                     {
                         "type": "string",
@@ -52,31 +177,100 @@ const docTemplateserver = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Error"
+                            "$ref": "#/definitions/errors.Error"
                         }
                     },
                     "401": {
                         "description": "Missing or malformed JWT",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Error"
+                            "$ref": "#/definitions/errors.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Error"
+                            "$ref": "#/definitions/errors.Error"
                         }
                     },
                     "422": {
                         "description": "Unprocessable Entity",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Error"
+                            "$ref": "#/definitions/errors.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Error"
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community/{comunityId}/": {
+            "patch": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Update the community information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Update Community.",
+                "parameters": [
+                    {
+                        "description": "Update Community Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UpdateCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Community"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
                         }
                     }
                 }
@@ -107,6 +301,28 @@ const docTemplateserver = `{
         }
     },
     "definitions": {
+        "errors.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Communities": {
+            "type": "object",
+            "properties": {
+                "communities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Community"
+                    }
+                }
+            }
+        },
         "schemas.Community": {
             "type": "object",
             "properties": {
@@ -127,13 +343,30 @@ const docTemplateserver = `{
                 }
             }
         },
-        "schemas.Error": {
+        "schemas.CreateCommunityRequest": {
             "type": "object",
             "properties": {
-                "code": {
+                "image_url": {
                     "type": "string"
                 },
-                "message": {
+                "name": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.UpdateCommunityRequest": {
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "purpose": {
                     "type": "string"
                 }
             }

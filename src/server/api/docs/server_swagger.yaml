@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  errors.Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  schemas.Communities:
+    properties:
+      communities:
+        items:
+          $ref: '#/definitions/schemas.Community'
+        type: array
+    type: object
   schemas.Community:
     properties:
       id:
@@ -13,11 +27,22 @@ definitions:
       purpose:
         type: string
     type: object
-  schemas.Error:
+  schemas.CreateCommunityRequest:
     properties:
-      code:
+      image_url:
         type: string
-      message:
+      name:
+        type: string
+      purpose:
+        type: string
+    type: object
+  schemas.UpdateCommunityRequest:
+    properties:
+      image_url:
+        type: string
+      name:
+        type: string
+      purpose:
         type: string
     type: object
 info:
@@ -26,6 +51,86 @@ info:
   title: AstroCat API
   version: "1.0"
 paths:
+  /community/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all communities, filtered by params.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Communities'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Communities.
+      tags:
+      - Community
+    post:
+      consumes:
+      - application/json
+      description: Create the community information.
+      parameters:
+      - description: Create Community Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Community'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Community.
+      tags:
+      - Community
   /community/{communityId}/:
     get:
       consumes:
@@ -47,26 +152,70 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/schemas.Error'
+            $ref: '#/definitions/errors.Error'
         "401":
           description: Missing or malformed JWT
           schema:
-            $ref: '#/definitions/schemas.Error'
+            $ref: '#/definitions/errors.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/schemas.Error'
+            $ref: '#/definitions/errors.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/schemas.Error'
+            $ref: '#/definitions/errors.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/schemas.Error'
+            $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Get Community
+      summary: Get Community.
+      tags:
+      - Community
+  /community/{comunityId}/:
+    patch:
+      consumes:
+      - application/json
+      description: Update the community information.
+      parameters:
+      - description: Update Community Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Community'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Community.
       tags:
       - Community
   /health-check/:
