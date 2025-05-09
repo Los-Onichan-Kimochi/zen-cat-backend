@@ -42,7 +42,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)
 	community.GET("/", a.FetchCommunities)
-	community.PUT("/", a.CreateCommunity)
+	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
 
 	// Start the server

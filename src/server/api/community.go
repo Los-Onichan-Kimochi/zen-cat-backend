@@ -96,6 +96,7 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
+// @Param               communityId    path   string  true  "Community ID"
 // @Param               request body schemas.UpdateCommunityRequest true "Update Community Request"
 // @Success 			200 {object} schemas.Community "Ok"
 // @Failure 			400 {object} errors.Error "Bad Request"
@@ -103,7 +104,7 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 // @Failure 			404 {object} errors.Error "Not Found"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community/{comunityId}/ [patch]
+// @Router 				/community/{communityId}/ [patch]
 func (a *Api) UpdateCommunity(c echo.Context) error {
 	// TODO: Add access token validation (from here we will get the `updatedBy` param)
 	updatedBy := "ADMIN"

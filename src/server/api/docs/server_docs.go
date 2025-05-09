@@ -205,9 +205,7 @@ const docTemplateserver = `{
                         }
                     }
                 }
-            }
-        },
-        "/community/{comunityId}/": {
+            },
             "patch": {
                 "security": [
                     {
@@ -226,6 +224,13 @@ const docTemplateserver = `{
                 ],
                 "summary": "Update Community.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "Update Community Request",
                         "name": "request",

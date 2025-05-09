@@ -174,12 +174,16 @@ paths:
       summary: Get Community.
       tags:
       - Community
-  /community/{comunityId}/:
     patch:
       consumes:
       - application/json
       description: Update the community information.
       parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
       - description: Update Community Request
         in: body
         name: request
