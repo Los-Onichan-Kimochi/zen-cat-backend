@@ -4,7 +4,8 @@ import (
 	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
-	"onichankimochi.com/astro_cat_backend/src/server/schemas"
+	errors "onichankimochi.com/astro_cat_backend/src/server/errors"
+	schemas "onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
 type Community struct {
@@ -26,28 +27,47 @@ func NewCommunityController(
 	}
 }
 
-// Creates a community.
-func (c *Community) CreateCommunity(community *schemas.Community, updatedBy string) *schemas.Error {
-	return c.Adapter.Community.CreatePostgresqlCommunity(community, updatedBy)
-}
-
 // Gets a community.
-func (c *Community) GetCommunity(id uuid.UUID) (*schemas.Community, *schemas.Error) {
-	return c.Adapter.Community.GetPostgresqlCommunity(id)
+func (c *Community) GetCommunity(communityId uuid.UUID) (*schemas.Community, *errors.Error) {
+	return c.Adapter.Community.GetPostgresqlCommunity(communityId)
 }
 
 // Fetch all communities.
-func (c *Community) FetchCommunities() ([]*schemas.Community, *schemas.Error) {
-	return c.Adapter.Community.FetchPostgresqlCommunities()
+func (c *Community) FetchCommunities() (*schemas.Communities, *errors.Error) {
+	communities, err := c.Adapter.Community.FetchPostgresqlCommunities()
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Communities{Communities: communities}, nil
+}
+
+// Creates a community.
+func (c *Community) CreateCommunity(
+	createCommunityData schemas.CreateCommunityRequest,
+	updatedBy string,
+) (*schemas.Community, *errors.Error) {
+	return c.Adapter.Community.CreatePostgresqlCommunity(
+		createCommunityData.Name,
+		createCommunityData.Purpose,
+		createCommunityData.ImageUrl,
+		updatedBy,
+	)
 }
 
 // Updates a community.
 func (c *Community) UpdateCommunity(
-	id uuid.UUID,
-	name *string,
-	purpose *string,
-	imageUrl *string,
+	communityId uuid.UUID,
+	updateCommunityData schemas.UpdateCommunityRequest,
 	updatedBy string,
-) *schemas.Error {
-	return c.Adapter.Community.UpdatePostgresqlCommunity(id, name, purpose, imageUrl, updatedBy)
+) (*schemas.Community, *errors.Error) {
+	return c.Adapter.Community.UpdatePostgresqlCommunity(
+		communityId,
+		updateCommunityData.Name,
+		updateCommunityData.Purpose,
+		updateCommunityData.ImageUrl,
+		updatedBy,
+	)
 }
+
+// TODO: Add BulkCreateCommunities (Batch)

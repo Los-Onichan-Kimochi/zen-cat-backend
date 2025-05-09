@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 )
@@ -20,16 +21,11 @@ func NewCommunityController(logger logging.Logger, postgresqlDB *gorm.DB) *Commu
 	}
 }
 
-// Creates a community given its model.
-func (p *Community) CreateCommunity(community *model.Community) error {
-	return p.PostgresqlDB.Create(community).Error
-}
-
 // Gets a community model given params.
-func (p *Community) GetCommunity(id uuid.UUID) (*model.Community, error) {
+func (c *Community) GetCommunity(communityId uuid.UUID) (*model.Community, error) {
 	community := &model.Community{}
 
-	result := p.PostgresqlDB.Where(id).Find(&community)
+	result := c.PostgresqlDB.First(&community, "id = ?", communityId)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -37,12 +33,12 @@ func (p *Community) GetCommunity(id uuid.UUID) (*model.Community, error) {
 	return community, nil
 }
 
-// TODO: Add sorting.
+// TODO: Add filters and sorting.
 // Fetch all communities.
-func (p *Community) FetchCommunities() ([]*model.Community, error) {
+func (c *Community) FetchCommunities() ([]*model.Community, error) {
 	communities := []*model.Community{}
 
-	result := p.PostgresqlDB.Find(&communities)
+	result := c.PostgresqlDB.Find(&communities)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -50,19 +46,21 @@ func (p *Community) FetchCommunities() ([]*model.Community, error) {
 	return communities, nil
 }
 
+// Creates a community given its model.
+func (c *Community) CreateCommunity(community *model.Community) error {
+	return c.PostgresqlDB.Create(community).Error
+}
+
 // Updates community given fields to update.
-func (r *Community) UpdateCommunity(
+func (c *Community) UpdateCommunity(
 	id uuid.UUID,
 	name *string,
 	purpose *string,
 	imageUrl *string,
 	updatedBy string,
-) error {
-	updateFields := map[string]any{}
-
-	// Check if there are any fields to update
-	if len(updateFields) == 0 {
-		return nil
+) (*model.Community, error) {
+	updateFields := map[string]any{
+		"updated_by": updatedBy,
 	}
 
 	if name != nil {
@@ -75,7 +73,27 @@ func (r *Community) UpdateCommunity(
 		updateFields["image_url"] = *imageUrl
 	}
 
-	updateFields["updated_by"] = updatedBy
+	// Check if there are any fields to update
+	var community model.Community
+	if len(updateFields) == 1 {
+		if err := c.PostgresqlDB.First(&community, "id = ?", id).Error; err != nil {
+			return nil, err
+		}
 
-	return r.PostgresqlDB.Model(&model.Community{}).Where(id).Updates(updateFields).Error
+		return &community, nil
+	}
+
+	// Perform the update and return the model
+	result := c.PostgresqlDB.Model(&community).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Updates(updateFields)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	return &community, nil
 }
