@@ -21,6 +21,6 @@ test-go:
 run:
 	cd src/server && go run main.go
 
-# Swagger
-swag-server:
+# Swagger documentation
+swag-docs:
 	cd src/server/api && swag init -g server.go --instanceName server --parseDependency --parseDepth 1
