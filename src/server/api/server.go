@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/bll/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
@@ -14,9 +15,8 @@ type Api struct {
 	Echo          *echo.Echo
 }
 
-// TODO: Stablish a connection to the AstroCat database
 /*
-Creates a new api server with
+Creates a new Api server with
 - Logger provided by input
 - BllController as new bll controller collection
 - EnvSettings as new env settings provided by .env file
@@ -24,15 +24,15 @@ Creates a new api server with
 func NewApi(
 	logger logging.Logger,
 	envSettings *schemas.EnvSettings,
-) *Api {
-	// bllController, astroCatPsqlDB := controller.NewControllerCollection(logger, envSettings)
+) (*Api, *gorm.DB) {
+	bllController, astroCatPsqlDB := controller.NewControllerCollection(logger, envSettings)
 
 	return &Api{
-		Logger: logger,
-		// BllController: bllController,
-		EnvSettings: envSettings,
-		Echo:        echo.New(),
-	}
+		Logger:        logger,
+		BllController: bllController,
+		EnvSettings:   envSettings,
+		Echo:          echo.New(),
+	}, astroCatPsqlDB
 }
 
 // @title AstroCat API
@@ -40,6 +40,6 @@ func NewApi(
 // @description AstroCat API sample for clients
 // @BasePath /
 func RunService(envSettings *schemas.EnvSettings, logger logging.Logger) {
-	api := NewApi(logger, envSettings)
+	api, _ := NewApi(logger, envSettings)
 	api.RunApi(envSettings)
 }

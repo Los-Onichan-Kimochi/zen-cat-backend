@@ -6,7 +6,7 @@ init-vscode:
 # Set up database
 set-up-db:
 	docker compose down && \
-	docker compose up -d server-postgres
+	docker compose up -d astro-cat-postgres
 	cd src/server/ && go run tests/commands/clear_database.go
 
 # Test commands
@@ -21,6 +21,6 @@ test-go:
 run:
 	cd src/server && go run main.go
 
-# Swagger
-swag-server:
+# Swagger documentation
+swag-docs:
 	cd src/server/api && swag init -g server.go --instanceName server --parseDependency --parseDepth 1

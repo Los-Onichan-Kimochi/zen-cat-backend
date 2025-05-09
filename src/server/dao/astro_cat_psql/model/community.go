@@ -5,11 +5,12 @@ import (
 )
 
 type Community struct {
-	Id          uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Name        string
-	Description string
-	ImageUrl    string
-	// Add Audit fields
+	Id                  uuid.UUID `gorm:"type:uuid;primaryKey"`
+	Name                string
+	Purpose             string
+	ImageUrl            string
+	NumberSubscriptions int
+	AuditFields
 }
 
 func (Community) TableName() string {
