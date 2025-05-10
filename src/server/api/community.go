@@ -9,7 +9,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
-// @Summary 			Get Community.
+// @Summary 			Get Community
 // @Description 		Gets a community given its id.
 // @Tags 				Community
 // @Accept 				json
