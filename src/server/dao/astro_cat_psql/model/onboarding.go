@@ -21,4 +21,11 @@ type Onboarding struct {
 	Region         string
 	Reference      string
 	AuditFields
+
+	UserId uuid.UUID `gorm:"type:uuid;unique"`
+	User   User      `gorm:"foreignKey:UserId"`
+}
+
+func (Onboarding) TableName() string {
+	return "astro_cat_onboarding"
 }

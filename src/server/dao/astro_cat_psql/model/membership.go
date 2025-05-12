@@ -22,9 +22,12 @@ type Membership struct {
 	Status      MembershipStatus
 	AuditFields
 
-	CommunityId uuid.UUID `gorm:"type:uuid;foreignKey:CommunityId"`
-	UserId      uuid.UUID `gorm:"type:uuid;foreignKey:UserId"`
-	PlanId      uuid.UUID `gorm:"type:uuid;foreignKey:PlanId"`
+	CommunityId uuid.UUID `gorm:"type:uuid"`
+	Community   Community `gorm:"foreignKey:CommunityId;constraint:OnUpdate:CASCADE;"`
+	UserId      uuid.UUID `gorm:"type:uuid"`
+	User        User      `gorm:"foreignKey:UserId;constraint:OnUpdate:CASCADE;"`
+	PlanId      uuid.UUID `gorm:"type:uuid"`
+	Plan        Plan      `gorm:"foreignKey:PlanId;constraint:OnUpdate:CASCADE;"`
 }
 
 func (Membership) TableName() string {

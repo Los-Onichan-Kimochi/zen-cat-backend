@@ -20,8 +20,7 @@ type User struct {
 	ImageUrl       string
 	AuditFields
 
-	OnboardingId *uuid.UUID  `gorm:"type:uuid"`
-	Onboarding   *Onboarding `gorm:"foreignKey:OnboardingId"`
+	Onboarding *Onboarding `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (User) TableName() string {

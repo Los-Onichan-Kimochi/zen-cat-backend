@@ -8,10 +8,10 @@ type Service struct {
 	Description string
 	ImageUrl    string
 	IsVirtual   bool
+	AuditFields
 
 	Locals        []Local        `gorm:"many2many:astro_cat_service_local;"`
 	Professionals []Professional `gorm:"many2many:astro_cat_service_professional;"`
-	AuditFields
 }
 
 func (Service) TableName() string {

@@ -22,8 +22,7 @@ type Professional struct {
 	ImageUrl       string
 	AuditFields
 
-	TemplateId *uuid.UUID `gorm:"type:uuid"`
-	Template   *Template  `gorm:"foreignKey:TemplateId"`
+	Template *Template `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 func (Professional) TableName() string {

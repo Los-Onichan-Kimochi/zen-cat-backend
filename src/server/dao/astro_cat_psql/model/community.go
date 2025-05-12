@@ -11,6 +11,8 @@ type Community struct {
 	ImageUrl            string
 	NumberSubscriptions int
 	AuditFields
+
+	Services []Service `gorm:"many2many:astro_cat_community_service;"`
 }
 
 func (Community) TableName() string {

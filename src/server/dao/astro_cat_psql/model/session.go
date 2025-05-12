@@ -28,8 +28,10 @@ type Session struct {
 	SessionLink     *string
 	AuditFields
 
-	ProfessionalId uuid.UUID  `gorm:"type:uuid;foreignKey:ProfessionalId"`
-	LocalId        *uuid.UUID `gorm:"type:uuid;foreignKey:LocalId"`
+	ProfessionalId uuid.UUID    `gorm:"type:uuid"`
+	Professional   Professional `gorm:"foreignKey:ProfessionalId"`
+	LocalId        *uuid.UUID   `gorm:"type:uuid"`
+	Local          *Local       `gorm:"foreignKey:LocalId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Session) TableName() string {
