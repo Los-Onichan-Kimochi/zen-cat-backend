@@ -35,13 +35,47 @@ func NewAstroCatPsqlCollection(
 		logger.Panicln("Failed to instrument AstroCat Postgresql database")
 	}
 
-	// Create Community table
-	if err := postgresqlDB.AutoMigrate(&model.Community{}); err != nil {
-		panic(err)
-	}
+	createTables(postgresqlDB)
 
 	return &AstroCatPsqlCollection{
 		Logger:    logger,
 		Community: NewCommunityController(logger, postgresqlDB),
 	}, postgresqlDB
+}
+
+// Helper function to create AstroCat tables
+func createTables(astroCatPsqlDB *gorm.DB) {
+	if err := astroCatPsqlDB.AutoMigrate(&model.Plan{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Template{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Local{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Professional{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Onboarding{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.User{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Community{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Membership{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Service{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Session{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.Reservation{}); err != nil {
+		panic(err)
+	}
 }
