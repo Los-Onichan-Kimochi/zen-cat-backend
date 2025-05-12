@@ -14,7 +14,7 @@ type Professional struct {
 	Id             uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Name           string
 	FirstLastName  string
-	SecondLastName *string
+	SecondLastName string
 	Specialty      string
 	Email          string
 	PhoneNumber    string

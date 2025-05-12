@@ -9,8 +9,9 @@ import (
 )
 
 type AdapterCollection struct {
-	Logger    logging.Logger
-	Community *Community
+	Logger       logging.Logger
+	Community    *Community
+	Professional *Professional
 }
 
 // Create bll adapter collection
