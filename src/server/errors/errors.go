@@ -16,16 +16,11 @@ var (
 	// For 404 Not Found errors
 	ObjectNotFoundError = struct {
 		CommunityNotFound    Error
-		ReservationNotFound  Error
 		ProfessionalNotFound Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
 			Message: "Community not found",
-		},
-		ReservationNotFound: Error{
-			Code:    "RESERVATION_ERROR_001",
-			Message: "Reservation not found",
 		},
 		ProfessionalNotFound: Error{
 			Code:    "PROFESSIONAL_ERROR_001",

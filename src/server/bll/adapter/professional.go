@@ -15,6 +15,7 @@ type Professional struct {
 	DaoPostgresql *daoPostgresql.AstroCatPsqlCollection
 }
 
+// Creates Professional adapter
 func NewProfessionalAdapter(
 	logger logging.Logger,
 	daoPostgresql *daoPostgresql.AstroCatPsqlCollection,
@@ -25,6 +26,7 @@ func NewProfessionalAdapter(
 	}
 }
 
+// Gets a professional from postgresql DB.
 func (p *Professional) GetPostgresqlProfessional(
 	professionalId uuid.UUID,
 ) (*schemas.Professional, *errors.Error) {
@@ -32,6 +34,7 @@ func (p *Professional) GetPostgresqlProfessional(
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.ProfessionalNotFound
 	}
+
 	return &schemas.Professional{
 		Id:             professionalModel.Id,
 		Name:           professionalModel.Name,
@@ -45,6 +48,7 @@ func (p *Professional) GetPostgresqlProfessional(
 	}, nil
 }
 
+// Fetch all professionals from postgresql DB.
 func (p *Professional) FetchPostgresqlProfessionals() ([]*schemas.Professional, *errors.Error) {
 	professionalsModel, err := p.DaoPostgresql.Professional.FetchProfessionals()
 	if err != nil {
@@ -72,7 +76,7 @@ func (p *Professional) FetchPostgresqlProfessionals() ([]*schemas.Professional, 
 func (p *Professional) CreatePostgresqlProfessional(
 	name string,
 	firstLastName string,
-	secondLastName string,
+	secondLastName *string,
 	specialty string,
 	email string,
 	phoneNumber string,

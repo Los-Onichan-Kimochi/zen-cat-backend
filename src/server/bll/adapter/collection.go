@@ -22,6 +22,7 @@ func NewAdapterCollection(
 	daoAstroCatPsql, astroCatPsqlDB := daoPostgresql.NewAstroCatPsqlCollection(logger, envSettings)
 
 	return &AdapterCollection{
-		Community: NewCommunityAdapter(logger, daoAstroCatPsql),
+		Community:    NewCommunityAdapter(logger, daoAstroCatPsql),
+		Professional: NewProfessionalAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }

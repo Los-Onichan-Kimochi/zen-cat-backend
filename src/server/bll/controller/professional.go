@@ -47,10 +47,14 @@ func (p *Professional) CreateProfessional(
 	createProfessionalData schemas.CreateProfessionalRequest,
 	updatedBy string,
 ) (*schemas.Professional, *errors.Error) {
+	var secondLastName *string
+	if createProfessionalData.SecondLastName != "" {
+		secondLastName = &createProfessionalData.SecondLastName
+	}
 	return p.Adapter.Professional.CreatePostgresqlProfessional(
 		createProfessionalData.Name,
 		createProfessionalData.FirstLastName,
-		createProfessionalData.SecondLastName,
+		secondLastName,
 		createProfessionalData.Specialty,
 		createProfessionalData.Email,
 		createProfessionalData.PhoneNumber,
