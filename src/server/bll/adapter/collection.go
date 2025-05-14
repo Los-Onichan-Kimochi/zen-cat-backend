@@ -9,8 +9,9 @@ import (
 )
 
 type AdapterCollection struct {
-	Logger    logging.Logger
-	Community *Community
+	Logger       logging.Logger
+	Community    *Community
+	Professional *Professional
 }
 
 // Create bll adapter collection
@@ -21,6 +22,7 @@ func NewAdapterCollection(
 	daoAstroCatPsql, astroCatPsqlDB := daoPostgresql.NewAstroCatPsqlCollection(logger, envSettings)
 
 	return &AdapterCollection{
-		Community: NewCommunityAdapter(logger, daoAstroCatPsql),
+		Community:    NewCommunityAdapter(logger, daoAstroCatPsql),
+		Professional: NewProfessionalAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }
