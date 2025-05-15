@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type UserRol string
 
 const (
-	UserRolAdmin  UserRol = "ADMIN"
+	UserRolAdmin  UserRol = "ADMINISTRATOR"
 	UserRolClient UserRol = "CLIENT"
 )
 
@@ -20,7 +20,8 @@ type User struct {
 	ImageUrl       string
 	AuditFields
 
-	Onboarding *Onboarding `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Onboarding  *Onboarding   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Memberships []*Membership `gorm:"many2many:astro_cat_user_membership;"`
 }
 
 func (User) TableName() string {

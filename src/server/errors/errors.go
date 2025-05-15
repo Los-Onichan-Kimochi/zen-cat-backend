@@ -17,6 +17,7 @@ var (
 	ObjectNotFoundError = struct {
 		CommunityNotFound    Error
 		ProfessionalNotFound Error
+		UserNotFound         Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -26,6 +27,10 @@ var (
 			Code:    "PROFESSIONAL_ERROR_001",
 			Message: "Professional not found",
 		},
+		UserNotFound: Error{
+			Code:    "USER_ERROR_001",
+			Message: "User not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
@@ -33,6 +38,10 @@ var (
 		InvalidCommunityId    Error
 		InvalidRequestBody    Error
 		InvalidProfessionalId Error
+		InvalidMembershipId   Error
+		InvalidOnboardingId   Error
+		InvalidUserEmail      Error
+		InvalidUserId         Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -46,6 +55,22 @@ var (
 			Code:    "PROFESSIONAL_ERROR_004",
 			Message: "Invalid professional id",
 		},
+		InvalidMembershipId: Error{
+			Code:    "MEMBERSHIP_ERROR_001",
+			Message: "Invalid membership id",
+		},
+		InvalidOnboardingId: Error{
+			Code:    "ONBOARDING_ERROR_001",
+			Message: "Invalid onboarding id",
+		},
+		InvalidUserEmail: Error{
+			Code:    "USER_ERROR_001",
+			Message: "Invalid user email",
+		},
+		InvalidUserId: Error{
+			Code:    "USER_ERROR_004",
+			Message: "Invalid user id",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -55,6 +80,12 @@ var (
 		CommunityNotUpdated    Error
 		ProfessionalNotCreated Error
 		ProfessionalNotUpdated Error
+		MembershipNotCreated   Error
+		MembershipNotUpdated   Error
+		OnboardingNotCreated   Error
+		OnboardingNotUpdated   Error
+		UserNotCreated         Error
+		UserNotUpdated         Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -75,6 +106,30 @@ var (
 		ProfessionalNotUpdated: Error{
 			Code:    "PROFESSIONAL_ERROR_003",
 			Message: "Professional not updated",
+		},
+		MembershipNotCreated: Error{
+			Code:    "MEMBERSHIP_ERROR_002",
+			Message: "Membership not created",
+		},
+		MembershipNotUpdated: Error{
+			Code:    "MEMBERSHIP_ERROR_003",
+			Message: "Membership not updated",
+		},
+		OnboardingNotCreated: Error{
+			Code:    "ONBOARDING_ERROR_002",
+			Message: "Onboarding not created",
+		},
+		OnboardingNotUpdated: Error{
+			Code:    "ONBOARDING_ERROR_003",
+			Message: "Onboarding not updated",
+		},
+		UserNotCreated: Error{
+			Code:    "USER_ERROR_002",
+			Message: "User not created",
+		},
+		UserNotUpdated: Error{
+			Code:    "USER_ERROR_003",
+			Message: "User not updated",
 		},
 	}
 
