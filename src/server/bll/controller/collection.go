@@ -8,11 +8,11 @@ import (
 )
 
 type ControllerCollection struct {
-	Logger      logging.Logger
-	EnvSettings *schemas.EnvSettings
-	Community   *Community
+	Logger       logging.Logger
+	EnvSettings  *schemas.EnvSettings
+	Community    *Community
 	Professional *Professional
-	Service	 	*Service
+	Service      *Service
 }
 
 // Create bll controller collection
@@ -29,10 +29,10 @@ func NewControllerCollection(
 	service := NewServiceController(logger, bllAdapter, envSettings)
 
 	return &ControllerCollection{
-		Logger:      logger,
-		EnvSettings: envSettings,
-		Community:   community,
+		Logger:       logger,
+		EnvSettings:  envSettings,
+		Community:    community,
 		Professional: professional,
-		Service:    service,
+		Service:      service,
 	}, astroCatPsqlDB
 }
