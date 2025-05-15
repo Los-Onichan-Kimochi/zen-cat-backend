@@ -32,6 +32,31 @@ func (u *User) GetPostgresqlUser(
 		return nil, &errors.ObjectNotFoundError.UserNotFound
 	}
 
+	// Mapear memberships
+	var memberships []*schemas.Membership
+	for _, m := range userModel.Memberships {
+		memberships = append(memberships, &schemas.Membership{
+			Id:          m.Id,
+			Description: m.Description,
+			StartDate:   m.StartDate,
+			EndDate:     m.EndDate,
+			Status:      schemas.MembershipStatus(m.Status),
+			Community: schemas.Community{
+				Id:                  m.Community.Id,
+				Name:                m.Community.Name,
+				Purpose:             m.Community.Purpose,
+				ImageUrl:            m.Community.ImageUrl,
+				NumberSubscriptions: m.Community.NumberSubscriptions,
+			},
+			Plan: schemas.Plan{
+				Id:               m.Plan.Id,
+				Fee:              m.Plan.Fee,
+				Type:             schemas.PlanType(m.Plan.Type),
+				ReservationLimit: m.Plan.ReservationLimit,
+			},
+		})
+	}
+
 	return &schemas.User{
 		Id:             userModel.Id,
 		Name:           userModel.Name,
@@ -41,6 +66,7 @@ func (u *User) GetPostgresqlUser(
 		Email:          userModel.Email,
 		Rol:            schemas.UserRol(userModel.Rol),
 		ImageUrl:       userModel.ImageUrl,
+		Memberships:    memberships,
 	}, nil
 }
 
@@ -52,6 +78,29 @@ func (u *User) FetchPostgresqlUsers() ([]*schemas.User, *errors.Error) {
 
 	users := make([]*schemas.User, len(usersModel))
 	for i, userModel := range usersModel {
+		var memberships []*schemas.Membership
+		for _, m := range userModel.Memberships {
+			memberships = append(memberships, &schemas.Membership{
+				Id:          m.Id,
+				Description: m.Description,
+				StartDate:   m.StartDate,
+				EndDate:     m.EndDate,
+				Status:      schemas.MembershipStatus(m.Status),
+				Community: schemas.Community{
+					Id:                  m.Community.Id,
+					Name:                m.Community.Name,
+					Purpose:             m.Community.Purpose,
+					ImageUrl:            m.Community.ImageUrl,
+					NumberSubscriptions: m.Community.NumberSubscriptions,
+				},
+				Plan: schemas.Plan{
+					Id:               m.Plan.Id,
+					Fee:              m.Plan.Fee,
+					Type:             schemas.PlanType(m.Plan.Type),
+					ReservationLimit: m.Plan.ReservationLimit,
+				},
+			})
+		}
 		users[i] = &schemas.User{
 			Id:             userModel.Id,
 			Name:           userModel.Name,
@@ -61,6 +110,7 @@ func (u *User) FetchPostgresqlUsers() ([]*schemas.User, *errors.Error) {
 			Email:          userModel.Email,
 			Rol:            schemas.UserRol(userModel.Rol),
 			ImageUrl:       userModel.ImageUrl,
+			Memberships:    memberships,
 		}
 	}
 

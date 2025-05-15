@@ -22,7 +22,11 @@ func NewUserController(logger logging.Logger, postgresqlDB *gorm.DB) *User {
 
 func (u *User) GetUser(userId uuid.UUID) (*model.User, error) {
 	user := &model.User{}
-	result := u.PostgresqlDB.First(&user, "id = ?", userId)
+	result := u.PostgresqlDB.
+		Preload("Memberships").
+		Preload("Memberships.Community").
+		Preload("Memberships.Plan").
+		First(&user, "id = ?", userId)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -32,7 +36,11 @@ func (u *User) GetUser(userId uuid.UUID) (*model.User, error) {
 
 func (u *User) FetchUsers() ([]*model.User, error) {
 	users := []*model.User{}
-	result := u.PostgresqlDB.Find(&users)
+	result := u.PostgresqlDB.
+		Preload("Memberships").
+		Preload("Memberships.Community").
+		Preload("Memberships.Plan").
+		Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
 	}

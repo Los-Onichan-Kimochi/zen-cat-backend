@@ -56,6 +56,7 @@ func (u *User) CreateUser(
 		createUserRequest.Email,
 		createUserRequest.Rol,
 		createUserRequest.ImageUrl,
+
 		updatedBy,
 	)
 }

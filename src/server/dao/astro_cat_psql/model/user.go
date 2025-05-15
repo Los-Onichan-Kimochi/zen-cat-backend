@@ -21,7 +21,7 @@ type User struct {
 	AuditFields
 
 	Onboarding  *Onboarding   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Memberships []*Membership `gorm:"many2many:astro_cat_user_membership;"`
+	Memberships []*Membership `gorm:"foreignKey:UserId"`
 }
 
 func (User) TableName() string {
