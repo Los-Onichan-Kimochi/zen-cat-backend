@@ -36,35 +36,51 @@ definitions:
       purpose:
         type: string
     type: object
-  schemas.CreateServiceRequest:
+  schemas.CreateProfessionalRequest:
     properties:
-      description:
+      email:
+        type: string
+      first_last_name:
         type: string
       image_url:
         type: string
-      is_virtual:
-        type: boolean
       name:
         type: string
+      phone_number:
+        type: string
+      second_last_name:
+        type: string
+      specialty:
+        type: string
+      type:
+        type: string
     type: object
-  schemas.Service:
+  schemas.Professional:
     properties:
-      description:
+      email:
+        type: string
+      first_last_name:
         type: string
       id:
         type: string
       image_url:
         type: string
-      is_virtual:
-        type: boolean
       name:
         type: string
+      phone_number:
+        type: string
+      second_last_name:
+        type: string
+      specialty:
+        type: string
+      type:
+        type: string
     type: object
-  schemas.Services:
+  schemas.Professionals:
     properties:
-      services:
+      professionals:
         items:
-          $ref: '#/definitions/schemas.Service'
+          $ref: '#/definitions/schemas.Professional'
         type: array
     type: object
   schemas.UpdateCommunityRequest:
@@ -76,15 +92,23 @@ definitions:
       purpose:
         type: string
     type: object
-  schemas.UpdateServiceRequest:
+  schemas.UpdateProfessionalRequest:
     properties:
-      description:
+      email:
+        type: string
+      first_last_name:
         type: string
       image_url:
         type: string
-      is_virtual:
-        type: boolean
       name:
+        type: string
+      phone_number:
+        type: string
+      second_last_name:
+        type: string
+      specialty:
+        type: string
+      type:
         type: string
     type: object
 info:
@@ -279,18 +303,18 @@ paths:
       summary: Health Check
       tags:
       - Health Check
-  /service/:
+  /professional/:
     get:
       consumes:
       - application/json
-      description: Fetch all services, filtered by params.
+      description: Fetch all professionals, filtered by params.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.Services'
+            $ref: '#/definitions/schemas.Professionals'
         "400":
           description: Bad Request
           schema:
@@ -313,27 +337,27 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Fetch Services.
+      summary: Fetch Professionals.
       tags:
-      - Service
+      - Professional
     post:
       consumes:
       - application/json
-      description: Create the service information.
+      description: Creates a new professional.
       parameters:
-      - description: Create Service Request
+      - description: Create Professional Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/schemas.CreateServiceRequest'
+          $ref: '#/definitions/schemas.CreateProfessionalRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/schemas.Service'
+            $ref: '#/definitions/schemas.Professional'
         "400":
           description: Bad Request
           schema:
@@ -356,18 +380,18 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Create Service.
+      summary: Create Professional.
       tags:
-      - Service
-  /service/{serviceId}/:
+      - Professional
+  /professional/{professionalId}/:
     get:
       consumes:
       - application/json
-      description: Gets a service given its id.
+      description: Gets a professional given its id.
       parameters:
-      - description: Service ID
+      - description: Professional ID
         in: path
-        name: serviceId
+        name: professionalId
         required: true
         type: string
       produces:
@@ -376,7 +400,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.Service'
+            $ref: '#/definitions/schemas.Professional'
         "400":
           description: Bad Request
           schema:
@@ -399,32 +423,32 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Get Service.
+      summary: Get Professional.
       tags:
-      - Service
+      - Professional
     patch:
       consumes:
       - application/json
-      description: Update the service information.
+      description: Updates a professional given its id.
       parameters:
-      - description: Service ID
+      - description: Professional ID
         in: path
-        name: serviceId
+        name: professionalId
         required: true
         type: string
-      - description: Update Service Request
+      - description: Update Professional Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/schemas.UpdateServiceRequest'
+          $ref: '#/definitions/schemas.UpdateProfessionalRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Ok
+          description: OK
           schema:
-            $ref: '#/definitions/schemas.Service'
+            $ref: '#/definitions/schemas.Professional'
         "400":
           description: Bad Request
           schema:
@@ -447,7 +471,7 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Update Service.
+      summary: Update Professional.
       tags:
-      - Service
+      - Professional
 swagger: "2.0"

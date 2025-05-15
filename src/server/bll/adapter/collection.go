@@ -11,6 +11,7 @@ import (
 type AdapterCollection struct {
 	Logger    logging.Logger
 	Community *Community
+	Professional *Professional
 	Service   *Service
 }
 
@@ -23,6 +24,7 @@ func NewAdapterCollection(
 
 	return &AdapterCollection{
 		Community: NewCommunityAdapter(logger, daoAstroCatPsql),
+		Professional: NewProfessionalAdapter(logger, daoAstroCatPsql),
 		Service:  NewServiceAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }

@@ -304,14 +304,14 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/service/": {
+        "/professional/": {
             "get": {
                 "security": [
                     {
                         "JWT": []
                     }
                 ],
-                "description": "Fetch all services, filtered by params.",
+                "description": "Fetch all professionals, filtered by params.",
                 "consumes": [
                     "application/json"
                 ],
@@ -319,14 +319,14 @@ const docTemplateserver = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Professional"
                 ],
-                "summary": "Fetch Services.",
+                "summary": "Fetch Professionals.",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Services"
+                            "$ref": "#/definitions/schemas.Professionals"
                         }
                     },
                     "400": {
@@ -367,7 +367,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Create the service information.",
+                "description": "Creates a new professional.",
                 "consumes": [
                     "application/json"
                 ],
@@ -375,17 +375,17 @@ const docTemplateserver = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Professional"
                 ],
-                "summary": "Create Service.",
+                "summary": "Create Professional.",
                 "parameters": [
                     {
-                        "description": "Create Service Request",
+                        "description": "Create Professional Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.CreateServiceRequest"
+                            "$ref": "#/definitions/schemas.CreateProfessionalRequest"
                         }
                     }
                 ],
@@ -393,7 +393,7 @@ const docTemplateserver = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Service"
+                            "$ref": "#/definitions/schemas.Professional"
                         }
                     },
                     "400": {
@@ -429,14 +429,14 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/service/{serviceId}/": {
+        "/professional/{professionalId}/": {
             "get": {
                 "security": [
                     {
                         "JWT": []
                     }
                 ],
-                "description": "Gets a service given its id.",
+                "description": "Gets a professional given its id.",
                 "consumes": [
                     "application/json"
                 ],
@@ -444,14 +444,14 @@ const docTemplateserver = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Professional"
                 ],
-                "summary": "Get Service.",
+                "summary": "Get Professional.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service ID",
-                        "name": "serviceId",
+                        "description": "Professional ID",
+                        "name": "professionalId",
                         "in": "path",
                         "required": true
                     }
@@ -460,7 +460,7 @@ const docTemplateserver = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Service"
+                            "$ref": "#/definitions/schemas.Professional"
                         }
                     },
                     "400": {
@@ -501,7 +501,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Update the service information.",
+                "description": "Updates a professional given its id.",
                 "consumes": [
                     "application/json"
                 ],
@@ -509,32 +509,32 @@ const docTemplateserver = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Service"
+                    "Professional"
                 ],
-                "summary": "Update Service.",
+                "summary": "Update Professional.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service ID",
-                        "name": "serviceId",
+                        "description": "Professional ID",
+                        "name": "professionalId",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Update Service Request",
+                        "description": "Update Professional Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.UpdateServiceRequest"
+                            "$ref": "#/definitions/schemas.UpdateProfessionalRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Ok",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Service"
+                            "$ref": "#/definitions/schemas.Professional"
                         }
                     },
                     "400": {
@@ -628,27 +628,42 @@ const docTemplateserver = `{
                 }
             }
         },
-        "schemas.CreateServiceRequest": {
+        "schemas.CreateProfessionalRequest": {
             "type": "object",
             "properties": {
-                "description": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
                     "type": "string"
                 },
                 "image_url": {
                     "type": "string"
                 },
-                "is_virtual": {
-                    "type": "boolean"
-                },
                 "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "second_last_name": {
+                    "type": "string"
+                },
+                "specialty": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
         },
-        "schemas.Service": {
+        "schemas.Professional": {
             "type": "object",
             "properties": {
-                "description": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
                     "type": "string"
                 },
                 "id": {
@@ -657,21 +672,30 @@ const docTemplateserver = `{
                 "image_url": {
                     "type": "string"
                 },
-                "is_virtual": {
-                    "type": "boolean"
-                },
                 "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "second_last_name": {
+                    "type": "string"
+                },
+                "specialty": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
         },
-        "schemas.Services": {
+        "schemas.Professionals": {
             "type": "object",
             "properties": {
-                "services": {
+                "professionals": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/schemas.Service"
+                        "$ref": "#/definitions/schemas.Professional"
                     }
                 }
             }
@@ -690,19 +714,31 @@ const docTemplateserver = `{
                 }
             }
         },
-        "schemas.UpdateServiceRequest": {
+        "schemas.UpdateProfessionalRequest": {
             "type": "object",
             "properties": {
-                "description": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
                     "type": "string"
                 },
                 "image_url": {
                     "type": "string"
                 },
-                "is_virtual": {
-                    "type": "boolean"
-                },
                 "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "second_last_name": {
+                    "type": "string"
+                },
+                "specialty": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }

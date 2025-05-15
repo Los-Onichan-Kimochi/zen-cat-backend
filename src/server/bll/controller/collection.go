@@ -11,6 +11,7 @@ type ControllerCollection struct {
 	Logger      logging.Logger
 	EnvSettings *schemas.EnvSettings
 	Community   *Community
+	Professional *Professional
 	Service	 	*Service
 }
 
@@ -24,12 +25,14 @@ func NewControllerCollection(
 		envSettings,
 	)
 	community := NewCommunityController(logger, bllAdapter, envSettings)
+	professional := NewProfessionalController(logger, bllAdapter, envSettings)
 	service := NewServiceController(logger, bllAdapter, envSettings)
 
 	return &ControllerCollection{
 		Logger:      logger,
 		EnvSettings: envSettings,
 		Community:   community,
+		Professional: professional,
 		Service:    service,
 	}, astroCatPsqlDB
 }

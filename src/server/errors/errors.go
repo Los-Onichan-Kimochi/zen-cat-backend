@@ -17,11 +17,16 @@ var (
 	ObjectNotFoundError = struct {
 		CommunityNotFound   Error
 		ReservationNotFound Error
+		ProfessionalNotFound Error
 		ServiceNotFound     Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
 			Message: "Community not found",
+		},
+		ProfessionalNotFound: Error{
+			Code:    "PROFESSIONAL_ERROR_001",
+			Message: "Professional not found",
 		},
 		ServiceNotFound: Error{
 			Code:    "SERVICE_ERROR_001",
@@ -33,6 +38,7 @@ var (
 	UnprocessableEntityError = struct {
 		InvalidCommunityId Error
 		InvalidRequestBody Error
+		InvalidProfessionalId Error
 		InvalidServiceId   Error
 	}{
 		InvalidRequestBody: Error{
@@ -42,6 +48,10 @@ var (
 		InvalidCommunityId: Error{
 			Code:    "COMMUNITY_ERROR_004",
 			Message: "Invalid community id",
+		},
+		InvalidProfessionalId: Error{
+			Code:    "PROFESSIONAL_ERROR_004",
+			Message: "Invalid professional id",
 		},
 		InvalidServiceId: Error{
 			Code:    "SERVICE_ERROR_004",
@@ -54,6 +64,8 @@ var (
 		InvalidUpdatedByValue Error
 		CommunityNotCreated   Error
 		CommunityNotUpdated   Error
+		ProfessionalNotCreated Error
+		ProfessionalNotUpdated Error
 		ServiceNotCreated   Error
 		ServiceNotUpdated   Error
 	}{
@@ -68,6 +80,14 @@ var (
 		CommunityNotUpdated: Error{
 			Code:    "COMMUNITY_ERROR_003",
 			Message: "Community not updated",
+		},
+		ProfessionalNotCreated: Error{
+			Code:    "PROFESSIONAL_ERROR_002",
+			Message: "Professional not created",
+		},
+		ProfessionalNotUpdated: Error{
+			Code:    "PROFESSIONAL_ERROR_003",
+			Message: "Professional not updated",
 		},
 		ServiceNotCreated: Error{
 			Code:    "SERVICE_ERROR_002",
