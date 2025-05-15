@@ -12,6 +12,7 @@ import (
 type AstroCatPsqlCollection struct {
 	Logger    logging.Logger
 	Community *Community
+	Service   *Service
 }
 
 // Create dao controller collection
@@ -40,6 +41,7 @@ func NewAstroCatPsqlCollection(
 	return &AstroCatPsqlCollection{
 		Logger:    logger,
 		Community: NewCommunityController(logger, postgresqlDB),
+		Service:  NewServiceController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 

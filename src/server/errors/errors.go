@@ -17,10 +17,15 @@ var (
 	ObjectNotFoundError = struct {
 		CommunityNotFound   Error
 		ReservationNotFound Error
+		ServiceNotFound     Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
 			Message: "Community not found",
+		},
+		ServiceNotFound: Error{
+			Code:    "SERVICE_ERROR_001",
+			Message: "Service not found",
 		},
 	}
 
@@ -28,6 +33,7 @@ var (
 	UnprocessableEntityError = struct {
 		InvalidCommunityId Error
 		InvalidRequestBody Error
+		InvalidServiceId   Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -37,6 +43,10 @@ var (
 			Code:    "COMMUNITY_ERROR_004",
 			Message: "Invalid community id",
 		},
+		InvalidServiceId: Error{
+			Code:    "SERVICE_ERROR_004",
+			Message: "Invalid service id",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -44,6 +54,8 @@ var (
 		InvalidUpdatedByValue Error
 		CommunityNotCreated   Error
 		CommunityNotUpdated   Error
+		ServiceNotCreated   Error
+		ServiceNotUpdated   Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -56,6 +68,14 @@ var (
 		CommunityNotUpdated: Error{
 			Code:    "COMMUNITY_ERROR_003",
 			Message: "Community not updated",
+		},
+		ServiceNotCreated: Error{
+			Code:    "SERVICE_ERROR_002",
+			Message: "Service not created",
+		},
+		ServiceNotUpdated: Error{
+			Code:    "SERVICE_ERROR_003",
+			Message: "Service not updated",
 		},
 	}
 

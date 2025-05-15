@@ -11,6 +11,7 @@ import (
 type AdapterCollection struct {
 	Logger    logging.Logger
 	Community *Community
+	Service   *Service
 }
 
 // Create bll adapter collection
@@ -22,5 +23,6 @@ func NewAdapterCollection(
 
 	return &AdapterCollection{
 		Community: NewCommunityAdapter(logger, daoAstroCatPsql),
+		Service:  NewServiceAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }
