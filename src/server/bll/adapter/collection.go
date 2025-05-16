@@ -13,6 +13,7 @@ type AdapterCollection struct {
 	Community    *Community
 	Professional *Professional
 	Local        *Local
+	User         *User
 	Service      *Service
 	Plan         *Plan
 }
@@ -28,6 +29,7 @@ func NewAdapterCollection(
 		Community:    NewCommunityAdapter(logger, daoAstroCatPsql),
 		Professional: NewProfessionalAdapter(logger, daoAstroCatPsql),
 		Local:        NewLocalAdapter(logger, daoAstroCatPsql),
+		User:         NewUserAdapter(logger, daoAstroCatPsql),
 		Service:      NewServiceAdapter(logger, daoAstroCatPsql),
 		Plan:         NewPlanAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
