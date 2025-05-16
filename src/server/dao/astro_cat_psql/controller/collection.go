@@ -84,4 +84,11 @@ func createTables(astroCatPsqlDB *gorm.DB) {
 	if err := astroCatPsqlDB.AutoMigrate(&model.Reservation{}); err != nil {
 		panic(err)
 	}
+
+	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityService{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityPlan{}); err != nil {
+		panic(err)
+	}
 }
