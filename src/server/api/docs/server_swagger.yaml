@@ -7,6 +7,13 @@ definitions:
       message:
         type: string
     type: object
+  schemas.BatchCreateCommunityRequest:
+    properties:
+      communities:
+        items:
+          $ref: '#/definitions/schemas.CreateCommunityRequest'
+        type: array
+    type: object
   schemas.Communities:
     properties:
       communities:
@@ -220,6 +227,52 @@ paths:
       security:
       - JWT: []
       summary: Update Community.
+      tags:
+      - Community
+  /community/bulk/:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple communities in a single.
+      parameters:
+      - description: Bulk Create Community Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.Communities'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Community.
       tags:
       - Community
   /health-check/:

@@ -44,6 +44,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
+	community.POST("/bulk/", a.BulkCreateCommunities)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))

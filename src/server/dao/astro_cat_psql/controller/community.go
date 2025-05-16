@@ -97,3 +97,8 @@ func (c *Community) UpdateCommunity(
 
 	return &community, nil
 }
+
+// Creates a communities given its model.
+func (c *Community) BulkCreateCommunities(communities []*model.Community) error {
+	return c.PostgresqlDB.Create(&communities).Error
+}

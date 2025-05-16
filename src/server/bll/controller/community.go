@@ -71,3 +71,9 @@ func (c *Community) UpdateCommunity(
 }
 
 // TODO: Add BulkCreateCommunities (Batch)
+func (c *Community) BulkCreateCommunities(
+	createCommunitiesData []*schemas.CreateCommunityRequest,
+	updatedBy string,
+) ([]*schemas.Community, *errors.Error) {
+	return c.Adapter.Community.BulkCreatePostgresqlCommunities(createCommunitiesData, updatedBy)
+}

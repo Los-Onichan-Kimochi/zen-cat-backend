@@ -126,3 +126,36 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Bulk Create Community.
+// @Description 		Create multiple communities in a single.
+// @Tags 				Community
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request body schemas.BatchCreateCommunityRequest true "Bulk Create Community Request"
+// @Success 			201 {array} schemas.Communities "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community/bulk/ [post]
+func (a *Api) BulkCreateCommunities(c echo.Context) error {
+
+	updatedBy := "ADMIN"
+
+	var request schemas.BatchCreateCommunityRequest
+
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, newErr := a.BllController.Community.BulkCreateCommunities(request.Communities, updatedBy)
+
+	if newErr != nil {
+		return errors.HandleError(*newErr, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
