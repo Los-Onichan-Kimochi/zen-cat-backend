@@ -15,16 +15,17 @@ type Error struct {
 var (
 	// For 404 Not Found errors
 	ObjectNotFoundError = struct {
-		CommunityNotFound     Error
-		ReservationNotFound   Error
-		ProfessionalNotFound  Error
-		LocalNotFound         Error
-		UserNotFound          Error
-		ServiceNotFound       Error
-		PlanNotFound          Error
-		MembershipNotFound    Error
-		OnboardingNotFound    Error
-		CommunityPlanNotFound Error
+		CommunityNotFound        Error
+		ReservationNotFound      Error
+		ProfessionalNotFound     Error
+		LocalNotFound            Error
+		UserNotFound             Error
+		ServiceNotFound          Error
+		PlanNotFound             Error
+		MembershipNotFound       Error
+		OnboardingNotFound       Error
+		CommunityPlanNotFound    Error
+		CommunityServiceNotFound Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -62,21 +63,26 @@ var (
 			Code:    "COMMUNITY_PLAN_ERROR_001",
 			Message: "Community-Plan association not found",
 		},
+		CommunityServiceNotFound: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_001",
+			Message: "Community-Service association not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
 	UnprocessableEntityError = struct {
-		InvalidCommunityId     Error
-		InvalidRequestBody     Error
-		InvalidProfessionalId  Error
-		InvalidLocalId         Error
-		InvalidServiceId       Error
-		InvalidPlanId          Error
-		InvalidMembershipId    Error
-		InvalidOnboardingId    Error
-		InvalidUserEmail       Error
-		InvalidUserId          Error
-		InvalidCommunityPlanId Error
+		InvalidCommunityId        Error
+		InvalidRequestBody        Error
+		InvalidProfessionalId     Error
+		InvalidLocalId            Error
+		InvalidServiceId          Error
+		InvalidPlanId             Error
+		InvalidMembershipId       Error
+		InvalidOnboardingId       Error
+		InvalidUserEmail          Error
+		InvalidUserId             Error
+		InvalidCommunityPlanId    Error
+		InvalidCommunityServiceId Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -122,34 +128,40 @@ var (
 			Code:    "COMMUNITY_PLAN_ERROR_004",
 			Message: "Invalid community_id or plan_id for association",
 		},
+		InvalidCommunityServiceId: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_004",
+			Message: "Invalid community_id or service_id for association",
+		},
 	}
 
 	// For 400 Bad Request errors
 	BadRequestError = struct {
-		InvalidUpdatedByValue      Error
-		CommunityNotCreated        Error
-		CommunityNotUpdated        Error
-		CommunityNotSoftDeleted    Error
-		LocalNotCreated            Error
-		LocalNotUpdated            Error
-		LocalNotSoftDeleted        Error
-		ProfessionalNotCreated     Error
-		ProfessionalNotUpdated     Error
-		ServiceNotCreated          Error
-		ServiceNotUpdated          Error
-		PlanNotCreated             Error
-		PlanNotUpdated             Error
-		PlanNotSoftDeleted         Error
-		InvalidPlanType            Error
-		MembershipNotCreated       Error
-		MembershipNotUpdated       Error
-		OnboardingNotCreated       Error
-		OnboardingNotUpdated       Error
-		UserNotCreated             Error
-		UserNotUpdated             Error
-		UserNotSoftDeleted         Error
-		CommunityPlanNotCreated    Error
-		CommunityPlanAlreadyExists Error
+		InvalidUpdatedByValue         Error
+		CommunityNotCreated           Error
+		CommunityNotUpdated           Error
+		CommunityNotSoftDeleted       Error
+		LocalNotCreated               Error
+		LocalNotUpdated               Error
+		LocalNotSoftDeleted           Error
+		ProfessionalNotCreated        Error
+		ProfessionalNotUpdated        Error
+		ServiceNotCreated             Error
+		ServiceNotUpdated             Error
+		PlanNotCreated                Error
+		PlanNotUpdated                Error
+		PlanNotSoftDeleted            Error
+		InvalidPlanType               Error
+		MembershipNotCreated          Error
+		MembershipNotUpdated          Error
+		OnboardingNotCreated          Error
+		OnboardingNotUpdated          Error
+		UserNotCreated                Error
+		UserNotUpdated                Error
+		UserNotSoftDeleted            Error
+		CommunityPlanNotCreated       Error
+		CommunityPlanAlreadyExists    Error
+		CommunityServiceNotCreated    Error
+		CommunityServiceAlreadyExists Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -246,6 +258,14 @@ var (
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_003",
 			Message: "Community-Plan association already exists",
+		},
+		CommunityServiceNotCreated: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_002",
+			Message: "Community-Service association not created",
+		},
+		CommunityServiceAlreadyExists: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_003",
+			Message: "Community-Service association already exists",
 		},
 	}
 

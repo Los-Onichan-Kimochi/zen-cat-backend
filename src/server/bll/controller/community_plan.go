@@ -3,6 +3,7 @@ package controller
 import (
 
 	// "gorm.io/gorm" // No longer directly needed here for these checks
+	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -54,4 +55,22 @@ func (cp *CommunityPlan) CreateCommunityPlan(
 	}
 
 	return cp.Adapter.CommunityPlan.CreatePostgresqlCommunityPlan(communityId, planId, updatedBy)
+}
+
+// Gets a specific community-plan association.
+func (cp *CommunityPlan) GetCommunityPlan(
+	communityIdString string,
+	planIdString string,
+) (*schemas.CommunityPlan, *errors.Error) {
+	communityId, err := uuid.Parse(communityIdString)
+	if err != nil {
+		return nil, &errors.UnprocessableEntityError.InvalidCommunityId
+	}
+
+	planId, err := uuid.Parse(planIdString)
+	if err != nil {
+		return nil, &errors.UnprocessableEntityError.InvalidPlanId
+	}
+
+	return cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)
 }

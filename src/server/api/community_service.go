@@ -9,37 +9,36 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
-// @Summary 			Create CommunityPlan.
-// @Description 		Associates a community with a plan.
-// @Tags 				CommunityPlan
+// @Summary 			Create CommunityService.
+// @Description 		Associates a community with a service.
+// @Tags 				CommunityService
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
-// @Param               request body schemas.CreateCommunityPlanRequest true "Community-Plan Association Request"
-// @Success 			201 {object} schemas.CommunityPlan "Created"
+// @Param               request body schemas.CreateCommunityServiceRequest true "Community-Service Association Request"
+// @Success 			201 {object} schemas.CommunityService "Created"
 // @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid updatedBy)"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
-// @Failure 			404 {object} errors.Error "Not Found (Community or Plan does not exist)"
+// @Failure 			404 {object} errors.Error "Not Found (Community or Service does not exist)"
 // @Failure 			409 {object} errors.Error "Conflict (Association already exists)"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-plan/ [post]
-func (a *Api) CreateCommunityPlan(c echo.Context) error {
+// @Router 				/community-service/ [post]
+func (a *Api) CreateCommunityService(c echo.Context) error {
 	updatedBy := "ADMIN"
 
-	var request schemas.CreateCommunityPlanRequest
+	var request schemas.CreateCommunityServiceRequest
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	if request.CommunityId == uuid.Nil || request.PlanId == uuid.Nil {
-		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityPlanId, c)
+	if request.CommunityId == uuid.Nil || request.ServiceId == uuid.Nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityServiceId, c)
 	}
 
-	response, err := a.BllController.CommunityPlan.CreateCommunityPlan(request, updatedBy)
+	response, err := a.BllController.CommunityService.CreateCommunityService(request, updatedBy)
 	if err != nil {
-		// TODO: Handle error more properly
-		if err.Code == errors.BadRequestError.CommunityPlanAlreadyExists.Code {
+		if err.Code == errors.BadRequestError.CommunityServiceAlreadyExists.Code {
 			return c.JSON(http.StatusConflict, err)
 		}
 		return errors.HandleError(*err, c)
@@ -48,29 +47,29 @@ func (a *Api) CreateCommunityPlan(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
-// @Summary 			Get CommunityPlan.
-// @Description 		Retrieves a specific community-plan association.
-// @Tags 				CommunityPlan
+// @Summary 			Get CommunityService.
+// @Description 		Retrieves a specific community-service association.
+// @Tags 				CommunityService
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
 // @Param 				communityId path string true "Community ID"
-// @Param 				planId path string true "Plan ID"
-// @Success 			200 {object} schemas.CommunityPlan "OK"
+// @Param 				serviceId path string true "Service ID"
+// @Success 			200 {object} schemas.CommunityService "OK"
 // @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-plan/{communityId}/{planId} [get]
-func (a *Api) GetCommunityPlan(c echo.Context) error {
+// @Router 				/community-service/{communityId}/{serviceId} [get]
+func (a *Api) GetCommunityService(c echo.Context) error {
 	communityId := c.Param("communityId")
-	planId := c.Param("planId")
+	serviceId := c.Param("serviceId")
 
-	if communityId == "" || planId == "" {
-		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityPlanId, c)
+	if communityId == "" || serviceId == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityServiceId, c)
 	}
 
-	response, err := a.BllController.CommunityPlan.GetCommunityPlan(communityId, planId)
+	response, err := a.BllController.CommunityService.GetCommunityService(communityId, serviceId)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

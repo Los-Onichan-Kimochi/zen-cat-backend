@@ -9,14 +9,15 @@ import (
 )
 
 type AdapterCollection struct {
-	Logger        logging.Logger
-	Community     *Community
-	Professional  *Professional
-	Local         *Local
-	User          *User
-	Service       *Service
-	Plan          *Plan
-	CommunityPlan *CommunityPlan
+	Logger           logging.Logger
+	Community        *Community
+	Professional     *Professional
+	Local            *Local
+	User             *User
+	Service          *Service
+	Plan             *Plan
+	CommunityPlan    *CommunityPlan
+	CommunityService *CommunityService
 }
 
 // Create bll adapter collection
@@ -27,12 +28,13 @@ func NewAdapterCollection(
 	daoAstroCatPsql, astroCatPsqlDB := daoPostgresql.NewAstroCatPsqlCollection(logger, envSettings)
 
 	return &AdapterCollection{
-		Community:     NewCommunityAdapter(logger, daoAstroCatPsql),
-		Professional:  NewProfessionalAdapter(logger, daoAstroCatPsql),
-		Local:         NewLocalAdapter(logger, daoAstroCatPsql),
-		User:          NewUserAdapter(logger, daoAstroCatPsql),
-		Service:       NewServiceAdapter(logger, daoAstroCatPsql),
-		Plan:          NewPlanAdapter(logger, daoAstroCatPsql),
-		CommunityPlan: NewCommunityPlanAdapter(logger, daoAstroCatPsql),
+		Community:        NewCommunityAdapter(logger, daoAstroCatPsql),
+		Professional:     NewProfessionalAdapter(logger, daoAstroCatPsql),
+		Local:            NewLocalAdapter(logger, daoAstroCatPsql),
+		User:             NewUserAdapter(logger, daoAstroCatPsql),
+		Service:          NewServiceAdapter(logger, daoAstroCatPsql),
+		Plan:             NewPlanAdapter(logger, daoAstroCatPsql),
+		CommunityPlan:    NewCommunityPlanAdapter(logger, daoAstroCatPsql),
+		CommunityService: NewCommunityServiceAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }
