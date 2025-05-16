@@ -12,7 +12,7 @@ type ControllerCollection struct {
 	EnvSettings  *schemas.EnvSettings
 	Community    *Community
 	Professional *Professional
-	Local		 *Local
+	Local        *Local
 	Service      *Service
 	Plan         *Plan
 }

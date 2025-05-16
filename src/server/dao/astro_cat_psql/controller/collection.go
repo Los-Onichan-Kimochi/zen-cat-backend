@@ -45,7 +45,7 @@ func NewAstroCatPsqlCollection(
 		Logger:       logger,
 		Community:    NewCommunityController(logger, postgresqlDB),
 		Professional: NewProfessionalController(logger, postgresqlDB),
-		Local:        NewLocalController(logger,postgresqlDB),
+		Local:        NewLocalController(logger, postgresqlDB),
 		Service:      NewServiceController(logger, postgresqlDB),
 		Plan:         NewPlanController(logger, postgresqlDB),
 	}, postgresqlDB
