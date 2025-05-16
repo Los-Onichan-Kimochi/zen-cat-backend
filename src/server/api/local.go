@@ -95,12 +95,12 @@ func (a *Api) UpadteLocal(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidLocalId, c)
 	}
 
-	var request schemas.UpdateLocalRequest
+	var request schemas.UdpateLocalRequest
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	response, newErr := a.BllController.Local.UpdateLocal(localId, request, updatedBy)
+	response, newErr := a.BllController.Local.UdpateLocal(localId, request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
 	}

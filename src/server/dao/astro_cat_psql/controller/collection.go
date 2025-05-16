@@ -13,6 +13,7 @@ type AstroCatPsqlCollection struct {
 	Logger       logging.Logger
 	Community    *Community
 	Professional *Professional
+	Local        *Local
 	Service      *Service
 	Plan         *Plan
 }
@@ -44,6 +45,7 @@ func NewAstroCatPsqlCollection(
 		Logger:       logger,
 		Community:    NewCommunityController(logger, postgresqlDB),
 		Professional: NewProfessionalController(logger, postgresqlDB),
+		Local:        NewLocalController(logger,postgresqlDB),
 		Service:      NewServiceController(logger, postgresqlDB),
 		Plan:         NewPlanController(logger, postgresqlDB),
 	}, postgresqlDB

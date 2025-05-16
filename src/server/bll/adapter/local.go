@@ -30,7 +30,7 @@ func NewLocalAdapter(
 func (l *Local) GetPostgresqlLocal(
 	localId uuid.UUID,
 )(*schemas.Local, *errors.Error) {
-	local, err := l.DaoPostgresql.Local.GetLocal(localId)
+	localModel, err := l.DaoPostgresql.Local.GetLocal(localId)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.LocalNotFound
 	}
@@ -56,7 +56,7 @@ func (l *Local) FetchPostgresqlLocals() ([]*schemas.Local, *errors.Error) {
 	}
 
 	locals := make([]*schemas.Local, len(localsModel))
-	for i, professionalModel := range localsModel {
+	for i, localModel := range localsModel {
 		locals[i] = &schemas.Local{
 			Id:             localModel.Id,
 			LocalName:		localModel.LocalName,
@@ -74,7 +74,6 @@ func (l *Local) FetchPostgresqlLocals() ([]*schemas.Local, *errors.Error) {
 }
 // Creates a local into postgresql DB and returns it.
 func (l *Local) CreatePostgresqlLocal(
-	id uuid.UUID,
 	localName string,
 	streetName string,
 	buildingNumber string,
