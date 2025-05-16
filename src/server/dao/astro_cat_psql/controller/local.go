@@ -22,10 +22,10 @@ func NewLocalController(logger logging.Logger, postgresqlDB *gorm.DB) *Local{
 }
 
 // Gets a local model given params.
-func (p *Local) GetLocal(localId uuid.UUID) (*model.Local, error) {
+func (l *Local) GetLocal(localId uuid.UUID) (*model.Local, error) {
 	local := &model.Local{}
 
-	result := p.PostgresqlDB.First(&local, "id = ?", localId)
+	result := l.PostgresqlDB.First(&local, "id = ?", localId)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -33,10 +33,10 @@ func (p *Local) GetLocal(localId uuid.UUID) (*model.Local, error) {
 	return local, nil
 }
 // Fetch all locals.
-func (p *Local) FetchLocals() ([]*model.Local, error) {
+func (l *Local) FetchLocals() ([]*model.Local, error) {
 	locals := []*model.Local{}
 
-	result := p.PostgresqlDB.Find(&locals)
+	result := l.PostgresqlDB.Find(&locals)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -44,12 +44,12 @@ func (p *Local) FetchLocals() ([]*model.Local, error) {
 	return locals, nil
 }
 // Creates a professional given its model.
-func (p *Local) CreateLocal(local *model.Local) error {
-	return p.PostgresqlDB.Create(local).Error
+func (l *Local) CreateLocal(local *model.Local) error {
+	return l.PostgresqlDB.Create(local).Error
 }
 
 // Updates a local given its model.
-func (p *Local) UpdateLocal(
+func (l *Local) UpdateLocal(
 	id uuid.UUID,
 	localName *string,
 	streetName *string,
@@ -95,13 +95,13 @@ func (p *Local) UpdateLocal(
 	// Check if there are any fields to update
 	var local model.Local;
 	if len(updateFields) == 1 {
-		if err := p.PostgresqlDB.First(&local, "id = ?", id).Error; err != nil {
+		if err := l.PostgresqlDB.First(&local, "id = ?", id).Error; err != nil {
 			return nil, err
 		}
 		return &local,nil;
 	}
 	// Perform the update
-	result := p.PostgresqlDB.Model(&local).
+	result := l.PostgresqlDB.Model(&local).
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Updates(updateFields)

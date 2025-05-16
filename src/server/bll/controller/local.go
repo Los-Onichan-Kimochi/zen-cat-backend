@@ -1,0 +1,70 @@
+package controller
+
+import (
+	"github.com/google/uuid"
+	"onichankimochi.com/astro_cat_backend/src/logging"
+	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
+	errors "onichankimochi.com/astro_cat_backend/src/server/errors"
+	schemas "onichankimochi.com/astro_cat_backend/src/server/schemas"
+)
+
+type Local struct {
+	logger      logging.Logger
+	Adapter     *bllAdapter.AdapterCollection
+	EnvSettings *schemas.EnvSettings
+}
+
+// Create Local controller
+func NewLocalController(
+	logger logging.Logger,
+	adapter *bllAdapter.AdapterCollection,
+	envSettings *schemas.EnvSettings,
+) *Local {
+	return &Local{
+		logger:      logger,
+		Adapter:     adapter,
+		EnvSettings: envSettings,
+	}
+}
+
+// Gets a local.
+func (l *Local) GetLocal(localId uuid.UUID) (*schemas.Local, *errors.Error) {
+	return l.Adapter.Local.GetPostgresqlProfessional(localId)
+}
+
+// Gets a local.
+func (l *Local) FetchLocals() (*schemas.Locals, *errors.Error) {
+	locals, err := l.Adapter.Local.FetchPostgresqlLocals()
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.LocalsNotFound
+	}
+	return &schemas.Locals{Locals: locals}, nil
+}
+
+// Fetch all locals.
+func (l *Local) FetchAllLocals() (*schemas.Locals, *errors.Error) {
+	locals, err := l.Adapter.Local.FetchPostgresqlLocals()
+	if err != nil {
+		return nil, err
+	}
+	return &schemas.Locals{Locals: locals}, nil
+}
+
+// Creates a local.
+func (l *Local) CreateLocal(
+	createLocalData *schemas.CreateLocalRequest,
+	updatedBy string,
+) (*schemas.Local, *errors.Error){
+	return l.Adapter.Local.CreatePostgresqlLocal(
+		createLocalData.LocalName,
+		createLocalData.StreetName,
+		createLocalData.BuildingNumber,
+		createLocalData.District,
+		createLocalData.Province,
+		createLocalData.Region,
+		createLocalData.Reference,
+		createLocalData.Capacity,
+		createLocalData.ImageUrl,
+		updatedBy,
+	)
+}
