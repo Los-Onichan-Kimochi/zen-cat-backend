@@ -131,3 +131,13 @@ func (c *Community) UpdatePostgresqlCommunity(
 		NumberSubscriptions: communityModel.NumberSubscriptions,
 	}, nil
 }
+
+// Soft deletes a community from postgresql DB.
+func (c *Community) DeletePostgresqlCommunity(communityId uuid.UUID) *errors.Error {
+	err := c.DaoPostgresql.Community.DeleteCommunity(communityId)
+	if err != nil {
+		return &errors.BadRequestError.CommunityNotSoftDeleted
+	}
+
+	return nil
+}

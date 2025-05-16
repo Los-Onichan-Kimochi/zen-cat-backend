@@ -70,4 +70,9 @@ func (c *Community) UpdateCommunity(
 	)
 }
 
+// Soft deletes a community.
+func (c *Community) DeleteCommunity(communityId uuid.UUID) *errors.Error {
+	return c.Adapter.Community.DeletePostgresqlCommunity(communityId)
+}
+
 // TODO: Add BulkCreateCommunities (Batch)

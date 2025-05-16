@@ -126,3 +126,29 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Delete Community.
+// @Description 		Deletes a community given its id.
+// @Tags 				Community
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               communityId    path   string  true  "Community ID"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community/{communityId}/ [delete]
+func (a *Api) DeleteCommunity(c echo.Context) error {
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	if err := a.BllController.Community.DeleteCommunity(communityId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}

@@ -97,3 +97,15 @@ func (c *Community) UpdateCommunity(
 
 	return &community, nil
 }
+
+// Soft deletes a community given its ID.
+func (c *Community) DeleteCommunity(communityId uuid.UUID) error {
+	result := c.PostgresqlDB.Delete(&model.Community{}, "id = ?", communityId)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
