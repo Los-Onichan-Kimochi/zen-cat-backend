@@ -8,13 +8,13 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 )
 
-type Local struct{
+type Local struct {
 	logger       logging.Logger
 	PostgresqlDB *gorm.DB
 }
 
 // Create Local postgresql controller
-func NewLocalController(logger logging.Logger, postgresqlDB *gorm.DB) *Local{
+func NewLocalController(logger logging.Logger, postgresqlDB *gorm.DB) *Local {
 	return &Local{
 		logger:       logger,
 		PostgresqlDB: postgresqlDB,
@@ -32,6 +32,7 @@ func (l *Local) GetLocal(localId uuid.UUID) (*model.Local, error) {
 
 	return local, nil
 }
+
 // Fetch all locals.
 func (l *Local) FetchLocals() ([]*model.Local, error) {
 	locals := []*model.Local{}
@@ -43,6 +44,7 @@ func (l *Local) FetchLocals() ([]*model.Local, error) {
 
 	return locals, nil
 }
+
 // Creates a professional given its model.
 func (l *Local) CreateLocal(local *model.Local) error {
 	return l.PostgresqlDB.Create(local).Error
@@ -65,41 +67,43 @@ func (l *Local) UpdateLocal(
 	updateFields := map[string]any{
 		"updated_by": updatedBy,
 	}
-	if localName != nil{
+	if localName != nil {
 		updateFields["local_name"] = *localName
 	}
-	if streetName != nil{
+	if streetName != nil {
 		updateFields["street_name"] = *streetName
 	}
-	if buildingNumber != nil{
+	if buildingNumber != nil {
 		updateFields["building_number"] = *buildingNumber
 	}
-	if district != nil{
+	if district != nil {
 		updateFields["district"] = *district
 	}
-	if province != nil{
+	if province != nil {
 		updateFields["province"] = *province
 	}
-	if region != nil{
+	if region != nil {
 		updateFields["region"] = *region
 	}
-	if reference != nil{
+	if reference != nil {
 		updateFields["reference"] = *reference
 	}
-	if capacity != nil{
+	if capacity != nil {
 		updateFields["capacity"] = *capacity
 	}
-	if imageUrl != nil{
+	if imageUrl != nil {
 		updateFields["image_url"] = *imageUrl
 	}
+
 	// Check if there are any fields to update
-	var local model.Local;
+	var local model.Local
 	if len(updateFields) == 1 {
 		if err := l.PostgresqlDB.First(&local, "id = ?", id).Error; err != nil {
 			return nil, err
 		}
-		return &local,nil;
+		return &local, nil
 	}
+
 	// Perform the update
 	result := l.PostgresqlDB.Model(&local).
 		Clauses(clause.Returning{}).
@@ -111,7 +115,8 @@ func (l *Local) UpdateLocal(
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
-	return &local,nil;
+
+	return &local, nil
 }
 
 // Soft deletes a local given its ID.

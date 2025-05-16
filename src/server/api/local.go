@@ -15,7 +15,7 @@ import (
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
-// @Param               local    path   string  true  "Local ID"
+// @Param               localId    path   string  true  "Local ID"
 // @Success 			200 {object} schemas.Local "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
@@ -23,7 +23,6 @@ import (
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/local/{localId}/ [get]
-
 func (a *Api) GetLocal(c echo.Context) error {
 	localId, parseErr := uuid.Parse(c.Param("localId"))
 	if parseErr != nil {
@@ -31,6 +30,28 @@ func (a *Api) GetLocal(c echo.Context) error {
 	}
 
 	response, err := a.BllController.Local.GetLocal(localId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// @Summary 			Fetch Locals.
+// @Description 		Fetches all locals.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Success 			200 {object} schemas.Locals "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/ [get]
+func (a *Api) FetchLocals(c echo.Context) error {
+	response, err := a.BllController.Local.FetchLocals()
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}
@@ -52,7 +73,6 @@ func (a *Api) GetLocal(c echo.Context) error {
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/local/ [post]
-
 func (a *Api) CreateLocal(c echo.Context) error {
 	// TODO: Add access token validation (from here we will get the `updatedBy` param)
 	updatedBy := "ADMIN"
@@ -77,7 +97,7 @@ func (a *Api) CreateLocal(c echo.Context) error {
 // @Produce 			json
 // @Security			JWT
 // @Param               localId    path   string  true  "Local ID"
-// @Param               request body schemas.UpdateCommunityRequest true "Update Local Request"
+// @Param               request body schemas.UpdateLocalRequest true "Update Local Request"
 // @Success 			200 {object} schemas.Local "Ok"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
@@ -85,8 +105,7 @@ func (a *Api) CreateLocal(c echo.Context) error {
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/local/{localId}/ [patch]
-
-func (a *Api) UpadteLocal(c echo.Context) error {
+func (a *Api) UpdateLocal(c echo.Context) error {
 	// TODO: Add access token validation (from here we will get the `updatedBy` param)
 	updatedBy := "ADMIN"
 
@@ -95,12 +114,12 @@ func (a *Api) UpadteLocal(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidLocalId, c)
 	}
 
-	var request schemas.UdpateLocalRequest
+	var request schemas.UpdateLocalRequest
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	response, newErr := a.BllController.Local.UdpateLocal(localId, request, updatedBy)
+	response, newErr := a.BllController.Local.UpdateLocal(localId, request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
 	}
@@ -121,7 +140,6 @@ func (a *Api) UpadteLocal(c echo.Context) error {
 // @Failure 			404 {object} errors.Error "Not Found"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/local/{localId}/ [delete]
-
 func (a *Api) DeleteLocal(c echo.Context) error {
 	localId, parseErr := uuid.Parse(c.Param("localId"))
 	if parseErr != nil {

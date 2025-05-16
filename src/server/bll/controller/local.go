@@ -32,21 +32,13 @@ func (l *Local) GetLocal(localId uuid.UUID) (*schemas.Local, *errors.Error) {
 	return l.Adapter.Local.GetPostgresqlLocal(localId)
 }
 
-// Gets a local.
-func (l *Local) FetchLocals() (*schemas.Locals, *errors.Error) {
-	locals, err := l.Adapter.Local.FetchPostgresqlLocals()
-	if err != nil {
-		return nil, &errors.ObjectNotFoundError.LocalNotFound
-	}
-	return &schemas.Locals{Locals: locals}, nil
-}
-
 // Fetch all locals.
-func (l *Local) FetchAllLocals() (*schemas.Locals, *errors.Error) {
+func (l *Local) FetchLocals() (*schemas.Locals, *errors.Error) {
 	locals, err := l.Adapter.Local.FetchPostgresqlLocals()
 	if err != nil {
 		return nil, err
 	}
+
 	return &schemas.Locals{Locals: locals}, nil
 }
 
@@ -54,7 +46,7 @@ func (l *Local) FetchAllLocals() (*schemas.Locals, *errors.Error) {
 func (l *Local) CreateLocal(
 	createLocalData schemas.CreateLocalRequest,
 	updatedBy string,
-) (*schemas.Local, *errors.Error){
+) (*schemas.Local, *errors.Error) {
 	return l.Adapter.Local.CreatePostgresqlLocal(
 		createLocalData.LocalName,
 		createLocalData.StreetName,
@@ -68,12 +60,13 @@ func (l *Local) CreateLocal(
 		updatedBy,
 	)
 }
+
 // Update a local.
-func (l *Local) UdpateLocal(
+func (l *Local) UpdateLocal(
 	localId uuid.UUID,
-	updateLocalData schemas.UdpateLocalRequest,
+	updateLocalData schemas.UpdateLocalRequest,
 	updatedBy string,
-)( *schemas.Local, *errors.Error) {
+) (*schemas.Local, *errors.Error) {
 	return l.Adapter.Local.UpdatePostgresqlLocal(
 		localId,
 		updateLocalData.LocalName,
@@ -90,6 +83,6 @@ func (l *Local) UdpateLocal(
 }
 
 // Deletes a local.
-func (l *Local) DeleteLocal(localId uuid.UUID)(*errors.Error) {
+func (l *Local) DeleteLocal(localId uuid.UUID) *errors.Error {
 	return l.Adapter.Local.DeletePostgresqlLocal(localId)
 }

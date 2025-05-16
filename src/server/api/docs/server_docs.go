@@ -304,6 +304,328 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/local/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetches all locals.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Fetch Locals.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Locals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Create the local information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Create Local.",
+                "parameters": [
+                    {
+                        "description": "Create Local Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateLocalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Local"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/local/{localId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a local given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Get Local.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Local"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Deletes a local given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Delete Local.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Update the local information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Update Local.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Local Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UpdateLocalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Local"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/plan/": {
             "get": {
                 "security": [
@@ -1227,6 +1549,38 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CreateLocalRequest": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.CreatePlanRequest": {
             "type": "object",
             "properties": {
@@ -1284,6 +1638,52 @@ const docTemplateserver = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.Local": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Locals": {
+            "type": "object",
+            "properties": {
+                "locals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Local"
+                    }
                 }
             }
         },
@@ -1399,6 +1799,38 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "purpose": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.UpdateLocalRequest": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
                     "type": "string"
                 }
             }

@@ -15,7 +15,7 @@ type Local struct {
 	ImageUrl       string    `json:"image_url"`
 }
 
-type Locals struct{
+type Locals struct {
 	Locals []*Local `json:"locals"`
 }
 
@@ -31,7 +31,7 @@ type CreateLocalRequest struct {
 	ImageUrl       string `json:"image_url"`
 }
 
-type UdpateLocalRequest struct {
+type UpdateLocalRequest struct {
 	LocalName      *string `json:"local_name"`
 	StreetName     *string `json:"street_name"`
 	BuildingNumber *string `json:"building_number"`

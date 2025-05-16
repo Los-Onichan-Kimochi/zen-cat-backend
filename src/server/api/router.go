@@ -68,6 +68,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	plan.PATCH("/:planId/", a.UpdatePlan)
 	plan.DELETE("/:planId/", a.DeletePlan)
 
+	// Local endpoints
+	local := a.Echo.Group("/local")
+	local.GET("/:localId/", a.GetLocal)
+	local.GET("/", a.FetchLocals)
+	local.POST("/", a.CreateLocal)
+	local.PATCH("/:localId/", a.UpdateLocal)
+	local.DELETE("/:localId/", a.DeleteLocal)
+
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
 	a.Logger.Fatal(a.Echo.Start(fmt.Sprintf(":%s", a.EnvSettings.MainPort)))
