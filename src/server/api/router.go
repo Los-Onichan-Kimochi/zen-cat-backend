@@ -38,7 +38,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck := a.Echo.Group("/health-check")
 	healthCheck.GET("/", a.HealthCheck)
 
-	// Add new endpoint groups here...
 	// Community endpoints
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)
@@ -56,6 +55,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
 	professional.DELETE("/:professionalId/", a.DeleteProfessional)
 
+	// Local endpoints
+	local := a.Echo.Group("/local")
+	local.GET("/:localId/", a.GetLocal)
+	local.GET("/", a.FetchLocals)
+	local.POST("/", a.CreateLocal)
+	local.PATCH("/:localId/", a.UpdateLocal)
+	local.DELETE("/:localId/", a.DeleteLocal)
+
 	// User endpoints
 	user := a.Echo.Group("/user")
 	user.GET("/:userId/", a.GetUser)
@@ -70,22 +77,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
-
-	// Plan endpoints
-	plan := a.Echo.Group("/plan")
-	plan.GET("/:planId/", a.GetPlan)
-	plan.GET("/", a.FetchPlans)
-	plan.POST("/", a.CreatePlan)
-	plan.PATCH("/:planId/", a.UpdatePlan)
-	plan.DELETE("/:planId/", a.DeletePlan)
-
-	// Local endpoints
-	local := a.Echo.Group("/local")
-	local.GET("/:localId/", a.GetLocal)
-	local.GET("/", a.FetchLocals)
-	local.POST("/", a.CreateLocal)
-	local.PATCH("/:localId/", a.UpdateLocal)
-	local.DELETE("/:localId/", a.DeleteLocal)
 
 	// Session endpoints
 
