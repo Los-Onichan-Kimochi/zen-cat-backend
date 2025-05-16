@@ -6,7 +6,7 @@ init-vscode:
 # Set up database
 set-up-db:
 	docker compose down && \
-	docker compose up -d astro-cat-postgres
+	docker compose up astro-cat-postgres -d --wait
 	cd src/server/ && go run tests/commands/clear_database.go
 
 # Test commands
