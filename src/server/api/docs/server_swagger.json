@@ -2011,6 +2011,52 @@
                 }
             }
         },
+        "schemas.Local": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Locals": {
+            "type": "object",
+            "properties": {
+                "locals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Local"
+                    }
+                }
+            }
+        },
         "schemas.Membership": {
             "type": "object",
             "properties": {

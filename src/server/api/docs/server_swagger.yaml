@@ -136,6 +136,36 @@ definitions:
       id:
         type: string
     type: object
+  schemas.Local:
+    properties:
+      building_number:
+        type: string
+      capacity:
+        type: integer
+      district:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      local_name:
+        type: string
+      province:
+        type: string
+      reference:
+        type: string
+      region:
+        type: string
+      street_name:
+        type: string
+    type: object
+  schemas.Locals:
+    properties:
+      locals:
+        items:
+          $ref: '#/definitions/schemas.Local'
+        type: array
+    type: object
   schemas.Membership:
     properties:
       community:
