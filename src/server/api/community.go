@@ -133,8 +133,8 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
-// @Param               request body schemas.BatchCreateCommunityRequest true "Bulk Create Community Request"
-// @Success 			201 {array} schemas.Communities "OK"
+// @Param               request body schemas.BatchCreateCommunityRequest true "Bulk Create Communities Request"
+// @Success 			201 {object} schemas.Communities "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found"

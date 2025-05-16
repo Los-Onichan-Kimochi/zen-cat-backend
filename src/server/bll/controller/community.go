@@ -70,7 +70,7 @@ func (c *Community) UpdateCommunity(
 	)
 }
 
-// TODO: Add BulkCreateCommunities (Batch)
+// Creates multiple communities
 func (c *Community) BulkCreateCommunities(
 	createCommunitiesData []*schemas.CreateCommunityRequest,
 	updatedBy string,
