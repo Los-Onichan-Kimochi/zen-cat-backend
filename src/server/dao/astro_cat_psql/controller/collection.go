@@ -15,13 +15,15 @@ import (
 )
 
 type AstroCatPsqlCollection struct {
-	Logger       logging.Logger
-	Community    *Community
-	Professional *Professional
-	Local        *Local
-	User         *User
-	Service      *Service
-	Plan         *Plan
+	Logger           logging.Logger
+	Community        *Community
+	Professional     *Professional
+	Local            *Local
+	User             *User
+	Service          *Service
+	Plan             *Plan
+	CommunityPlan    *CommunityPlan
+	CommunityService *CommunityService
 }
 
 // Create dao controller collection
@@ -48,13 +50,15 @@ func NewAstroCatPsqlCollection(
 	createTables(postgresqlDB)
 
 	return &AstroCatPsqlCollection{
-		Logger:       logger,
-		Community:    NewCommunityController(logger, postgresqlDB),
-		Professional: NewProfessionalController(logger, postgresqlDB),
-		Local:        NewLocalController(logger, postgresqlDB),
-		User:         NewUserController(logger, postgresqlDB),
-		Service:      NewServiceController(logger, postgresqlDB),
-		Plan:         NewPlanController(logger, postgresqlDB),
+		Logger:           logger,
+		Community:        NewCommunityController(logger, postgresqlDB),
+		Professional:     NewProfessionalController(logger, postgresqlDB),
+		Local:            NewLocalController(logger, postgresqlDB),
+		User:             NewUserController(logger, postgresqlDB),
+		Service:          NewServiceController(logger, postgresqlDB),
+		Plan:             NewPlanController(logger, postgresqlDB),
+		CommunityPlan:    NewCommunityPlanController(logger, postgresqlDB),
+		CommunityService: NewCommunityServiceController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 
@@ -107,6 +111,13 @@ func createTables(astroCatPsqlDB *gorm.DB) {
 		panic(err)
 	}
 	if err := astroCatPsqlDB.AutoMigrate(&model.Reservation{}); err != nil {
+		panic(err)
+	}
+
+	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityService{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityPlan{}); err != nil {
 		panic(err)
 	}
 
