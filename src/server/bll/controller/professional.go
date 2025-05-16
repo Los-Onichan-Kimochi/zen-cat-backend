@@ -83,3 +83,7 @@ func (p *Professional) UpdateProfessional(
 		updatedBy,
 	)
 }
+
+func (p *Professional) DeleteProfessional(professionalId uuid.UUID) *errors.Error {
+	return p.Adapter.Professional.DeletePostgresqlProfessional(professionalId)
+}
