@@ -60,6 +60,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
 
+	// Plan endpoints
+	plan := a.Echo.Group("/plan")
+	plan.GET("/:planId/", a.GetPlan)
+	plan.GET("/", a.FetchPlans)
+	plan.POST("/", a.CreatePlan)
+	plan.PATCH("/:planId/", a.UpdatePlan)
+	plan.DELETE("/:planId/", a.DeletePlan)
+
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
 	a.Logger.Fatal(a.Echo.Start(fmt.Sprintf(":%s", a.EnvSettings.MainPort)))
