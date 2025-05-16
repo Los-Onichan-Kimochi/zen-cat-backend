@@ -47,13 +47,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.PATCH("/:communityId/", a.UpdateCommunity)
 	community.POST("/bulk/", a.BulkCreateCommunities)
 
-	// professional
+	// Professional endpoints
 	professional := a.Echo.Group("/professional")
 	professional.GET("/:professionalId/", a.GetProfessional)
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
-	// user
+
+	// User endpoints
 	user := a.Echo.Group("/user")
 	user.GET("/:userId/", a.GetUser)
 	user.GET("/", a.FetchUsers)

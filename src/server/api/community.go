@@ -142,7 +142,6 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/community/bulk/ [post]
 func (a *Api) BulkCreateCommunities(c echo.Context) error {
-
 	updatedBy := "ADMIN"
 
 	var request schemas.BatchCreateCommunityRequest
@@ -151,7 +150,10 @@ func (a *Api) BulkCreateCommunities(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	response, newErr := a.BllController.Community.BulkCreateCommunities(request.Communities, updatedBy)
+	response, newErr := a.BllController.Community.BulkCreateCommunities(
+		request.Communities,
+		updatedBy,
+	)
 
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
