@@ -151,7 +151,7 @@ func (l *Local) UpdatePostgresqlLocal(
 		updatedBy,
 	)
 	if err != nil {
-		return nil, &errors.ObjectNotFoundError.LocalNotUpdated
+		return nil, &errors.ObjectNotFoundError.LocalNotFound
 	}
 	return &schemas.Local{
 		Id:             localModel.Id,
