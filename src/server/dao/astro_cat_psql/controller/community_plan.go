@@ -39,3 +39,21 @@ func (cp *CommunityPlan) GetCommunityPlan(
 
 	return &communityPlan, nil
 }
+
+// Deletes a specific community-plan association.
+func (cp *CommunityPlan) DeleteCommunityPlan(
+	communityId uuid.UUID,
+	planId uuid.UUID,
+) error {
+	result := cp.PostgresqlDB.Where("community_id = ? AND plan_id = ?", communityId, planId).
+		Delete(&model.CommunityPlan{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound // Indicate that no record was deleted
+	}
+
+	return nil
+}

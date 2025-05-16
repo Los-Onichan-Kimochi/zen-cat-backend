@@ -70,3 +70,16 @@ func (cp *CommunityPlan) GetPostgresqlCommunityPlan(
 		PlanId:      associationModel.PlanId,
 	}, nil
 }
+
+// Deletes a specific community-plan association from postgresql DB.
+func (cp *CommunityPlan) DeletePostgresqlCommunityPlan(
+	communityId uuid.UUID,
+	planId uuid.UUID,
+) *errors.Error {
+	err := cp.DaoPostgresql.CommunityPlan.DeleteCommunityPlan(communityId, planId)
+	if err != nil {
+		return &errors.BadRequestError.CommunityPlanNotDeleted
+	}
+
+	return nil
+}

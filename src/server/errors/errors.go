@@ -160,8 +160,10 @@ var (
 		UserNotSoftDeleted            Error
 		CommunityPlanNotCreated       Error
 		CommunityPlanAlreadyExists    Error
+		CommunityPlanNotDeleted       Error
 		CommunityServiceNotCreated    Error
 		CommunityServiceAlreadyExists Error
+		CommunityServiceNotDeleted    Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -259,6 +261,10 @@ var (
 			Code:    "COMMUNITY_PLAN_ERROR_003",
 			Message: "Community-Plan association already exists",
 		},
+		CommunityPlanNotDeleted: Error{
+			Code:    "COMMUNITY_PLAN_ERROR_005",
+			Message: "Community-Plan association not deleted",
+		},
 		CommunityServiceNotCreated: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_002",
 			Message: "Community-Service association not created",
@@ -266,6 +272,10 @@ var (
 		CommunityServiceAlreadyExists: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_003",
 			Message: "Community-Service association already exists",
+		},
+		CommunityServiceNotDeleted: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_005",
+			Message: "Community-Service association not deleted",
 		},
 	}
 

@@ -74,3 +74,16 @@ func (cs *CommunityService) GetPostgresqlCommunityService(
 		ServiceId:   associationModel.ServiceId,
 	}, nil
 }
+
+// Deletes a specific community-service association from postgresql DB.
+func (cs *CommunityService) DeletePostgresqlCommunityService(
+	communityId uuid.UUID,
+	serviceId uuid.UUID,
+) *errors.Error {
+	err := cs.DaoPostgresql.CommunityService.DeleteCommunityService(communityId, serviceId)
+	if err != nil {
+		return &errors.BadRequestError.CommunityServiceNotDeleted
+	}
+
+	return nil
+}

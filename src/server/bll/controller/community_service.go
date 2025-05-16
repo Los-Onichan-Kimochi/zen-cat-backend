@@ -76,3 +76,26 @@ func (cs *CommunityService) GetCommunityService(
 
 	return cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
 }
+
+// Deletes a specific community-service association.
+func (cs *CommunityService) DeleteCommunityService(
+	communityIdString string,
+	serviceIdString string,
+) *errors.Error {
+	communityId, parseErr := uuid.Parse(communityIdString)
+	if parseErr != nil {
+		return &errors.UnprocessableEntityError.InvalidCommunityId
+	}
+
+	serviceId, parseErrS := uuid.Parse(serviceIdString)
+	if parseErrS != nil {
+		return &errors.UnprocessableEntityError.InvalidServiceId
+	}
+
+	_, err := cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
+	if err != nil {
+		return err
+	}
+
+	return cs.Adapter.CommunityService.DeletePostgresqlCommunityService(communityId, serviceId)
+}

@@ -39,3 +39,21 @@ func (cs *CommunityService) GetCommunityService(
 
 	return &communityService, nil
 }
+
+// Deletes a specific community-service association.
+func (cs *CommunityService) DeleteCommunityService(
+	communityId uuid.UUID,
+	serviceId uuid.UUID,
+) error {
+	result := cs.PostgresqlDB.Where("community_id = ? AND service_id = ?", communityId, serviceId).
+		Delete(&model.CommunityService{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound // Indicate that no record was deleted
+	}
+
+	return nil
+}

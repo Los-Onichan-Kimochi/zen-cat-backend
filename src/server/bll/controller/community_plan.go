@@ -74,3 +74,26 @@ func (cp *CommunityPlan) GetCommunityPlan(
 
 	return cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)
 }
+
+// Deletes a specific community-plan association.
+func (cp *CommunityPlan) DeleteCommunityPlan(
+	communityIdString string,
+	planIdString string,
+) *errors.Error {
+	communityId, parseErr := uuid.Parse(communityIdString)
+	if parseErr != nil {
+		return &errors.UnprocessableEntityError.InvalidCommunityId
+	}
+
+	planId, parseErr := uuid.Parse(planIdString)
+	if parseErr != nil {
+		return &errors.UnprocessableEntityError.InvalidPlanId
+	}
+
+	_, err := cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)
+	if err != nil {
+		return err
+	}
+
+	return cp.Adapter.CommunityPlan.DeletePostgresqlCommunityPlan(communityId, planId)
+}

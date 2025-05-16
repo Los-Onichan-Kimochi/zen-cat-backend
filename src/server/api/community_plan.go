@@ -77,3 +77,33 @@ func (a *Api) GetCommunityPlan(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Delete CommunityPlan.
+// @Description 		Deletes a specific community-plan association.
+// @Tags 				CommunityPlan
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				communityId path string true "Community ID"
+// @Param 				planId path string true "Plan ID"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
+// @Failure 			500 {object} errors.Error "Internal Server Error (e.g., deletion failed)"
+// @Router 				/community-plan/{communityId}/{planId} [delete]
+func (a *Api) DeleteCommunityPlan(c echo.Context) error {
+	communityId := c.Param("communityId")
+	planId := c.Param("planId")
+
+	if communityId == "" || planId == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityPlanId, c)
+	}
+
+	err := a.BllController.CommunityPlan.DeleteCommunityPlan(communityId, planId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
