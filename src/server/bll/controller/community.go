@@ -75,4 +75,10 @@ func (c *Community) DeleteCommunity(communityId uuid.UUID) *errors.Error {
 	return c.Adapter.Community.DeletePostgresqlCommunity(communityId)
 }
 
-// TODO: Add BulkCreateCommunities (Batch)
+// Creates multiple communities
+func (c *Community) BulkCreateCommunities(
+	createCommunitiesData []*schemas.CreateCommunityRequest,
+	updatedBy string,
+) ([]*schemas.Community, *errors.Error) {
+	return c.Adapter.Community.BulkCreatePostgresqlCommunities(createCommunitiesData, updatedBy)
+}

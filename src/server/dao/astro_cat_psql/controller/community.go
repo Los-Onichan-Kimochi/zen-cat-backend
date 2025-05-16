@@ -109,3 +109,8 @@ func (c *Community) DeleteCommunity(communityId uuid.UUID) error {
 	}
 	return nil
 }
+
+// Creates communities given their models.
+func (c *Community) BulkCreateCommunities(communities []*model.Community) error {
+	return c.PostgresqlDB.Create(&communities).Error
+}
