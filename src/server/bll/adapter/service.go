@@ -36,11 +36,11 @@ func (c *Service) GetPostgresqlService(
 	}
 
 	return &schemas.Service{
-		Id:                  serviceModel.Id,
-		Name:                serviceModel.Name,
-		Description: 	   	 serviceModel.Description,
-		ImageUrl:            serviceModel.ImageUrl,
-		IsVirtual:           serviceModel.IsVirtual,
+		Id:          serviceModel.Id,
+		Name:        serviceModel.Name,
+		Description: serviceModel.Description,
+		ImageUrl:    serviceModel.ImageUrl,
+		IsVirtual:   serviceModel.IsVirtual,
 	}, nil
 }
 
@@ -54,11 +54,11 @@ func (c *Service) FetchPostgresqlServices() ([]*schemas.Service, *errors.Error) 
 	services := make([]*schemas.Service, len(servicesModel))
 	for i, serviceModel := range servicesModel {
 		services[i] = &schemas.Service{
-			Id:                  serviceModel.Id,
-			Name:                serviceModel.Name,
-			Description: 	   	 serviceModel.Description,
-			ImageUrl:            serviceModel.ImageUrl,
-			IsVirtual:           serviceModel.IsVirtual,
+			Id:          serviceModel.Id,
+			Name:        serviceModel.Name,
+			Description: serviceModel.Description,
+			ImageUrl:    serviceModel.ImageUrl,
+			IsVirtual:   serviceModel.IsVirtual,
 		}
 	}
 
@@ -78,11 +78,11 @@ func (c *Service) CreatePostgresqlService(
 	}
 
 	serviceModel := &model.Service{
-		Id:                  uuid.New(),
-		Name:                name,
-		Description:         description,
-		ImageUrl:            imageUrl,
-		IsVirtual:           isVirtual,
+		Id:          uuid.New(),
+		Name:        name,
+		Description: description,
+		ImageUrl:    imageUrl,
+		IsVirtual:   isVirtual,
 		AuditFields: model.AuditFields{
 			UpdatedBy: updatedBy,
 		},
@@ -93,11 +93,11 @@ func (c *Service) CreatePostgresqlService(
 	}
 
 	return &schemas.Service{
-		Id:                  serviceModel.Id,
-		Name:                serviceModel.Name,
-		Description:         serviceModel.Description,
-		ImageUrl:            serviceModel.ImageUrl,
-		IsVirtual: 			 serviceModel.IsVirtual,
+		Id:          serviceModel.Id,
+		Name:        serviceModel.Name,
+		Description: serviceModel.Description,
+		ImageUrl:    serviceModel.ImageUrl,
+		IsVirtual:   serviceModel.IsVirtual,
 	}, nil
 }
 
@@ -127,10 +127,10 @@ func (c *Service) UpdatePostgresqlService(
 	}
 
 	return &schemas.Service{
-		Id:                 serviceModel.Id,
-		Name:               serviceModel.Name,
-		Description:        serviceModel.Description,
-		ImageUrl:           serviceModel.ImageUrl,
-		IsVirtual: 			serviceModel.IsVirtual,
+		Id:          serviceModel.Id,
+		Name:        serviceModel.Name,
+		Description: serviceModel.Description,
+		ImageUrl:    serviceModel.ImageUrl,
+		IsVirtual:   serviceModel.IsVirtual,
 	}, nil
 }

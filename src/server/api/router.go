@@ -39,12 +39,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck.GET("/", a.HealthCheck)
 
 	// Add new endpoint groups here...
+	// Community endpoints
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
-	// professional
+
+	// Professional endpoints
 	professional := a.Echo.Group("/professional")
 	professional.GET("/:professionalId/", a.GetProfessional)
 	professional.GET("/", a.FetchProfessionals)
