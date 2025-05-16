@@ -44,6 +44,27 @@ definitions:
       purpose:
         type: string
     type: object
+  schemas.CreateLocalRequest:
+    properties:
+      building_number:
+        type: string
+      capacity:
+        type: integer
+      district:
+        type: string
+      image_url:
+        type: string
+      local_name:
+        type: string
+      province:
+        type: string
+      reference:
+        type: string
+      region:
+        type: string
+      street_name:
+        type: string
+    type: object
   schemas.CreatePlanRequest:
     properties:
       fee:
@@ -114,6 +135,36 @@ definitions:
         type: string
       id:
         type: string
+    type: object
+  schemas.Local:
+    properties:
+      building_number:
+        type: string
+      capacity:
+        type: integer
+      district:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      local_name:
+        type: string
+      province:
+        type: string
+      reference:
+        type: string
+      region:
+        type: string
+      street_name:
+        type: string
+    type: object
+  schemas.Locals:
+    properties:
+      locals:
+        items:
+          $ref: '#/definitions/schemas.Local'
+        type: array
     type: object
   schemas.Membership:
     properties:
@@ -232,6 +283,27 @@ definitions:
       name:
         type: string
       purpose:
+        type: string
+    type: object
+  schemas.UpdateLocalRequest:
+    properties:
+      building_number:
+        type: string
+      capacity:
+        type: integer
+      district:
+        type: string
+      image_url:
+        type: string
+      local_name:
+        type: string
+      province:
+        type: string
+      reference:
+        type: string
+      region:
+        type: string
+      street_name:
         type: string
     type: object
   schemas.UpdatePlanRequest:
@@ -528,6 +600,213 @@ paths:
       summary: Health Check
       tags:
       - Health Check
+  /local/:
+    get:
+      consumes:
+      - application/json
+      description: Fetches all locals.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Locals'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Locals.
+      tags:
+      - Local
+    post:
+      consumes:
+      - application/json
+      description: Create the local information.
+      parameters:
+      - description: Create Local Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateLocalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Local'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Local.
+      tags:
+      - Local
+  /local/{localId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a local given its id.
+      parameters:
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Local.
+      tags:
+      - Local
+    get:
+      consumes:
+      - application/json
+      description: Gets a local given its id.
+      parameters:
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Local'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Local.
+      tags:
+      - Local
+    patch:
+      consumes:
+      - application/json
+      description: Update the local information.
+      parameters:
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      - description: Update Local Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateLocalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Local'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Local.
+      tags:
+      - Local
   /plan/:
     get:
       consumes:

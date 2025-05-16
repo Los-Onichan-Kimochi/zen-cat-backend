@@ -114,7 +114,11 @@ func (a *Api) UpdateProfessional(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
-	response, err := a.BllController.Professional.UpdateProfessional(professionalId, request, updateBy)
+	response, err := a.BllController.Professional.UpdateProfessional(
+		professionalId,
+		request,
+		updateBy,
+	)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

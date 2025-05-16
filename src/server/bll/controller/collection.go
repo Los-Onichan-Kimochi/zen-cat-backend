@@ -12,6 +12,7 @@ type ControllerCollection struct {
 	EnvSettings  *schemas.EnvSettings
 	Community    *Community
 	Professional *Professional
+	Local        *Local
 	User         *User
 	Service      *Service
 	Plan         *Plan
@@ -28,6 +29,7 @@ func NewControllerCollection(
 	)
 	community := NewCommunityController(logger, bllAdapter, envSettings)
 	professional := NewProfessionalController(logger, bllAdapter, envSettings)
+	local := NewLocalController(logger, bllAdapter, envSettings)
 	user := NewUserController(logger, bllAdapter, envSettings)
 	service := NewServiceController(logger, bllAdapter, envSettings)
 	plan := NewPlanController(logger, bllAdapter, envSettings)
@@ -37,6 +39,7 @@ func NewControllerCollection(
 		EnvSettings:  envSettings,
 		Community:    community,
 		Professional: professional,
+		Local:        local,
 		User:         user,
 		Service:      service,
 		Plan:         plan,

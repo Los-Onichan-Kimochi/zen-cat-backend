@@ -18,6 +18,7 @@ var (
 		CommunityNotFound    Error
 		ReservationNotFound  Error
 		ProfessionalNotFound Error
+		LocalNotFound        Error
 		UserNotFound         Error
 		ServiceNotFound      Error
 		PlanNotFound         Error
@@ -31,6 +32,10 @@ var (
 		ProfessionalNotFound: Error{
 			Code:    "PROFESSIONAL_ERROR_001",
 			Message: "Professional not found",
+		},
+		LocalNotFound: Error{
+			Code:    "LOCAL_ERROR_001",
+			Message: "Local not found",
 		},
 		ServiceNotFound: Error{
 			Code:    "SERVICE_ERROR_001",
@@ -59,6 +64,7 @@ var (
 		InvalidCommunityId    Error
 		InvalidRequestBody    Error
 		InvalidProfessionalId Error
+		InvalidLocalId        Error
 		InvalidServiceId      Error
 		InvalidPlanId         Error
 		InvalidMembershipId   Error
@@ -77,6 +83,10 @@ var (
 		InvalidProfessionalId: Error{
 			Code:    "PROFESSIONAL_ERROR_004",
 			Message: "Invalid professional id",
+		},
+		InvalidLocalId: Error{
+			Code:    "LOCAL_ERROR_004",
+			Message: "Invalid local id",
 		},
 		InvalidServiceId: Error{
 			Code:    "SERVICE_ERROR_004",
@@ -109,6 +119,9 @@ var (
 		InvalidUpdatedByValue  Error
 		CommunityNotCreated    Error
 		CommunityNotUpdated    Error
+		LocalNotCreated        Error
+		LocalNotUpdated        Error
+		LocalNotSoftDeleted    Error
 		ProfessionalNotCreated Error
 		ProfessionalNotUpdated Error
 		ServiceNotCreated      Error
@@ -144,6 +157,18 @@ var (
 		ProfessionalNotUpdated: Error{
 			Code:    "PROFESSIONAL_ERROR_003",
 			Message: "Professional not updated",
+		},
+		LocalNotCreated: Error{
+			Code:    "LOCAL_ERROR_002",
+			Message: "Local not created",
+		},
+		LocalNotUpdated: Error{
+			Code:    "LOCAL_ERROR_003",
+			Message: "Local not updated",
+		},
+		LocalNotSoftDeleted: Error{
+			Code:    "LOCAL_ERROR_005",
+			Message: "Local not soft deleted",
 		},
 		MembershipNotCreated: Error{
 			Code:    "MEMBERSHIP_ERROR_002",
