@@ -88,3 +88,8 @@ func (l *Local) UdpateLocal(
 		updatedBy,
 	)
 }
+
+// Deletes a local.
+func (l *Local) DeleteLocal(localId uuid.UUID)(*errors.Error) {
+	return l.Adapter.Local.DeletePostgresqlLocal(localId)
+}

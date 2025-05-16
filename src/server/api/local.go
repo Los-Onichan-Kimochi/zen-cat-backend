@@ -107,3 +107,30 @@ func (a *Api) UpadteLocal(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Delete Local.
+// @Description 		Deletes a local given its id.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               localId    path   string  true  "Local ID"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/{localId}/ [delete]
+
+func (a *Api) DeleteLocal(c echo.Context) error {
+	localId, parseErr := uuid.Parse(c.Param("localId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidLocalId, c)
+	}
+
+	if err := a.BllController.Local.DeleteLocal(localId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}

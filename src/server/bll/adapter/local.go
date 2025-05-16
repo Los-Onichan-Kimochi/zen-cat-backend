@@ -165,3 +165,11 @@ func (l *Local) UpdatePostgresqlLocal(
 		ImageUrl: 		localModel.ImageUrl,
 	},nil
 }
+
+//Delets a plan from postgresql BD
+func (l *Local)DeletePostgresqlLocal(localId uuid.UUID)(*errors.Error) {
+	if err := l.DaoPostgresql.Local.DeleteLocal(localId); err != nil {
+		return &errors.BadRequestError.LocalNotSoftDeleted
+	}
+	return nil
+}

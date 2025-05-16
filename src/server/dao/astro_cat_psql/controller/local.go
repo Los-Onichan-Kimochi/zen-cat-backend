@@ -113,3 +113,16 @@ func (l *Local) UpdateLocal(
 	}
 	return &local,nil;
 }
+
+// Soft deletes a local given its ID.
+func (l *Local) DeleteLocal(id uuid.UUID) error {
+	result := l.PostgresqlDB.Delete(&model.Local{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
