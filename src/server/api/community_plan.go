@@ -61,7 +61,7 @@ func (a *Api) CreateCommunityPlan(c echo.Context) error {
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-plan/{communityId}/{planId} [get]
+// @Router 				/community-plan/{communityId}/{planId}/ [get]
 func (a *Api) GetCommunityPlan(c echo.Context) error {
 	communityId := c.Param("communityId")
 	planId := c.Param("planId")
@@ -91,7 +91,7 @@ func (a *Api) GetCommunityPlan(c echo.Context) error {
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
 // @Failure 			500 {object} errors.Error "Internal Server Error (e.g., deletion failed)"
-// @Router 				/community-plan/{communityId}/{planId} [delete]
+// @Router 				/community-plan/{communityId}/{planId}/ [delete]
 func (a *Api) DeleteCommunityPlan(c echo.Context) error {
 	communityId := c.Param("communityId")
 	planId := c.Param("planId")

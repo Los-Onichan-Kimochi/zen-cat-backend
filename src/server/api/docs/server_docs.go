@@ -90,7 +90,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-plan/{communityId}/{planId}": {
+        "/community-plan/{communityId}/{planId}/": {
             "get": {
                 "security": [
                     {
@@ -296,7 +296,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-service/{communityId}/{serviceId}": {
+        "/community-service/{communityId}/{serviceId}/": {
             "get": {
                 "security": [
                     {

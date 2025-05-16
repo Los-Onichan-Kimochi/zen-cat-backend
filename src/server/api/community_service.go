@@ -60,7 +60,7 @@ func (a *Api) CreateCommunityService(c echo.Context) error {
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-service/{communityId}/{serviceId} [get]
+// @Router 				/community-service/{communityId}/{serviceId}/ [get]
 func (a *Api) GetCommunityService(c echo.Context) error {
 	communityId := c.Param("communityId")
 	serviceId := c.Param("serviceId")
@@ -90,7 +90,7 @@ func (a *Api) GetCommunityService(c echo.Context) error {
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
 // @Failure 			500 {object} errors.Error "Internal Server Error (e.g., deletion failed)"
-// @Router 				/community-service/{communityId}/{serviceId} [delete]
+// @Router 				/community-service/{communityId}/{serviceId}/ [delete]
 func (a *Api) DeleteCommunityService(c echo.Context) error {
 	communityId := c.Param("communityId")
 	serviceId := c.Param("serviceId")

@@ -83,7 +83,7 @@
                 }
             }
         },
-        "/community-plan/{communityId}/{planId}": {
+        "/community-plan/{communityId}/{planId}/": {
             "get": {
                 "security": [
                     {
@@ -289,7 +289,7 @@
                 }
             }
         },
-        "/community-service/{communityId}/{serviceId}": {
+        "/community-service/{communityId}/{serviceId}/": {
             "get": {
                 "security": [
                     {

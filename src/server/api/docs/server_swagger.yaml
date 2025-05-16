@@ -503,7 +503,7 @@ paths:
       summary: Create CommunityPlan.
       tags:
       - CommunityPlan
-  /community-plan/{communityId}/{planId}:
+  /community-plan/{communityId}/{planId}/:
     delete:
       consumes:
       - application/json
@@ -636,7 +636,7 @@ paths:
       summary: Create CommunityService.
       tags:
       - CommunityService
-  /community-service/{communityId}/{serviceId}:
+  /community-service/{communityId}/{serviceId}/:
     delete:
       consumes:
       - application/json
