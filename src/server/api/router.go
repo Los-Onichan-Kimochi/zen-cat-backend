@@ -39,6 +39,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck.GET("/", a.HealthCheck)
 
 	// Add new endpoint groups here...
+	// Community endpoints
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)
 	community.GET("/", a.FetchCommunities)
@@ -52,6 +53,22 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
+
+	// Service Endpoints
+	service := a.Echo.Group("/service")
+	service.GET("/:serviceId/", a.GetService)
+	service.GET("/", a.FetchServices)
+	service.POST("/", a.CreateService)
+	service.PATCH("/:serviceId/", a.UpdateService)
+
+	// Plan endpoints
+	plan := a.Echo.Group("/plan")
+	plan.GET("/:planId/", a.GetPlan)
+	plan.GET("/", a.FetchPlans)
+	plan.POST("/", a.CreatePlan)
+	plan.PATCH("/:planId/", a.UpdatePlan)
+	plan.DELETE("/:planId/", a.DeletePlan)
+
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
 	a.Logger.Fatal(a.Echo.Start(fmt.Sprintf(":%s", a.EnvSettings.MainPort)))
