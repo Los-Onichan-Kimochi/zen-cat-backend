@@ -160,7 +160,7 @@ const docTemplateserver = `{
                 "summary": "Bulk Create Community.",
                 "parameters": [
                     {
-                        "description": "Bulk Create Community Request",
+                        "description": "Bulk Create Communities Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -173,10 +173,7 @@ const docTemplateserver = `{
                     "201": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schemas.Communities"
-                            }
+                            "$ref": "#/definitions/schemas.Communities"
                         }
                     },
                     "400": {
