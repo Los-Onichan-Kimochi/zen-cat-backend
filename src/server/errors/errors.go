@@ -16,8 +16,11 @@ var (
 	// For 404 Not Found errors
 	ObjectNotFoundError = struct {
 		CommunityNotFound    Error
+		ReservationNotFound  Error
 		ProfessionalNotFound Error
 		UserNotFound         Error
+		ServiceNotFound      Error
+		PlanNotFound         Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -26,6 +29,14 @@ var (
 		ProfessionalNotFound: Error{
 			Code:    "PROFESSIONAL_ERROR_001",
 			Message: "Professional not found",
+		},
+		ServiceNotFound: Error{
+			Code:    "SERVICE_ERROR_001",
+			Message: "Service not found",
+		},
+		PlanNotFound: Error{
+			Code:    "PLAN_ERROR_001",
+			Message: "Plan not found",
 		},
 		UserNotFound: Error{
 			Code:    "USER_ERROR_001",
@@ -38,6 +49,8 @@ var (
 		InvalidCommunityId    Error
 		InvalidRequestBody    Error
 		InvalidProfessionalId Error
+		InvalidServiceId      Error
+		InvalidPlanId         Error
 		InvalidMembershipId   Error
 		InvalidOnboardingId   Error
 		InvalidUserEmail      Error
@@ -54,6 +67,14 @@ var (
 		InvalidProfessionalId: Error{
 			Code:    "PROFESSIONAL_ERROR_004",
 			Message: "Invalid professional id",
+		},
+		InvalidServiceId: Error{
+			Code:    "SERVICE_ERROR_004",
+			Message: "Invalid service id",
+		},
+		InvalidPlanId: Error{
+			Code:    "PLAN_ERROR_004",
+			Message: "Invalid plan id",
 		},
 		InvalidMembershipId: Error{
 			Code:    "MEMBERSHIP_ERROR_001",
@@ -80,6 +101,12 @@ var (
 		CommunityNotUpdated    Error
 		ProfessionalNotCreated Error
 		ProfessionalNotUpdated Error
+		ServiceNotCreated      Error
+		ServiceNotUpdated      Error
+		PlanNotCreated         Error
+		PlanNotUpdated         Error
+		PlanNotSoftDeleted     Error
+		InvalidPlanType        Error
 		MembershipNotCreated   Error
 		MembershipNotUpdated   Error
 		OnboardingNotCreated   Error
@@ -131,10 +158,41 @@ var (
 			Code:    "USER_ERROR_003",
 			Message: "User not updated",
 		},
+		ServiceNotCreated: Error{
+			Code:    "SERVICE_ERROR_002",
+			Message: "Service not created",
+		},
+		ServiceNotUpdated: Error{
+			Code:    "SERVICE_ERROR_003",
+			Message: "Service not updated",
+		},
+		PlanNotCreated: Error{
+			Code:    "PLAN_ERROR_002",
+			Message: "Plan not created",
+		},
+		PlanNotUpdated: Error{
+			Code:    "PLAN_ERROR_003",
+			Message: "Plan not updated",
+		},
+		InvalidPlanType: Error{
+			Code:    "PLAN_ERROR_005",
+			Message: "Invalid plan type",
+		},
+		PlanNotSoftDeleted: Error{
+			Code:    "PLAN_ERROR_006",
+			Message: "Plan not soft deleted",
+		},
 	}
 
 	// For 500 Internal Server errors
-	InternalServerError = struct{}{}
+	InternalServerError = struct {
+		Default Error
+	}{
+		Default: Error{
+			Code:    "INTERNAL_SERVER_ERROR_001",
+			Message: "An unexpected error occurred.",
+		},
+	}
 )
 
 // Helper function to check if an error is in a specific error group.

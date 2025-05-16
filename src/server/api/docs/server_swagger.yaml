@@ -7,6 +7,14 @@ definitions:
       message:
         type: string
     type: object
+  model.PlanType:
+    enum:
+    - MONTHLY
+    - ANUAL
+    type: string
+    x-enum-varnames:
+    - PlanTypeMonthly
+    - PlanTypeAnual
   schemas.Communities:
     properties:
       communities:
@@ -35,6 +43,15 @@ definitions:
         type: string
       purpose:
         type: string
+    type: object
+  schemas.CreatePlanRequest:
+    properties:
+      fee:
+        type: number
+      reservation_limit:
+        type: integer
+      type:
+        $ref: '#/definitions/model.PlanType'
     type: object
   schemas.CreateProfessionalRequest:
     properties:
@@ -128,6 +145,34 @@ definitions:
         type: string
       postal_code:
         type: string
+  schemas.CreateServiceRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
+    type: object
+  schemas.Plan:
+    properties:
+      fee:
+        type: number
+      id:
+        type: string
+      reservation_limit:
+        type: integer
+      type:
+        $ref: '#/definitions/model.PlanType'
+    type: object
+  schemas.Plans:
+    properties:
+      plans:
+        items:
+          $ref: '#/definitions/schemas.Plan'
+        type: array
     type: object
   schemas.Professional:
     properties:
@@ -157,6 +202,26 @@ definitions:
           $ref: '#/definitions/schemas.Professional'
         type: array
     type: object
+  schemas.Service:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
+    type: object
+  schemas.Services:
+    properties:
+      services:
+        items:
+          $ref: '#/definitions/schemas.Service'
+        type: array
+    type: object
   schemas.UpdateCommunityRequest:
     properties:
       image_url:
@@ -165,6 +230,15 @@ definitions:
         type: string
       purpose:
         type: string
+    type: object
+  schemas.UpdatePlanRequest:
+    properties:
+      fee:
+        type: number
+      reservation_limit:
+        type: integer
+      type:
+        $ref: '#/definitions/model.PlanType'
     type: object
   schemas.UpdateProfessionalRequest:
     properties:
@@ -247,6 +321,16 @@ definitions:
         items:
           $ref: '#/definitions/schemas.User'
         type: array
+  schemas.UpdateServiceRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
     type: object
 info:
   contact: {}
@@ -440,6 +524,213 @@ paths:
       summary: Health Check
       tags:
       - Health Check
+  /plan/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all plans, filtered by params.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Plans'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Plans.
+      tags:
+      - Plan
+    post:
+      consumes:
+      - application/json
+      description: Create the plan information.
+      parameters:
+      - description: Create Plan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreatePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Plan.
+      tags:
+      - Plan
+  /plan/{planId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a plan given its id.
+      parameters:
+      - description: Plan ID
+        in: path
+        name: planId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Plan.
+      tags:
+      - Plan
+    get:
+      consumes:
+      - application/json
+      description: Gets a plan given its id.
+      parameters:
+      - description: Plan ID
+        in: path
+        name: planId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Plan.
+      tags:
+      - Plan
+    patch:
+      consumes:
+      - application/json
+      description: Update the plan information.
+      parameters:
+      - description: Plan ID
+        in: path
+        name: planId
+        required: true
+        type: string
+      - description: Update Plan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdatePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Plan.
+      tags:
+      - Plan
   /professional/:
     get:
       consumes:
@@ -616,6 +907,11 @@ paths:
       consumes:
       - application/json
       description: Fetch all users, filtered by params.
+  /service/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all services, filtered by params.
       produces:
       - application/json
       responses:
@@ -623,6 +919,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.Users'
+            $ref: '#/definitions/schemas.Services'
         "400":
           description: Bad Request
           schema:
@@ -666,6 +963,27 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.User'
+      summary: Fetch Services.
+      tags:
+      - Service
+    post:
+      consumes:
+      - application/json
+      description: Create the service information.
+      parameters:
+      - description: Create Service Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Service'
         "400":
           description: Bad Request
           schema:
@@ -700,6 +1018,18 @@ paths:
       - description: User ID
         in: path
         name: userId
+      summary: Create Service.
+      tags:
+      - Service
+  /service/{serviceId}/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a service given its id.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
         required: true
         type: string
       produces:
@@ -709,6 +1039,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.User'
+            $ref: '#/definitions/schemas.Service'
         "400":
           description: Bad Request
           schema:
@@ -750,6 +1081,25 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/schemas.UpdateUserRequest'
+      summary: Get Service.
+      tags:
+      - Service
+    patch:
+      consumes:
+      - application/json
+      description: Update the service information.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Update Service Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateServiceRequest'
       produces:
       - application/json
       responses:
@@ -757,6 +1107,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.User'
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Service'
         "400":
           description: Bad Request
           schema:
@@ -782,4 +1135,7 @@ paths:
       summary: Update User.
       tags:
       - User
+      summary: Update Service.
+      tags:
+      - Service
 swagger: "2.0"
