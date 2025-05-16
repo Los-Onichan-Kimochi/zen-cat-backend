@@ -18,8 +18,12 @@ var (
 		CommunityNotFound    Error
 		ReservationNotFound  Error
 		ProfessionalNotFound Error
+		LocalNotFound        Error
+		UserNotFound         Error
 		ServiceNotFound      Error
 		PlanNotFound         Error
+		MembershipNotFound   Error
+		OnboardingNotFound   Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -29,6 +33,10 @@ var (
 			Code:    "PROFESSIONAL_ERROR_001",
 			Message: "Professional not found",
 		},
+		LocalNotFound: Error{
+			Code:    "LOCAL_ERROR_001",
+			Message: "Local not found",
+		},
 		ServiceNotFound: Error{
 			Code:    "SERVICE_ERROR_001",
 			Message: "Service not found",
@@ -37,6 +45,18 @@ var (
 			Code:    "PLAN_ERROR_001",
 			Message: "Plan not found",
 		},
+		UserNotFound: Error{
+			Code:    "USER_ERROR_001",
+			Message: "User not found",
+		},
+		MembershipNotFound: Error{
+			Code:    "MEMBERSHIP_ERROR_001",
+			Message: "Membership not found",
+		},
+		OnboardingNotFound: Error{
+			Code:    "ONBOARDING_ERROR_001",
+			Message: "Onboarding not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
@@ -44,8 +64,13 @@ var (
 		InvalidCommunityId    Error
 		InvalidRequestBody    Error
 		InvalidProfessionalId Error
+		InvalidLocalId        Error
 		InvalidServiceId      Error
 		InvalidPlanId         Error
+		InvalidMembershipId   Error
+		InvalidOnboardingId   Error
+		InvalidUserEmail      Error
+		InvalidUserId         Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -59,6 +84,10 @@ var (
 			Code:    "PROFESSIONAL_ERROR_004",
 			Message: "Invalid professional id",
 		},
+		InvalidLocalId: Error{
+			Code:    "LOCAL_ERROR_004",
+			Message: "Invalid local id",
+		},
 		InvalidServiceId: Error{
 			Code:    "SERVICE_ERROR_004",
 			Message: "Invalid service id",
@@ -67,6 +96,22 @@ var (
 			Code:    "PLAN_ERROR_004",
 			Message: "Invalid plan id",
 		},
+		InvalidMembershipId: Error{
+			Code:    "MEMBERSHIP_ERROR_001",
+			Message: "Invalid membership id",
+		},
+		InvalidOnboardingId: Error{
+			Code:    "ONBOARDING_ERROR_001",
+			Message: "Invalid onboarding id",
+		},
+		InvalidUserEmail: Error{
+			Code:    "USER_ERROR_001",
+			Message: "Invalid user email",
+		},
+		InvalidUserId: Error{
+			Code:    "USER_ERROR_004",
+			Message: "Invalid user id",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -74,6 +119,9 @@ var (
 		InvalidUpdatedByValue  Error
 		CommunityNotCreated    Error
 		CommunityNotUpdated    Error
+		LocalNotCreated        Error
+		LocalNotUpdated        Error
+		LocalNotSoftDeleted    Error
 		ProfessionalNotCreated Error
 		ProfessionalNotUpdated Error
 		ServiceNotCreated      Error
@@ -82,6 +130,13 @@ var (
 		PlanNotUpdated         Error
 		PlanNotSoftDeleted     Error
 		InvalidPlanType        Error
+		MembershipNotCreated   Error
+		MembershipNotUpdated   Error
+		OnboardingNotCreated   Error
+		OnboardingNotUpdated   Error
+		UserNotCreated         Error
+		UserNotUpdated         Error
+		UserNotSoftDeleted     Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -102,6 +157,42 @@ var (
 		ProfessionalNotUpdated: Error{
 			Code:    "PROFESSIONAL_ERROR_003",
 			Message: "Professional not updated",
+		},
+		LocalNotCreated: Error{
+			Code:    "LOCAL_ERROR_002",
+			Message: "Local not created",
+		},
+		LocalNotUpdated: Error{
+			Code:    "LOCAL_ERROR_003",
+			Message: "Local not updated",
+		},
+		LocalNotSoftDeleted: Error{
+			Code:    "LOCAL_ERROR_005",
+			Message: "Local not soft deleted",
+		},
+		MembershipNotCreated: Error{
+			Code:    "MEMBERSHIP_ERROR_002",
+			Message: "Membership not created",
+		},
+		MembershipNotUpdated: Error{
+			Code:    "MEMBERSHIP_ERROR_003",
+			Message: "Membership not updated",
+		},
+		OnboardingNotCreated: Error{
+			Code:    "ONBOARDING_ERROR_002",
+			Message: "Onboarding not created",
+		},
+		OnboardingNotUpdated: Error{
+			Code:    "ONBOARDING_ERROR_003",
+			Message: "Onboarding not updated",
+		},
+		UserNotCreated: Error{
+			Code:    "USER_ERROR_002",
+			Message: "User not created",
+		},
+		UserNotUpdated: Error{
+			Code:    "USER_ERROR_003",
+			Message: "User not updated",
 		},
 		ServiceNotCreated: Error{
 			Code:    "SERVICE_ERROR_002",
@@ -126,6 +217,10 @@ var (
 		PlanNotSoftDeleted: Error{
 			Code:    "PLAN_ERROR_006",
 			Message: "Plan not soft deleted",
+		},
+		UserNotSoftDeleted: Error{
+			Code:    "USER_ERROR_005",
+			Message: "User not soft deleted",
 		},
 	}
 
