@@ -120,3 +120,28 @@ func (a *Api) UpdateUser(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Delete User.
+// @Description 		Deletes a user given its id.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               userId    path   string  true  "User ID"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/{userId}/ [delete]
+func (a *Api) DeleteUser(c echo.Context) error {
+	userId, parseErr := uuid.Parse(c.Param("userId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
+	}
+	if err := a.BllController.User.DeleteUser(userId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.NoContent(http.StatusNoContent)
+}

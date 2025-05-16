@@ -58,6 +58,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	user.GET("/", a.FetchUsers)
 	user.POST("/", a.CreateUser)
 	user.PATCH("/:userId/", a.UpdateUser)
+	user.DELETE("/:userId/", a.DeleteUser)
 
 	// Service Endpoints
 	service := a.Echo.Group("/service")

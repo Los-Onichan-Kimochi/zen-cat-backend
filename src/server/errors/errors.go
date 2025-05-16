@@ -21,6 +21,8 @@ var (
 		UserNotFound         Error
 		ServiceNotFound      Error
 		PlanNotFound         Error
+		MembershipNotFound   Error
+		OnboardingNotFound   Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -41,6 +43,14 @@ var (
 		UserNotFound: Error{
 			Code:    "USER_ERROR_001",
 			Message: "User not found",
+		},
+		MembershipNotFound: Error{
+			Code:    "MEMBERSHIP_ERROR_001",
+			Message: "Membership not found",
+		},
+		OnboardingNotFound: Error{
+			Code:    "ONBOARDING_ERROR_001",
+			Message: "Onboarding not found",
 		},
 	}
 
@@ -113,6 +123,7 @@ var (
 		OnboardingNotUpdated   Error
 		UserNotCreated         Error
 		UserNotUpdated         Error
+		UserNotSoftDeleted     Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -181,6 +192,10 @@ var (
 		PlanNotSoftDeleted: Error{
 			Code:    "PLAN_ERROR_006",
 			Message: "Plan not soft deleted",
+		},
+		UserNotSoftDeleted: Error{
+			Code:    "USER_ERROR_005",
+			Message: "User not soft deleted",
 		},
 	}
 

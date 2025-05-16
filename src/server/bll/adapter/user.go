@@ -51,7 +51,7 @@ func (u *User) GetPostgresqlUser(
 			Plan: schemas.Plan{
 				Id:               m.Plan.Id,
 				Fee:              m.Plan.Fee,
-				Type:             schemas.PlanType(m.Plan.Type),
+				Type:             model.PlanType(m.Plan.Type),
 				ReservationLimit: m.Plan.ReservationLimit,
 			},
 		})
@@ -96,7 +96,7 @@ func (u *User) FetchPostgresqlUsers() ([]*schemas.User, *errors.Error) {
 				Plan: schemas.Plan{
 					Id:               m.Plan.Id,
 					Fee:              m.Plan.Fee,
-					Type:             schemas.PlanType(m.Plan.Type),
+					Type:             model.PlanType(m.Plan.Type),
 					ReservationLimit: m.Plan.ReservationLimit,
 				},
 			})
@@ -204,4 +204,12 @@ func (u *User) UpdatePostgresqlUser(
 		ImageUrl:       userModel.ImageUrl,
 		// Memberships:    userModel.Memberships,
 	}, nil
+}
+
+func (u *User) DeletePostgresqlUser(userId uuid.UUID) *errors.Error {
+	err := u.DaoPostgresql.User.DeleteUser(userId)
+	if err != nil {
+		return &errors.BadRequestError.UserNotSoftDeleted
+	}
+	return nil
 }

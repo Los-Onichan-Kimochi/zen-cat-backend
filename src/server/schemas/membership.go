@@ -14,21 +14,6 @@ const (
 	MembershipStatusCancelled MembershipStatus = "CANCELLED"
 )
 
-type PlanType string
-
-const (
-	PlanTypeMonthly PlanType = "MONTHLY"
-	PlanTypeYearly  PlanType = "YEARLY"
-)
-
-type Plan struct {
-	Id               uuid.UUID `json:"id"`
-	Fee              float64   `json:"fee"`
-	Type             PlanType  `json:"type"`
-	ReservationLimit *int      `json:"reservation_limit,omitempty"`
-}
-
-// Falta definir plan
 type Membership struct {
 	Id          uuid.UUID        `json:"id"`
 	Description string           `json:"description"`

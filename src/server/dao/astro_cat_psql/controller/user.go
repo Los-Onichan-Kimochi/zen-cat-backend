@@ -108,13 +108,15 @@ func (u *User) UpdateUser(
 	return &user, nil
 }
 
-// creeria que el delete no es necesario, seria un update de un campo, caso contrario
-// se podria usar. queda como referencia
 func (u *User) DeleteUser(userId uuid.UUID) error {
-	result := u.PostgresqlDB.Delete(&model.User{}, userId)
+	result := u.PostgresqlDB.Model(&model.User{}).
+		Where("id = ?", userId).
+		Update("deleted_at", gorm.Expr("NOW()"))
 	if result.Error != nil {
 		return result.Error
 	}
-
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
 	return nil
 }

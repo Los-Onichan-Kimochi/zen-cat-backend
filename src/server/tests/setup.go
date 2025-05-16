@@ -69,23 +69,44 @@ func ClearPostgresqlDatabase(
 			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Info)
 		}
 
+		// Iniciar una transacción
+		tx := astroCatPsqlDB.Begin()
+
+		// Desactivar temporalmente las restricciones de clave foránea
+		tx.Exec("SET CONSTRAINTS ALL DEFERRED")
+
+		// Primero eliminar las membresías que tienen referencias a otras tablas
+		if err := tx.Unscoped().Where("true").Delete(&model.Membership{}).Error; err != nil {
+			tx.Rollback()
+			appLogger.Errorf("Error clearing Membership table: %v", err)
+			return
+		}
+
+		// Luego eliminar las otras tablas
 		tablesToClear := map[string]interface{}{
-			"Community": &model.Community{},
+			"User":         &model.User{},
+			"Community":    &model.Community{},
+			"Professional": &model.Professional{},
+			"Service":      &model.Service{},
+			"Plan":         &model.Plan{},
 		}
 
 		for tableName, modelInstance := range tablesToClear {
 			appLogger.Infof("Attempting to hard delete all records from %s table...", tableName)
-			result := astroCatPsqlDB.Unscoped().Where("true").Delete(modelInstance)
-			if result.Error != nil {
-				errDetail := fmt.Sprintf("Error clearing %s table: %v", tableName, result.Error)
-				if t == nil {
-					appLogger.Errorf(errDetail)
-				} else {
-					t.Errorf(errDetail)
-				}
-			} else {
-				appLogger.Infof("Successfully cleared %s table. Records affected: %d", tableName, result.RowsAffected)
+			if err := tx.Unscoped().Where("true").Delete(modelInstance).Error; err != nil {
+				tx.Rollback()
+				appLogger.Errorf("Error clearing %s table: %v", tableName, err)
+				return
 			}
+		}
+
+		// Reactivar las restricciones de clave foránea
+		tx.Exec("SET CONSTRAINTS ALL IMMEDIATE")
+
+		// Confirmar la transacción
+		if err := tx.Commit().Error; err != nil {
+			appLogger.Errorf("Error committing transaction: %v", err)
+			return
 		}
 
 		if !envSetting.EnableSqlLogs {

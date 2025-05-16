@@ -72,6 +72,17 @@ definitions:
       type:
         type: string
     type: object
+  schemas.CreateServiceRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
+    type: object
   schemas.CreateUserRequest:
     properties:
       email:
@@ -114,6 +125,8 @@ definitions:
         type: string
       id:
         type: string
+      plan:
+        $ref: '#/definitions/schemas.Plan'
       start_date:
         type: string
       status:
@@ -144,16 +157,6 @@ definitions:
       phone_number:
         type: string
       postal_code:
-        type: string
-  schemas.CreateServiceRequest:
-    properties:
-      description:
-        type: string
-      image_url:
-        type: string
-      is_virtual:
-        type: boolean
-      name:
         type: string
     type: object
   schemas.Plan:
@@ -259,6 +262,17 @@ definitions:
       type:
         type: string
     type: object
+  schemas.UpdateServiceRequest:
+    properties:
+      description:
+        type: string
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
+    type: object
   schemas.UpdateUserRequest:
     properties:
       email:
@@ -321,16 +335,6 @@ definitions:
         items:
           $ref: '#/definitions/schemas.User'
         type: array
-  schemas.UpdateServiceRequest:
-    properties:
-      description:
-        type: string
-      image_url:
-        type: string
-      is_virtual:
-        type: boolean
-      name:
-        type: string
     type: object
 info:
   contact: {}
@@ -902,11 +906,6 @@ paths:
       summary: Update Professional.
       tags:
       - Professional
-  /user/:
-    get:
-      consumes:
-      - application/json
-      description: Fetch all users, filtered by params.
   /service/:
     get:
       consumes:
@@ -918,7 +917,6 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.Users'
             $ref: '#/definitions/schemas.Services'
         "400":
           description: Bad Request
@@ -942,27 +940,6 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Fetch Users.
-      tags:
-      - User
-    post:
-      consumes:
-      - application/json
-      description: Creates a new user.
-      parameters:
-      - description: Create User Request
-        in: body
-        name: createUserRequest
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.User'
       summary: Fetch Services.
       tags:
       - Service
@@ -1006,18 +983,6 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Create User.
-      tags:
-      - User
-  /user/{userId}/:
-    get:
-      consumes:
-      - application/json
-      description: Gets a user given its id.
-      parameters:
-      - description: User ID
-        in: path
-        name: userId
       summary: Create Service.
       tags:
       - Service
@@ -1038,8 +1003,218 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.User'
             $ref: '#/definitions/schemas.Service'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Service.
+      tags:
+      - Service
+    patch:
+      consumes:
+      - application/json
+      description: Update the service information.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Update Service Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Service'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Service.
+      tags:
+      - Service
+  /user/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all users, filtered by params.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Users.
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user.
+      parameters:
+      - description: Create User Request
+        in: body
+        name: createUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create User.
+      tags:
+      - User
+  /user/{userId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user given its id.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete User.
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Gets a user given its id.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.User'
         "400":
           description: Bad Request
           schema:
@@ -1081,25 +1256,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/schemas.UpdateUserRequest'
-      summary: Get Service.
-      tags:
-      - Service
-    patch:
-      consumes:
-      - application/json
-      description: Update the service information.
-      parameters:
-      - description: Service ID
-        in: path
-        name: serviceId
-        required: true
-        type: string
-      - description: Update Service Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.UpdateServiceRequest'
       produces:
       - application/json
       responses:
@@ -1107,9 +1263,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.User'
-          description: Ok
-          schema:
-            $ref: '#/definitions/schemas.Service'
         "400":
           description: Bad Request
           schema:
@@ -1135,7 +1288,4 @@ paths:
       summary: Update User.
       tags:
       - User
-      summary: Update Service.
-      tags:
-      - Service
 swagger: "2.0"
