@@ -1,6 +1,6 @@
 module onichankimochi.com/astro_cat_backend
 
-go 1.23.0
+go 1.23
 
 toolchain go1.23.7
 
@@ -13,7 +13,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	github.com/uptrace/opentelemetry-go-extra/otelgorm v0.3.2
 	gorm.io/driver/postgres v1.5.11
-	gorm.io/gorm v1.26.1
+	gorm.io/gorm v1.26.0
 )
 
 require (
