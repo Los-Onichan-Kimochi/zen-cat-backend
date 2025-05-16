@@ -124,3 +124,30 @@ func (a *Api) UpdateProfessional(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Delete Professional.
+// @Description 		Deletes a professional given its id.
+// @Tags 				Professional
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               professionalId    path   string  true  "Professional ID"
+// @Success 			204 {object} schemas.Professional "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/professional/{professionalId}/ [delete]
+func (a *Api) DeleteProfessional(c echo.Context) error {
+	professionalId, parseErr := uuid.Parse(c.Param("professionalId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidProfessionalId, c)
+	}
+
+	if err := a.BllController.Professional.DeleteProfessional(professionalId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
