@@ -131,3 +131,44 @@ func (c *Community) UpdatePostgresqlCommunity(
 		NumberSubscriptions: communityModel.NumberSubscriptions,
 	}, nil
 }
+
+// Creates multiple communities into postgresql DB and returns them.
+func (c *Community) BulkCreatePostgresqlCommunities(
+	communitiesData []*schemas.CreateCommunityRequest,
+	updatedBy string,
+) ([]*schemas.Community, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	communitiesModel := make([]*model.Community, len(communitiesData))
+	for i, communityData := range communitiesData {
+		communitiesModel[i] = &model.Community{
+			Id:                  uuid.New(),
+			Name:                communityData.Name,
+			Purpose:             communityData.Purpose,
+			ImageUrl:            communityData.ImageUrl,
+			NumberSubscriptions: 0,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+
+	if err := c.DaoPostgresql.Community.BulkCreateCommunities(communitiesModel); err != nil {
+		return nil, &errors.BadRequestError.CommunityNotCreated
+	}
+
+	communities := make([]*schemas.Community, len(communitiesModel))
+	for i, communityModel := range communitiesModel {
+		communities[i] = &schemas.Community{
+			Id:                  communityModel.Id,
+			Name:                communityModel.Name,
+			Purpose:             communityModel.Purpose,
+			ImageUrl:            communityModel.ImageUrl,
+			NumberSubscriptions: communityModel.NumberSubscriptions,
+		}
+	}
+
+	return communities, nil
+}

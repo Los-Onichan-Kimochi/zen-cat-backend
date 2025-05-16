@@ -26,3 +26,7 @@ type UpdateCommunityRequest struct {
 	Purpose  *string `json:"purpose"`
 	ImageUrl *string `json:"image_url"`
 }
+
+type BatchCreateCommunityRequest struct {
+	Communities []*CreateCommunityRequest `json:"communities"`
+}
