@@ -63,6 +63,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
 
+	// Plan endpoints
+	plan := a.Echo.Group("/plan")
+	plan.GET("/:planId/", a.GetPlan)
+	plan.GET("/", a.FetchPlans)
+	plan.POST("/", a.CreatePlan)
+	plan.PATCH("/:planId/", a.UpdatePlan)
+	plan.DELETE("/:planId/", a.DeletePlan)
+
 	// User endpoints
 	user := a.Echo.Group("/user")
 	user.GET("/:userId/", a.GetUser)
