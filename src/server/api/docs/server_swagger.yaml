@@ -42,6 +42,30 @@ definitions:
       purpose:
         type: string
     type: object
+  schemas.CommunityPlan:
+    properties:
+      community_id:
+        type: string
+      plan_id:
+        type: string
+    type: object
+  schemas.CommunityService:
+    properties:
+      community_id:
+        type: string
+      service_id:
+        type: string
+    type: object
+  schemas.CreateCommunityPlanRequest:
+    properties:
+      community_id:
+        type: string
+      plan_id:
+        type: string
+    required:
+    - community_id
+    - plan_id
+    type: object
   schemas.CreateCommunityRequest:
     properties:
       image_url:
@@ -50,6 +74,16 @@ definitions:
         type: string
       purpose:
         type: string
+    type: object
+  schemas.CreateCommunityServiceRequest:
+    properties:
+      community_id:
+        type: string
+      service_id:
+        type: string
+    required:
+    - community_id
+    - service_id
     type: object
   schemas.CreateLocalRequest:
     properties:
@@ -421,6 +455,272 @@ info:
   title: AstroCat API
   version: "1.0"
 paths:
+  /community-plan/:
+    post:
+      consumes:
+      - application/json
+      description: Associates a community with a plan.
+      parameters:
+      - description: Community-Plan Association Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateCommunityPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlan'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Plan does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create CommunityPlan.
+      tags:
+      - CommunityPlan
+  /community-plan/{communityId}/{planId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific community-plan association.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: planId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error (e.g., deletion failed)
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete CommunityPlan.
+      tags:
+      - CommunityPlan
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific community-plan association.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      - description: Plan ID
+        in: path
+        name: planId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlan'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get CommunityPlan.
+      tags:
+      - CommunityPlan
+  /community-service/:
+    post:
+      consumes:
+      - application/json
+      description: Associates a community with a service.
+      parameters:
+      - description: Community-Service Association Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateCommunityServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CommunityService'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Service does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create CommunityService.
+      tags:
+      - CommunityService
+  /community-service/{communityId}/{serviceId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific community-service association.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error (e.g., deletion failed)
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete CommunityService.
+      tags:
+      - CommunityService
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific community-service association.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityService'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get CommunityService.
+      tags:
+      - CommunityService
   /community/:
     get:
       consumes:
