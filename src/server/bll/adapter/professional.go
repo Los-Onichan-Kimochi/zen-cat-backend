@@ -165,3 +165,11 @@ func (p *Professional) UpdatePostgresqlProfessional(
 		ImageUrl:       professionalModel.ImageUrl,
 	}, nil
 }
+
+// Deletes a professional from postgresql DB.
+func (p *Professional) DeletePostgresqlProfessional(id uuid.UUID) *errors.Error {
+	if err := p.DaoPostgresql.Professional.DeleteProfessional(id); err != nil {
+		return &errors.ObjectNotFoundError.ProfessionalNotFound
+	}
+	return nil
+}

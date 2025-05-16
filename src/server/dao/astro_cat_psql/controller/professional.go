@@ -112,3 +112,15 @@ func (p *Professional) UpdateProfessional(
 	}
 	return &professional, nil
 }
+
+// Soft deletes a professional given its ID.
+func (p *Professional) DeleteProfessional(professionalId uuid.UUID) error {
+	result := p.PostgresqlDB.Delete(&model.Professional{}, "id = ?", professionalId)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

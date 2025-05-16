@@ -53,6 +53,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
+	professional.DELETE("/:professionalId/", a.DeleteProfessional)
 
 	// User endpoints
 	user := a.Echo.Group("/user")
