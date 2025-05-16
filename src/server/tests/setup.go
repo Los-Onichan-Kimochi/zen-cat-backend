@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,7 +43,7 @@ func (l *CustomLogger) Trace(
 // Remove all data from AstroCatPsql db.
 //   - Note: Only use for tests
 func ClearPostgresqlDatabase(
-	logger logging.Logger,
+	appLogger logging.Logger,
 	astroCatPsqlDB *gorm.DB,
 	envSetting *schemas.EnvSettings,
 	t *testing.T,
@@ -50,23 +51,51 @@ func ClearPostgresqlDatabase(
 	if envSetting.AstroCatPostgresHost != "localhost" {
 		msg := "Not allow clear Levels Postgres DB into instance different to localhost"
 		if t == nil {
-			panic(msg)
+			appLogger.Panicf(
+				"%s. This function should only be used for tests in local environment",
+				msg,
+			)
 		} else {
 			t.Fatalf("%s. This function should only be used for tests in local environment", msg)
 		}
-
 		return
 	}
 
 	if astroCatPsqlDB != nil {
-		astroCatPsqlDB.Where("true").Delete(&model.Community{})
+		fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+
+		originalLogger := astroCatPsqlDB.Logger
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Info)
+		}
+
+		tablesToClear := map[string]interface{}{
+			"Community": &model.Community{},
+		}
+
+		for tableName, modelInstance := range tablesToClear {
+			appLogger.Infof("Attempting to hard delete all records from %s table...", tableName)
+			result := astroCatPsqlDB.Unscoped().Where("true").Delete(modelInstance)
+			if result.Error != nil {
+				errDetail := fmt.Sprintf("Error clearing %s table: %v", tableName, result.Error)
+				if t == nil {
+					appLogger.Errorf(errDetail)
+				} else {
+					t.Errorf(errDetail)
+				}
+			} else {
+				appLogger.Infof("Successfully cleared %s table. Records affected: %d", tableName, result.RowsAffected)
+			}
+		}
 
 		if !envSetting.EnableSqlLogs {
-			astroCatPsqlDB.Logger = &CustomLogger{}
+			astroCatPsqlDB.Logger = originalLogger
 		}
 
 		if t == nil {
 			// Add sample data for testing
 		}
+	} else {
+		appLogger.Warn("astroCatPsqlDB is nil, skipping database clearing.")
 	}
 }
