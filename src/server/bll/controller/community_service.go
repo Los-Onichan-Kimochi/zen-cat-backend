@@ -47,7 +47,7 @@ func (cs *CommunityService) CreateCommunityService(
 
 	_, err = cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
 	if err == nil {
-		return nil, &errors.BadRequestError.CommunityServiceAlreadyExists
+		return nil, &errors.ConflictError.CommunityServiceAlreadyExists
 	} else if err.Code != errors.ObjectNotFoundError.CommunityServiceNotFound.Code {
 		return nil, &errors.InternalServerError.Default
 	}

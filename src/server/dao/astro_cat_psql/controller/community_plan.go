@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
@@ -56,4 +59,43 @@ func (cp *CommunityPlan) DeleteCommunityPlan(
 	}
 
 	return nil
+}
+
+// Creates multiple community-plan associations.
+func (cp *CommunityPlan) BulkCreateCommunityPlans(communityPlans []*model.CommunityPlan) error {
+	err := cp.PostgresqlDB.Create(communityPlans).Error
+	if err != nil {
+		// Check if it's a duplicate key error
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return fmt.Errorf("one or more community-plan associations already exist: %w", err)
+		}
+		return err
+	}
+	return nil
+}
+
+// Fetch all community-plan associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `planId` if provided.
+func (cp *CommunityPlan) FetchCommunityPlans(
+	communityId *uuid.UUID,
+	planId *uuid.UUID,
+) ([]*model.CommunityPlan, error) {
+	var communityPlans []*model.CommunityPlan
+
+	result := cp.PostgresqlDB.Find(&communityPlans)
+
+	if communityId != nil {
+		result = result.Where("community_id = ?", communityId)
+	}
+	if planId != nil {
+		result = result.Where("plan_id = ?", planId)
+	}
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return communityPlans, nil
 }

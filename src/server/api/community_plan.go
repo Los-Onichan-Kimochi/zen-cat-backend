@@ -38,10 +38,6 @@ func (a *Api) CreateCommunityPlan(c echo.Context) error {
 
 	response, err := a.BllController.CommunityPlan.CreateCommunityPlan(request, updatedBy)
 	if err != nil {
-		// TODO: Handle error more properly
-		if err.Code == errors.BadRequestError.CommunityPlanAlreadyExists.Code {
-			return c.JSON(http.StatusConflict, err)
-		}
 		return errors.HandleError(*err, c)
 	}
 
@@ -106,4 +102,64 @@ func (a *Api) DeleteCommunityPlan(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Create CommunityPlans.
+// @Description 		Creates multiple community-plan associations.
+// @Tags 				CommunityPlan
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request body schemas.BatchCreateCommunityPlanRequest true "Bulk Create CommunityPlans Request"
+// @Success 			201 {object} schemas.CommunityPlans "Created"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid updatedBy)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Community or Plan does not exist)"
+// @Failure 			409 {object} errors.Error "Conflict (Association already exists)"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-plan/bulk/ [post]
+func (a *Api) BulkCreateCommunityPlans(c echo.Context) error {
+	updatedBy := "ADMIN"
+
+	var request schemas.BatchCreateCommunityPlanRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, err := a.BllController.CommunityPlan.BulkCreateCommunityPlans(
+		request.CommunityPlans,
+		updatedBy,
+	)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
+
+// @Summary 			Fetch CommunityPlans.
+// @Description 		Fetch all community-plan associations, filtered by params.
+// @Tags 				CommunityPlan
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				communityId query string false "Community ID"
+// @Param 				planId query string false "Plan ID"
+// @Success 			200 {object} schemas.CommunityPlans "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Community or Plan does not exist)"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-plan/ [get]
+func (a *Api) FetchCommunityPlans(c echo.Context) error {
+	communityId := c.QueryParam("communityId")
+	planId := c.QueryParam("planId")
+
+	response, err := a.BllController.CommunityPlan.FetchCommunityPlans(communityId, planId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.JSON(http.StatusOK, response)
 }

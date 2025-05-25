@@ -15,6 +15,13 @@ definitions:
     x-enum-varnames:
     - PlanTypeMonthly
     - PlanTypeAnual
+  schemas.BatchCreateCommunityPlanRequest:
+    properties:
+      community_plans:
+        items:
+          $ref: '#/definitions/schemas.CreateCommunityPlanRequest'
+        type: array
+    type: object
   schemas.BatchCreateCommunityRequest:
     properties:
       communities:
@@ -48,6 +55,13 @@ definitions:
         type: string
       plan_id:
         type: string
+    type: object
+  schemas.CommunityPlans:
+    properties:
+      community_plans:
+        items:
+          $ref: '#/definitions/schemas.CommunityPlan'
+        type: array
     type: object
   schemas.CommunityService:
     properties:
@@ -456,6 +470,51 @@ info:
   version: "1.0"
 paths:
   /community-plan/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all community-plan associations, filtered by params.
+      parameters:
+      - description: Community ID
+        in: query
+        name: communityId
+        type: string
+      - description: Plan ID
+        in: query
+        name: planId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlans'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Plan does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch CommunityPlans.
+      tags:
+      - CommunityPlan
     post:
       consumes:
       - application/json
@@ -586,6 +645,54 @@ paths:
       security:
       - JWT: []
       summary: Get CommunityPlan.
+      tags:
+      - CommunityPlan
+  /community-plan/bulk/:
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple community-plan associations.
+      parameters:
+      - description: Bulk Create CommunityPlans Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateCommunityPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlans'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Plan does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create CommunityPlans.
       tags:
       - CommunityPlan
   /community-service/:

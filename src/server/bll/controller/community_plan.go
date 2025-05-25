@@ -49,7 +49,7 @@ func (cp *CommunityPlan) CreateCommunityPlan(
 
 	_, err = cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)
 	if err == nil {
-		return nil, &errors.BadRequestError.CommunityPlanAlreadyExists
+		return nil, &errors.ConflictError.CommunityPlanAlreadyExists
 	} else if err.Code != errors.ObjectNotFoundError.CommunityPlanNotFound.Code {
 		return nil, &errors.InternalServerError.Default
 	}
@@ -96,4 +96,67 @@ func (cp *CommunityPlan) DeleteCommunityPlan(
 	}
 
 	return cp.Adapter.CommunityPlan.DeletePostgresqlCommunityPlan(communityId, planId)
+}
+
+// Bulk creates community-plan associations.
+func (cp *CommunityPlan) BulkCreateCommunityPlans(
+	createCommunityPlansData []*schemas.CreateCommunityPlanRequest,
+	updatedBy string,
+) (*schemas.CommunityPlans, *errors.Error) {
+	communityPlans, err := cp.Adapter.CommunityPlan.BulkCreatePostgresqlCommunityPlans(
+		createCommunityPlansData,
+		updatedBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.CommunityPlans{CommunityPlans: communityPlans}, nil
+}
+
+// Fetch all community-plan associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `planId` if provided.
+func (cp *CommunityPlan) FetchCommunityPlans(
+	communityIdString string,
+	planIdString string,
+) (*schemas.CommunityPlans, *errors.Error) {
+	var communityId *uuid.UUID
+	var planId *uuid.UUID
+
+	// Validate and convert params to UUIDs if provided
+	if communityIdString != "" {
+		communityId, err := uuid.Parse(communityIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidCommunityId
+		}
+
+		_, newErr := cp.Adapter.Community.GetPostgresqlCommunity(communityId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	if planIdString != "" {
+		planId, err := uuid.Parse(planIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidPlanId
+		}
+
+		_, newErr := cp.Adapter.Plan.GetPostgresqlPlan(planId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	communityPlans, err := cp.Adapter.CommunityPlan.FetchPostgresqlCommunityPlans(
+		communityId,
+		planId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.CommunityPlans{CommunityPlans: communityPlans}, nil
 }

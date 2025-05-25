@@ -38,9 +38,6 @@ func (a *Api) CreateCommunityService(c echo.Context) error {
 
 	response, err := a.BllController.CommunityService.CreateCommunityService(request, updatedBy)
 	if err != nil {
-		if err.Code == errors.BadRequestError.CommunityServiceAlreadyExists.Code {
-			return c.JSON(http.StatusConflict, err)
-		}
 		return errors.HandleError(*err, c)
 	}
 

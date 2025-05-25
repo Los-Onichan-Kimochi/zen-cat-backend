@@ -1,6 +1,8 @@
 package adapter
 
 import (
+	"strings"
+
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -82,4 +84,66 @@ func (cp *CommunityPlan) DeletePostgresqlCommunityPlan(
 	}
 
 	return nil
+}
+
+// Creates multiple community-plan associations.
+func (cp *CommunityPlan) BulkCreatePostgresqlCommunityPlans(
+	communityPlans []*schemas.CreateCommunityPlanRequest,
+	updatedBy string,
+) ([]*schemas.CommunityPlan, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	communityPlanModels := make([]*model.CommunityPlan, len(communityPlans))
+	for i, communityPlan := range communityPlans {
+		communityPlanModels[i] = &model.CommunityPlan{
+			CommunityId: communityPlan.CommunityId,
+			PlanId:      communityPlan.PlanId,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+	err := cp.DaoPostgresql.CommunityPlan.BulkCreateCommunityPlans(communityPlanModels)
+	if err != nil {
+		if strings.Contains(err.Error(), "already exist") {
+			return nil, &errors.ConflictError.CommunityPlanAlreadyExists
+		}
+		return nil, &errors.BadRequestError.CommunityPlanNotCreated
+	}
+
+	communityPlansResponse := make([]*schemas.CommunityPlan, len(communityPlans))
+	for i, communityPlan := range communityPlanModels {
+		communityPlansResponse[i] = &schemas.CommunityPlan{
+			CommunityId: communityPlan.CommunityId,
+			PlanId:      communityPlan.PlanId,
+		}
+	}
+
+	return communityPlansResponse, nil
+}
+
+// Fetch all community-plan associations from postgresql DB and adapts them to a CommunityPlan schema.
+func (cp *CommunityPlan) FetchPostgresqlCommunityPlans(
+	communityId *uuid.UUID,
+	planId *uuid.UUID,
+) ([]*schemas.CommunityPlan, *errors.Error) {
+	communityPlanModels, err := cp.DaoPostgresql.CommunityPlan.FetchCommunityPlans(
+		communityId,
+		planId,
+	)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.CommunityPlanNotFound
+	}
+
+	communityPlans := make([]*schemas.CommunityPlan, len(communityPlanModels))
+	for i, communityPlan := range communityPlanModels {
+		communityPlans[i] = &schemas.CommunityPlan{
+			CommunityId: communityPlan.CommunityId,
+			PlanId:      communityPlan.PlanId,
+		}
+	}
+
+	return communityPlans, nil
 }
