@@ -124,3 +124,25 @@ func (p *Professional) DeleteProfessional(professionalId uuid.UUID) error {
 	}
 	return nil
 }
+
+// Creates multiple professionals in a batch.
+func (p *Professional) BulkCreateProfessionals(professionals []*model.Professional) error {
+	return p.PostgresqlDB.Create(&professionals).Error
+}
+
+// Batch deletes multiple professionals given their IDs.
+func (p *Professional) BulkDeleteProfessionals(professionalIds []uuid.UUID) error {
+	if len(professionalIds) == 0 {
+		return nil // No professionals to delete
+	}
+
+	result := p.PostgresqlDB.Where("id IN ?", professionalIds).Delete(&model.Professional{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}

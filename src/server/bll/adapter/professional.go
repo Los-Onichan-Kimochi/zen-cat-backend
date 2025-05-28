@@ -173,3 +173,69 @@ func (p *Professional) DeletePostgresqlProfessional(id uuid.UUID) *errors.Error 
 	}
 	return nil
 }
+
+// Bulk deletes professionals from postgresql DB.
+func (p *Professional) BulkDeletePostgresqlProfessionals(
+	professionals []uuid.UUID,
+) *errors.Error {
+	if len(professionals) == 0 {
+		return &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	if err := p.DaoPostgresql.Professional.BulkDeleteProfessionals(professionals); err != nil {
+		return &errors.ObjectNotFoundError.ProfessionalNotFound
+	}
+	return nil
+}
+
+// Bulk creates professionals into postgresql DB.
+func (p *Professional) BulkCreatePostgresqlProfessionals(
+	professionalsData []*schemas.CreateProfessionalRequest,
+	updatedBy string,
+) ([]*schemas.Professional, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	professionalsModel := make([]*model.Professional, len(professionalsData))
+	for i, professionalData := range professionalsData {
+		var secondLastNamePtr *string
+		if professionalData.SecondLastName != "" {
+			secondLastNamePtr = &professionalData.SecondLastName
+		} else {
+			secondLastNamePtr = nil
+		}
+		professionalsModel[i] = &model.Professional{
+			Id:             uuid.New(),
+			Name:           professionalData.Name,
+			FirstLastName:  professionalData.FirstLastName,
+			SecondLastName: secondLastNamePtr,
+			Specialty:      professionalData.Specialty,
+			Email:          professionalData.Email,
+			PhoneNumber:    professionalData.PhoneNumber,
+			Type:           model.ProfessionalType(professionalData.Type),
+			ImageUrl:       professionalData.ImageUrl,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+	if err := p.DaoPostgresql.Professional.BulkCreateProfessionals(professionalsModel); err != nil {
+		return nil, &errors.BadRequestError.ProfessionalNotCreated
+	}
+	professionals := make([]*schemas.Professional, len(professionalsModel))
+	for i, professionalModel := range professionalsModel {
+		professionals[i] = &schemas.Professional{
+			Id:             professionalModel.Id,
+			Name:           professionalModel.Name,
+			FirstLastName:  professionalModel.FirstLastName,
+			SecondLastName: professionalModel.SecondLastName,
+			Specialty:      professionalModel.Specialty,
+			Email:          professionalModel.Email,
+			PhoneNumber:    professionalModel.PhoneNumber,
+			Type:           string(professionalModel.Type),
+			ImageUrl:       professionalModel.ImageUrl,
+		}
+	}
+	return professionals, nil
+}

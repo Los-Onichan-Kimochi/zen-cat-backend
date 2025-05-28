@@ -36,6 +36,20 @@ definitions:
           $ref: '#/definitions/schemas.CreateCommunityServiceRequest'
         type: array
     type: object
+  schemas.BulkCreateProfessionalRequest:
+    properties:
+      professionals:
+        items:
+          $ref: '#/definitions/schemas.CreateProfessionalRequest'
+        type: array
+    type: object
+  schemas.BulkDeleteProfessionalRequest:
+    properties:
+      professionals:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.Communities:
     properties:
       communities:
@@ -1826,6 +1840,94 @@ paths:
       security:
       - JWT: []
       summary: Update Professional.
+      tags:
+      - Professional
+  /professional/bulk-create/:
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple professionals in a batch.
+      parameters:
+      - description: Bulk Create Professional Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkCreateProfessionalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Professionals'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Professionals.
+      tags:
+      - Professional
+  /professional/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes professionals given their ids.
+      parameters:
+      - description: Bulk Delete Professional Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteProfessionalRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Professional'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Professionals.
       tags:
       - Professional
   /service/:
