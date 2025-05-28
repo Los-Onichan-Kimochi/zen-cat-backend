@@ -360,6 +360,76 @@
             }
         },
         "/community-service/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all community-service associations, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Fetch CommunityServices.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityServices"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Service does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -393,6 +463,81 @@
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/schemas.CommunityService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Service does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community-service/bulk/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple community-service associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Bulk Create CommunityServices.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create CommunityServices Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BatchCreateCommunityServiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityServices"
                         }
                     },
                     "400": {
@@ -2594,6 +2739,17 @@
                 }
             }
         },
+        "schemas.BatchCreateCommunityServiceRequest": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateCommunityServiceRequest"
+                    }
+                }
+            }
+        },
         "schemas.Communities": {
             "type": "object",
             "properties": {
@@ -2655,6 +2811,17 @@
                 },
                 "service_id": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.CommunityServices": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CommunityService"
+                    }
                 }
             }
         },

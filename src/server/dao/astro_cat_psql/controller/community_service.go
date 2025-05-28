@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
@@ -56,4 +59,45 @@ func (cs *CommunityService) DeleteCommunityService(
 	}
 
 	return nil
+}
+
+// Creates multiple community-service associations.
+func (cs *CommunityService) BulkCreateCommunityServices(
+	communityServices []*model.CommunityService,
+) error {
+	err := cs.PostgresqlDB.Create(communityServices).Error
+	if err != nil {
+		// Check if it's a duplicate key error
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return fmt.Errorf("one or more community-service associations already exist: %w", err)
+		}
+		return err
+	}
+	return nil
+}
+
+// Fetch all community-service associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `serviceId` if provided.
+func (cs *CommunityService) FetchCommunityServices(
+	communityId *uuid.UUID,
+	serviceId *uuid.UUID,
+) ([]*model.CommunityService, error) {
+	var communityServices []*model.CommunityService
+
+	query := cs.PostgresqlDB.Model(&model.CommunityService{})
+
+	if communityId != nil {
+		query = query.Where("community_id = ?", communityId)
+	}
+	if serviceId != nil {
+		query = query.Where("service_id = ?", serviceId)
+	}
+
+	if err := query.Find(&communityServices).Error; err != nil {
+		return nil, err
+	}
+
+	return communityServices, nil
 }

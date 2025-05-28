@@ -1,6 +1,8 @@
 package adapter
 
 import (
+	"strings"
+
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
@@ -86,4 +88,66 @@ func (cs *CommunityService) DeletePostgresqlCommunityService(
 	}
 
 	return nil
+}
+
+// Creates multiple community-service associations.
+func (cs *CommunityService) BulkCreatePostgresqlCommunityServices(
+	communityServices []*schemas.CreateCommunityServiceRequest,
+	updatedBy string,
+) ([]*schemas.CommunityService, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	communityServiceModels := make([]*model.CommunityService, len(communityServices))
+	for i, communityService := range communityServices {
+		communityServiceModels[i] = &model.CommunityService{
+			CommunityId: communityService.CommunityId,
+			ServiceId:   communityService.ServiceId,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+	err := cs.DaoPostgresql.CommunityService.BulkCreateCommunityServices(communityServiceModels)
+	if err != nil {
+		if strings.Contains(err.Error(), "already exist") {
+			return nil, &errors.ConflictError.CommunityServiceAlreadyExists
+		}
+		return nil, &errors.BadRequestError.CommunityServiceNotCreated
+	}
+
+	communityServicesResponse := make([]*schemas.CommunityService, len(communityServices))
+	for i, communityService := range communityServiceModels {
+		communityServicesResponse[i] = &schemas.CommunityService{
+			CommunityId: communityService.CommunityId,
+			ServiceId:   communityService.ServiceId,
+		}
+	}
+
+	return communityServicesResponse, nil
+}
+
+// Fetch all community-service associations from postgresql DB and adapts them to a CommunityService schema.
+func (cs *CommunityService) FetchPostgresqlCommunityServices(
+	communityId *uuid.UUID,
+	serviceId *uuid.UUID,
+) ([]*schemas.CommunityService, *errors.Error) {
+	communityServiceModels, err := cs.DaoPostgresql.CommunityService.FetchCommunityServices(
+		communityId,
+		serviceId,
+	)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.CommunityServiceNotFound
+	}
+
+	communityServices := make([]*schemas.CommunityService, len(communityServiceModels))
+	for i, communityService := range communityServiceModels {
+		communityServices[i] = &schemas.CommunityService{
+			CommunityId: communityService.CommunityId,
+			ServiceId:   communityService.ServiceId,
+		}
+	}
+
+	return communityServices, nil
 }
