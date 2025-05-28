@@ -54,6 +54,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
 	professional.DELETE("/:professionalId/", a.DeleteProfessional)
+	professional.POST("/bulk-create/", a.BulkCreateProfessionals)
+	professional.DELETE("/bulk-delete/", a.BulkDeleteProfessionals)
 
 	// Local endpoints
 	local := a.Echo.Group("/local")
