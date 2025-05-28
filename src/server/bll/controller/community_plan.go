@@ -127,24 +127,26 @@ func (cp *CommunityPlan) FetchCommunityPlans(
 
 	// Validate and convert params to UUIDs if provided
 	if communityIdString != "" {
-		communityId, err := uuid.Parse(communityIdString)
+		parsedId, err := uuid.Parse(communityIdString)
 		if err != nil {
 			return nil, &errors.UnprocessableEntityError.InvalidCommunityId
 		}
+		communityId = &parsedId
 
-		_, newErr := cp.Adapter.Community.GetPostgresqlCommunity(communityId)
+		_, newErr := cp.Adapter.Community.GetPostgresqlCommunity(parsedId)
 		if newErr != nil {
 			return nil, newErr
 		}
 	}
 
 	if planIdString != "" {
-		planId, err := uuid.Parse(planIdString)
+		parsedId, err := uuid.Parse(planIdString)
 		if err != nil {
 			return nil, &errors.UnprocessableEntityError.InvalidPlanId
 		}
+		planId = &parsedId
 
-		_, newErr := cp.Adapter.Plan.GetPostgresqlPlan(planId)
+		_, newErr := cp.Adapter.Plan.GetPostgresqlPlan(parsedId)
 		if newErr != nil {
 			return nil, newErr
 		}

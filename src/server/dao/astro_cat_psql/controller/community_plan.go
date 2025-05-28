@@ -84,17 +84,17 @@ func (cp *CommunityPlan) FetchCommunityPlans(
 ) ([]*model.CommunityPlan, error) {
 	var communityPlans []*model.CommunityPlan
 
-	result := cp.PostgresqlDB.Find(&communityPlans)
+	query := cp.PostgresqlDB.Model(&model.CommunityPlan{})
 
 	if communityId != nil {
-		result = result.Where("community_id = ?", communityId)
+		query = query.Where("community_id = ?", communityId)
 	}
 	if planId != nil {
-		result = result.Where("plan_id = ?", planId)
+		query = query.Where("plan_id = ?", planId)
 	}
 
-	if result.Error != nil {
-		return nil, result.Error
+	if err := query.Find(&communityPlans).Error; err != nil {
+		return nil, err
 	}
 
 	return communityPlans, nil

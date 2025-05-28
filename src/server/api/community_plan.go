@@ -161,5 +161,6 @@ func (a *Api) FetchCommunityPlans(c echo.Context) error {
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}
+
 	return c.JSON(http.StatusOK, response)
 }
