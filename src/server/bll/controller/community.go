@@ -70,6 +70,11 @@ func (c *Community) UpdateCommunity(
 	)
 }
 
+// Soft deletes a community.
+func (c *Community) DeleteCommunity(communityId uuid.UUID) *errors.Error {
+	return c.Adapter.Community.DeletePostgresqlCommunity(communityId)
+}
+
 // Creates multiple communities
 func (c *Community) BulkCreateCommunities(
 	createCommunitiesData []*schemas.CreateCommunityRequest,

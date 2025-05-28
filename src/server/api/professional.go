@@ -151,3 +151,59 @@ func (a *Api) DeleteProfessional(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+// @Summary 			Bulk Create Professionals.
+// @Description 		Creates multiple professionals in a batch.
+// @Tags 				Professional
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkCreateProfessionalRequest true  "Bulk Create Professional Request"
+// @Success 			201 {object} schemas.Professionals "Created"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/professional/bulk-create/ [post]
+func (a *Api) BulkCreateProfessionals(c echo.Context) error {
+	var request schemas.BulkCreateProfessionalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	updateBy := "ADMIN"
+	response, err := a.BllController.Professional.BulkCreateProfessionals(request.Professionals, updateBy)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
+
+// @Summary 			Bulk Delete Professionals.
+// @Description 		Bulk deletes professionals given their ids.
+// @Tags 				Professional
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteProfessionalRequest true  "Bulk Delete Professional Request"
+// @Success 			204 {object} schemas.Professional "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/professional/bulk-delete/ [delete]
+func (a *Api) BulkDeleteProfessionals(c echo.Context) error {
+	var request schemas.BulkDeleteProfessionalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.Professional.BulkDeleteProfessionals(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}

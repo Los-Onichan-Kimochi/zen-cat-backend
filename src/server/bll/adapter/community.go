@@ -132,6 +132,16 @@ func (c *Community) UpdatePostgresqlCommunity(
 	}, nil
 }
 
+// Soft deletes a community from postgresql DB.
+func (c *Community) DeletePostgresqlCommunity(communityId uuid.UUID) *errors.Error {
+	err := c.DaoPostgresql.Community.DeleteCommunity(communityId)
+	if err != nil {
+		return &errors.BadRequestError.CommunityNotSoftDeleted
+	}
+
+	return nil
+}
+
 // Creates multiple communities into postgresql DB and returns them.
 func (c *Community) BulkCreatePostgresqlCommunities(
 	communitiesData []*schemas.CreateCommunityRequest,

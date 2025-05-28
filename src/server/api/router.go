@@ -38,13 +38,13 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck := a.Echo.Group("/health-check")
 	healthCheck.GET("/", a.HealthCheck)
 
-	// Add new endpoint groups here...
 	// Community endpoints
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
+	community.DELETE("/:communityId/", a.DeleteCommunity)
 	community.POST("/bulk/", a.BulkCreateCommunities)
 
 	// Professional endpoints
@@ -54,6 +54,24 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
 	professional.DELETE("/:professionalId/", a.DeleteProfessional)
+	professional.POST("/bulk-create/", a.BulkCreateProfessionals)
+	professional.DELETE("/bulk-delete/", a.BulkDeleteProfessionals)
+
+	// Local endpoints
+	local := a.Echo.Group("/local")
+	local.GET("/:localId/", a.GetLocal)
+	local.GET("/", a.FetchLocals)
+	local.POST("/", a.CreateLocal)
+	local.PATCH("/:localId/", a.UpdateLocal)
+	local.DELETE("/:localId/", a.DeleteLocal)
+
+	// Plan endpoints
+	plan := a.Echo.Group("/plan")
+	plan.GET("/:planId/", a.GetPlan)
+	plan.GET("/", a.FetchPlans)
+	plan.POST("/", a.CreatePlan)
+	plan.PATCH("/:planId/", a.UpdatePlan)
+	plan.DELETE("/:planId/", a.DeletePlan)
 
 	// User endpoints
 	user := a.Echo.Group("/user")
@@ -70,21 +88,19 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
 
-	// Plan endpoints
-	plan := a.Echo.Group("/plan")
-	plan.GET("/:planId/", a.GetPlan)
-	plan.GET("/", a.FetchPlans)
-	plan.POST("/", a.CreatePlan)
-	plan.PATCH("/:planId/", a.UpdatePlan)
-	plan.DELETE("/:planId/", a.DeletePlan)
+	// Session endpoints
 
-	// Local endpoints
-	local := a.Echo.Group("/local")
-	local.GET("/:localId/", a.GetLocal)
-	local.GET("/", a.FetchLocals)
-	local.POST("/", a.CreateLocal)
-	local.PATCH("/:localId/", a.UpdateLocal)
-	local.DELETE("/:localId/", a.DeleteLocal)
+	// CommunityPlan endpoints
+	communityPlan := a.Echo.Group("/community-plan")
+	communityPlan.POST("/", a.CreateCommunityPlan)
+	communityPlan.GET("/:communityId/:planId/", a.GetCommunityPlan)
+	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
+
+	// CommunityService endpoints
+	communityService := a.Echo.Group("/community-service")
+	communityService.POST("/", a.CreateCommunityService)
+	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
+	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
