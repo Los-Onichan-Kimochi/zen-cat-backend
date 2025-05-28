@@ -145,6 +145,7 @@ var (
 		LocalNotSoftDeleted        Error
 		ProfessionalNotCreated     Error
 		ProfessionalNotUpdated     Error
+		ProfessionalNotSoftDeleted Error
 		ServiceNotCreated          Error
 		ServiceNotUpdated          Error
 		PlanNotCreated             Error
@@ -186,6 +187,10 @@ var (
 		ProfessionalNotUpdated: Error{
 			Code:    "PROFESSIONAL_ERROR_003",
 			Message: "Professional not updated",
+		},
+		ProfessionalNotSoftDeleted: Error{
+			Code:    "PROFESSIONAL_ERROR_005",
+			Message: "Professional not soft deleted",
 		},
 		LocalNotCreated: Error{
 			Code:    "LOCAL_ERROR_002",

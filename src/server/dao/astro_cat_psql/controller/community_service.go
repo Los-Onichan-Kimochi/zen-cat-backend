@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -73,6 +74,32 @@ func (cs *CommunityService) BulkCreateCommunityServices(
 		}
 		return err
 	}
+	return nil
+}
+
+// Bulk deletes multiple community-service associations.
+func (cs *CommunityService) BulkDeleteCommunityServices(
+	communityServices []*model.CommunityService,
+) error {
+	if len(communityServices) == 0 {
+		return nil
+	}
+
+	// Build the WHERE clause for the bulk delete
+	var conditions []string
+	var args []interface{}
+	for _, communityService := range communityServices {
+		conditions = append(conditions, "(community_id = ? AND service_id = ?)")
+		args = append(args, communityService.CommunityId, communityService.ServiceId)
+	}
+
+	// Execute the bulk delete
+	result := cs.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Delete(&model.CommunityService{})
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 

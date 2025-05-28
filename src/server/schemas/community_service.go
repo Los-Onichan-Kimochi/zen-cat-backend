@@ -19,3 +19,7 @@ type CreateCommunityServiceRequest struct {
 type BatchCreateCommunityServiceRequest struct {
 	CommunityServices []*CreateCommunityServiceRequest `json:"community_services"`
 }
+
+type BulkDeleteCommunityServiceRequest struct {
+	CommunityServices []*CommunityService `json:"community_services"`
+}

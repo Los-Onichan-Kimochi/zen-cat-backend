@@ -138,6 +138,33 @@ func (a *Api) BulkCreateCommunityServices(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
+// @Summary 			Bulk Delete CommunityServices.
+// @Description 		Bulk deletes community-service associations.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteCommunityServiceRequest true  "Bulk Delete CommunityService Request"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/bulk/ [delete]
+func (a *Api) BulkDeleteCommunityServices(c echo.Context) error {
+	var request schemas.BulkDeleteCommunityServiceRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.CommunityService.BulkDeleteCommunityServices(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 // @Summary 			Fetch CommunityServices.
 // @Description 		Fetch all community-service associations, filtered by params.
 // @Tags 				CommunityService

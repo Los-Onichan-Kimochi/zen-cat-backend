@@ -116,6 +116,15 @@ func (cs *CommunityService) BulkCreateCommunityServices(
 	return &schemas.CommunityServices{CommunityServices: communityServices}, nil
 }
 
+// Bulk deletes community-service associations.
+func (cs *CommunityService) BulkDeleteCommunityServices(
+	bulkDeleteCommunityServiceData schemas.BulkDeleteCommunityServiceRequest,
+) *errors.Error {
+	return cs.Adapter.CommunityService.BulkDeletePostgresqlCommunityServices(
+		bulkDeleteCommunityServiceData.CommunityServices,
+	)
+}
+
 // Fetch all community-service associations, filtered by
 //
 //   - `communityId` if provided.

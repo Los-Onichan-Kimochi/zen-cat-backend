@@ -584,6 +584,70 @@ const docTemplateserver = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes community-service associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Bulk Delete CommunityServices.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete CommunityService Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityServiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
             }
         },
         "/community-service/{communityId}/{serviceId}/": {
@@ -2902,6 +2966,17 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CreateProfessionalRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteCommunityServiceRequest": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CommunityService"
                     }
                 }
             }

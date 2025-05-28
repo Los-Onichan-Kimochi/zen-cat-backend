@@ -105,6 +105,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
+	communityService.DELETE("/bulk/", a.BulkDeleteCommunityServices)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))

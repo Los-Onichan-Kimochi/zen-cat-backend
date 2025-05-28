@@ -128,6 +128,34 @@ func (cs *CommunityService) BulkCreatePostgresqlCommunityServices(
 	return communityServicesResponse, nil
 }
 
+// Bulk deletes community-service associations from postgresql DB.
+func (cs *CommunityService) BulkDeletePostgresqlCommunityServices(
+	communityServices []*schemas.CommunityService,
+) *errors.Error {
+	if len(communityServices) == 0 {
+		return nil
+	}
+
+	// Validate that all community-service ids to delete are valid
+	communityServiceModels := make([]*model.CommunityService, len(communityServices))
+	for i, communityService := range communityServices {
+		if communityService.CommunityId == uuid.Nil || communityService.ServiceId == uuid.Nil {
+			return &errors.UnprocessableEntityError.InvalidCommunityServiceId
+		}
+
+		communityServiceModels[i] = &model.CommunityService{
+			CommunityId: communityService.CommunityId,
+			ServiceId:   communityService.ServiceId,
+		}
+	}
+
+	if err := cs.DaoPostgresql.CommunityService.BulkDeleteCommunityServices(communityServiceModels); err != nil {
+		return &errors.BadRequestError.CommunityServiceNotDeleted
+	}
+
+	return nil
+}
+
 // Fetch all community-service associations from postgresql DB and adapts them to a CommunityService schema.
 func (cs *CommunityService) FetchPostgresqlCommunityServices(
 	communityId *uuid.UUID,
