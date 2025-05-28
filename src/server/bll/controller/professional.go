@@ -87,3 +87,20 @@ func (p *Professional) UpdateProfessional(
 func (p *Professional) DeleteProfessional(professionalId uuid.UUID) *errors.Error {
 	return p.Adapter.Professional.DeletePostgresqlProfessional(professionalId)
 }
+
+// Bulk creates professionals.
+func (p *Professional) BulkCreateProfessionals(
+	createProfessionalsData []*schemas.CreateProfessionalRequest,
+	updatedBy string,
+) ([]*schemas.Professional, *errors.Error) {
+	return p.Adapter.Professional.BulkCreatePostgresqlProfessionals(createProfessionalsData, updatedBy)
+}
+
+// Bulk deletes professionals.
+func (p *Professional) BulkDeleteProfessionals(
+	bulkDeleteProfessionalData schemas.BulkDeleteProfessionalRequest,
+) *errors.Error {
+	return p.Adapter.Professional.BulkDeletePostgresqlProfessionals(
+		bulkDeleteProfessionalData.Professionals,
+	)
+}

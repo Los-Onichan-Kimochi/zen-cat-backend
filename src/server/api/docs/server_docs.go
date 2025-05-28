@@ -1610,6 +1610,144 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/professional/bulk-create/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple professionals in a batch.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Professional"
+                ],
+                "summary": "Bulk Create Professionals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create Professional Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkCreateProfessionalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Professionals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/professional/bulk-delete/": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes professionals given their ids.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Professional"
+                ],
+                "summary": "Bulk Delete Professionals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete Professional Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteProfessionalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Professional"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/professional/{professionalId}/": {
             "get": {
                 "security": [
@@ -2441,6 +2579,28 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CreateCommunityRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkCreateProfessionalRequest": {
+            "type": "object",
+            "properties": {
+                "professionals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateProfessionalRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteProfessionalRequest": {
+            "type": "object",
+            "properties": {
+                "professionals": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 }
             }

@@ -39,3 +39,11 @@ type UpdateProfessionalRequest struct {
 	Type           *string `json:"type"`
 	ImageUrl       *string `json:"image_url"`
 }
+
+type BulkCreateProfessionalRequest struct {
+	Professionals []*CreateProfessionalRequest `json:"professionals"`
+}
+
+type BulkDeleteProfessionalRequest struct {
+	Professionals []uuid.UUID `json:"professionals"`
+}
