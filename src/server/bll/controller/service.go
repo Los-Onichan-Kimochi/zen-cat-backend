@@ -72,4 +72,9 @@ func (c *Service) UpdateService(
 	)
 }
 
+// Deletes a service.
+func (l *Service) DeleteService(serviceId uuid.UUID) *errors.Error {
+	return l.Adapter.Service.DeletePostgresqlService(serviceId)
+}
+
 // TODO: Add BulkCreateCommunities (Batch)
