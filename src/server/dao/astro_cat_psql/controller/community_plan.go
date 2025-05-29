@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -29,6 +29,7 @@ func (cp *CommunityPlan) CreateCommunityPlan(communityPlan *model.CommunityPlan)
 }
 
 // Gets a specific community-plan association.
+// Gorm does not return the Id of a soft deleted record.
 func (cp *CommunityPlan) GetCommunityPlan(
 	communityId uuid.UUID,
 	planId uuid.UUID,
@@ -62,15 +63,36 @@ func (cp *CommunityPlan) DeleteCommunityPlan(
 }
 
 // Creates multiple community-plan associations.
-func (cp *CommunityPlan) BulkCreateCommunityPlans(communityPlans []*model.CommunityPlan) error {
+func (cp *CommunityPlan) BulkCreateCommunityPlans(
+	communityPlans []*model.CommunityPlan,
+) error {
+	if len(communityPlans) == 0 {
+		return nil
+	}
+
+	var conditions []string
+	var args []interface{}
+	var count int64
+
+	for _, communityPlan := range communityPlans {
+		conditions = append(conditions, "(community_id = ? AND plan_id = ?)")
+		args = append(args, communityPlan.CommunityId, communityPlan.PlanId)
+	}
+	result := cp.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Find(&model.CommunityPlan{}).
+		Count(&count)
+	if result.Error != nil {
+		return result.Error
+	}
+	if count > 0 {
+		return fmt.Errorf("one or more community-plan associations already exist")
+	}
+
 	err := cp.PostgresqlDB.Create(communityPlans).Error
 	if err != nil {
-		// Check if it's a duplicate key error
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return fmt.Errorf("one or more community-plan associations already exist: %w", err)
-		}
 		return err
 	}
+
 	return nil
 }
 
@@ -98,4 +120,30 @@ func (cp *CommunityPlan) FetchCommunityPlans(
 	}
 
 	return communityPlans, nil
+}
+
+// Bulk deletes multiple community-plan associations.
+func (cp *CommunityPlan) BulkDeleteCommunityPlans(
+	communityPlans []*model.CommunityPlan,
+) error {
+	if len(communityPlans) == 0 {
+		return nil
+	}
+
+	// Build the WHERE clause for the bulk delete
+	var conditions []string
+	var args []interface{}
+	for _, communityPlan := range communityPlans {
+		conditions = append(conditions, "(community_id = ? AND plan_id = ?)")
+		args = append(args, communityPlan.CommunityId, communityPlan.PlanId)
+	}
+
+	// Execute the bulk delete
+	result := cp.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Delete(&model.CommunityPlan{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }

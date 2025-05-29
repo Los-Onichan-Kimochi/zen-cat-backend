@@ -71,7 +71,7 @@ func (cs *CommunityService) BulkCreateCommunityServices(
 	}
 
 	var conditions []string
-	var args []interface{}
+	var args []any
 	var count int64
 
 	for _, communityService := range communityServices {

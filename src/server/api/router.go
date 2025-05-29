@@ -97,6 +97,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
 	communityPlan.POST("/bulk/", a.BulkCreateCommunityPlans)
 	communityPlan.GET("/", a.FetchCommunityPlans)
+	communityPlan.DELETE("/bulk/", a.BulkDeleteCommunityPlans)
 
 	// CommunityService endpoints
 	communityService := a.Echo.Group("/community-service")

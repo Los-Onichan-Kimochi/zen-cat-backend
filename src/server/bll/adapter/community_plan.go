@@ -39,6 +39,7 @@ func (cp *CommunityPlan) CreatePostgresqlCommunityPlan(
 	}
 
 	communityPlanModel := &model.CommunityPlan{
+		Id:          uuid.New(),
 		CommunityId: communityId,
 		PlanId:      planId,
 		AuditFields: model.AuditFields{
@@ -52,6 +53,7 @@ func (cp *CommunityPlan) CreatePostgresqlCommunityPlan(
 	}
 
 	return &schemas.CommunityPlan{
+		Id:          communityPlanModel.Id,
 		CommunityId: communityPlanModel.CommunityId,
 		PlanId:      communityPlanModel.PlanId,
 	}, nil
@@ -68,6 +70,7 @@ func (cp *CommunityPlan) GetPostgresqlCommunityPlan(
 	}
 
 	return &schemas.CommunityPlan{
+		Id:          associationModel.Id,
 		CommunityId: associationModel.CommunityId,
 		PlanId:      associationModel.PlanId,
 	}, nil
@@ -98,6 +101,7 @@ func (cp *CommunityPlan) BulkCreatePostgresqlCommunityPlans(
 	communityPlanModels := make([]*model.CommunityPlan, len(communityPlans))
 	for i, communityPlan := range communityPlans {
 		communityPlanModels[i] = &model.CommunityPlan{
+			Id:          uuid.New(),
 			CommunityId: communityPlan.CommunityId,
 			PlanId:      communityPlan.PlanId,
 			AuditFields: model.AuditFields{
@@ -116,6 +120,7 @@ func (cp *CommunityPlan) BulkCreatePostgresqlCommunityPlans(
 	communityPlansResponse := make([]*schemas.CommunityPlan, len(communityPlans))
 	for i, communityPlan := range communityPlanModels {
 		communityPlansResponse[i] = &schemas.CommunityPlan{
+			Id:          communityPlan.Id,
 			CommunityId: communityPlan.CommunityId,
 			PlanId:      communityPlan.PlanId,
 		}
@@ -140,10 +145,40 @@ func (cp *CommunityPlan) FetchPostgresqlCommunityPlans(
 	communityPlans := make([]*schemas.CommunityPlan, len(communityPlanModels))
 	for i, communityPlan := range communityPlanModels {
 		communityPlans[i] = &schemas.CommunityPlan{
+			Id:          communityPlan.Id,
 			CommunityId: communityPlan.CommunityId,
 			PlanId:      communityPlan.PlanId,
 		}
 	}
 
 	return communityPlans, nil
+}
+
+// Bulk deletes community-plan associations from postgresql DB.
+func (cp *CommunityPlan) BulkDeletePostgresqlCommunityPlans(
+	communityPlans []*schemas.CommunityPlan,
+) *errors.Error {
+	if len(communityPlans) == 0 {
+		return nil
+	}
+
+	// Validate that all community-plan ids to delete are valid
+	communityPlanModels := make([]*model.CommunityPlan, len(communityPlans))
+	for i, communityPlan := range communityPlans {
+		if communityPlan.CommunityId == uuid.Nil || communityPlan.PlanId == uuid.Nil {
+			return &errors.UnprocessableEntityError.InvalidCommunityPlanId
+		}
+
+		communityPlanModels[i] = &model.CommunityPlan{
+			Id:          communityPlan.Id,
+			CommunityId: communityPlan.CommunityId,
+			PlanId:      communityPlan.PlanId,
+		}
+	}
+
+	if err := cp.DaoPostgresql.CommunityPlan.BulkDeleteCommunityPlans(communityPlanModels); err != nil {
+		return &errors.BadRequestError.CommunityPlanNotDeleted
+	}
+
+	return nil
 }

@@ -162,3 +162,12 @@ func (cp *CommunityPlan) FetchCommunityPlans(
 
 	return &schemas.CommunityPlans{CommunityPlans: communityPlans}, nil
 }
+
+// Bulk deletes community-plan associations.
+func (cp *CommunityPlan) BulkDeleteCommunityPlans(
+	bulkDeleteCommunityPlanData schemas.BulkDeleteCommunityPlanRequest,
+) *errors.Error {
+	return cp.Adapter.CommunityPlan.BulkDeletePostgresqlCommunityPlans(
+		bulkDeleteCommunityPlanData.CommunityPlans,
+	)
+}
