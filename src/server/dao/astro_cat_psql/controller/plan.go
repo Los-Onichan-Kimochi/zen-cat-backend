@@ -33,14 +33,18 @@ func (p *Plan) GetPlan(planId uuid.UUID) (*model.Plan, error) {
 	return plan, nil
 }
 
-// Fetches all plans.
-// TODO: Add filters and sorting.
-func (p *Plan) FetchPlans() ([]*model.Plan, error) {
+// Fetch all plans, filtered by `ids` if provided.
+func (p *Plan) FetchPlans(ids []uuid.UUID) ([]*model.Plan, error) {
 	plans := []*model.Plan{}
 
-	result := p.PostgresqlDB.Find(&plans)
-	if result.Error != nil {
-		return nil, result.Error
+	query := p.PostgresqlDB.Model(&model.Plan{})
+
+	if len(ids) > 0 {
+		query = query.Where("id IN (?)", ids)
+	}
+
+	if err := query.Find(&plans).Error; err != nil {
+		return nil, err
 	}
 
 	return plans, nil

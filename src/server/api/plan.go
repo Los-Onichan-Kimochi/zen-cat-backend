@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -43,6 +44,7 @@ func (a *Api) GetPlan(c echo.Context) error {
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
+// @Param               ids query []string false "Plan IDs"
 // @Success 			200 {object} schemas.Plans "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
@@ -51,7 +53,14 @@ func (a *Api) GetPlan(c echo.Context) error {
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/plan/ [get]
 func (a *Api) FetchPlans(c echo.Context) error {
-	response, err := a.BllController.Plan.FetchPlans()
+	idsString := c.QueryParam("ids")
+
+	ids := []string{}
+	if idsString != "" {
+		ids = strings.Split(idsString, ",")
+	}
+
+	response, err := a.BllController.Plan.FetchPlans(ids)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

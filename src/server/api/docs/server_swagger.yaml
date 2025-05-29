@@ -15,6 +15,13 @@ definitions:
     x-enum-varnames:
     - PlanTypeMonthly
     - PlanTypeAnual
+  schemas.BatchCreateCommunityPlanRequest:
+    properties:
+      community_plans:
+        items:
+          $ref: '#/definitions/schemas.CreateCommunityPlanRequest'
+        type: array
+    type: object
   schemas.BatchCreateCommunityRequest:
     properties:
       communities:
@@ -22,11 +29,32 @@ definitions:
           $ref: '#/definitions/schemas.CreateCommunityRequest'
         type: array
     type: object
+  schemas.BatchCreateCommunityServiceRequest:
+    properties:
+      community_services:
+        items:
+          $ref: '#/definitions/schemas.CreateCommunityServiceRequest'
+        type: array
+    type: object
   schemas.BulkCreateProfessionalRequest:
     properties:
       professionals:
         items:
           $ref: '#/definitions/schemas.CreateProfessionalRequest'
+        type: array
+    type: object
+  schemas.BulkDeleteCommunityPlanRequest:
+    properties:
+      community_plans:
+        items:
+          $ref: '#/definitions/schemas.DeleteCommunityPlanRequest'
+        type: array
+    type: object
+  schemas.BulkDeleteCommunityServiceRequest:
+    properties:
+      community_services:
+        items:
+          $ref: '#/definitions/schemas.DeleteCommunityServiceRequest'
         type: array
     type: object
   schemas.BulkDeleteProfessionalRequest:
@@ -60,15 +88,33 @@ definitions:
     properties:
       community_id:
         type: string
+      id:
+        type: string
       plan_id:
         type: string
+    type: object
+  schemas.CommunityPlans:
+    properties:
+      community_plans:
+        items:
+          $ref: '#/definitions/schemas.CommunityPlan'
+        type: array
     type: object
   schemas.CommunityService:
     properties:
       community_id:
         type: string
+      id:
+        type: string
       service_id:
         type: string
+    type: object
+  schemas.CommunityServices:
+    properties:
+      community_services:
+        items:
+          $ref: '#/definitions/schemas.CommunityService'
+        type: array
     type: object
   schemas.CreateCommunityPlanRequest:
     properties:
@@ -181,6 +227,26 @@ definitions:
         type: string
       second_last_name:
         type: string
+    type: object
+  schemas.DeleteCommunityPlanRequest:
+    properties:
+      community_id:
+        type: string
+      plan_id:
+        type: string
+    required:
+    - community_id
+    - plan_id
+    type: object
+  schemas.DeleteCommunityServiceRequest:
+    properties:
+      community_id:
+        type: string
+      service_id:
+        type: string
+    required:
+    - community_id
+    - service_id
     type: object
   schemas.IdentificationDocument:
     properties:
@@ -470,6 +536,51 @@ info:
   version: "1.0"
 paths:
   /community-plan/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all community-plan associations, filtered by params.
+      parameters:
+      - description: Community ID
+        in: query
+        name: communityId
+        type: string
+      - description: Plan ID
+        in: query
+        name: planId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlans'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Plan does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch CommunityPlans.
+      tags:
+      - CommunityPlan
     post:
       consumes:
       - application/json
@@ -602,7 +713,141 @@ paths:
       summary: Get CommunityPlan.
       tags:
       - CommunityPlan
+  /community-plan/bulk/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes community-plan associations.
+      parameters:
+      - description: Bulk Delete CommunityPlan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteCommunityPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete CommunityPlans.
+      tags:
+      - CommunityPlan
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple community-plan associations.
+      parameters:
+      - description: Bulk Create CommunityPlans Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateCommunityPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CommunityPlans'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Plan does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create CommunityPlans.
+      tags:
+      - CommunityPlan
   /community-service/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all community-service associations, filtered by params.
+      parameters:
+      - description: Community ID
+        in: query
+        name: communityId
+        type: string
+      - description: Service ID
+        in: query
+        name: serviceId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityServices'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Service does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch CommunityServices.
+      tags:
+      - CommunityService
     post:
       consumes:
       - application/json
@@ -733,6 +978,95 @@ paths:
       security:
       - JWT: []
       summary: Get CommunityService.
+      tags:
+      - CommunityService
+  /community-service/bulk/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes community-service associations.
+      parameters:
+      - description: Bulk Delete CommunityService Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteCommunityServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete CommunityServices.
+      tags:
+      - CommunityService
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple community-service associations.
+      parameters:
+      - description: Bulk Create CommunityServices Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateCommunityServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.CommunityServices'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Community or Service does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create CommunityServices.
       tags:
       - CommunityService
   /community/:
@@ -1213,6 +1547,14 @@ paths:
       consumes:
       - application/json
       description: Fetch all plans, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: Plan IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
       produces:
       - application/json
       responses:
@@ -1721,6 +2063,14 @@ paths:
       consumes:
       - application/json
       description: Fetch all services, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: Service IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
       produces:
       - application/json
       responses:

@@ -136,35 +136,34 @@ var (
 
 	// For 400 Bad Request errors
 	BadRequestError = struct {
-		InvalidUpdatedByValue  Error
-		CommunityNotCreated    Error
-		CommunityNotUpdated    Error
-		CommunityNotSoftDeleted Error
-		LocalNotCreated        Error
-		LocalNotUpdated        Error
-		LocalNotSoftDeleted    Error
-		ProfessionalNotCreated Error
-		ProfessionalNotUpdated Error
-		ServiceNotCreated      Error
-		ServiceNotUpdated      Error
-		ServiceNotSoftDeleted  Error
-		PlanNotCreated         Error
-		PlanNotUpdated         Error
-		PlanNotSoftDeleted     Error
-		InvalidPlanType        Error
-		MembershipNotCreated   Error
-		MembershipNotUpdated   Error
-		OnboardingNotCreated   Error
-		OnboardingNotUpdated   Error
-		UserNotCreated         Error
-		UserNotUpdated         Error
-		UserNotSoftDeleted     Error
-		CommunityPlanNotCreated       Error
-		CommunityPlanAlreadyExists    Error
-		CommunityPlanNotDeleted       Error
-		CommunityServiceNotCreated    Error
-		CommunityServiceAlreadyExists Error
-		CommunityServiceNotDeleted    Error
+		InvalidUpdatedByValue      Error
+		CommunityNotCreated        Error
+		CommunityNotUpdated        Error
+		CommunityNotSoftDeleted    Error
+		LocalNotCreated            Error
+		LocalNotUpdated            Error
+		LocalNotSoftDeleted        Error
+		ProfessionalNotCreated     Error
+		ProfessionalNotUpdated     Error
+		ProfessionalNotSoftDeleted Error
+		ServiceNotCreated          Error
+		ServiceNotUpdated          Error
+		ServiceNotSoftDeleted      Error
+		PlanNotCreated             Error
+		PlanNotUpdated             Error
+		PlanNotSoftDeleted         Error
+		InvalidPlanType            Error
+		MembershipNotCreated       Error
+		MembershipNotUpdated       Error
+		OnboardingNotCreated       Error
+		OnboardingNotUpdated       Error
+		UserNotCreated             Error
+		UserNotUpdated             Error
+		UserNotSoftDeleted         Error
+		CommunityPlanNotCreated    Error
+		CommunityPlanNotDeleted    Error
+		CommunityServiceNotCreated Error
+		CommunityServiceNotDeleted Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -189,6 +188,10 @@ var (
 		ProfessionalNotUpdated: Error{
 			Code:    "PROFESSIONAL_ERROR_003",
 			Message: "Professional not updated",
+		},
+		ProfessionalNotSoftDeleted: Error{
+			Code:    "PROFESSIONAL_ERROR_005",
+			Message: "Professional not soft deleted",
 		},
 		LocalNotCreated: Error{
 			Code:    "LOCAL_ERROR_002",
@@ -262,10 +265,6 @@ var (
 			Code:    "COMMUNITY_PLAN_ERROR_002",
 			Message: "Community-Plan association not created",
 		},
-		CommunityPlanAlreadyExists: Error{
-			Code:    "COMMUNITY_PLAN_ERROR_003",
-			Message: "Community-Plan association already exists",
-		},
 		CommunityPlanNotDeleted: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_005",
 			Message: "Community-Plan association not deleted",
@@ -274,13 +273,24 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_002",
 			Message: "Community-Service association not created",
 		},
-		CommunityServiceAlreadyExists: Error{
-			Code:    "COMMUNITY_SERVICE_ERROR_003",
-			Message: "Community-Service association already exists",
-		},
 		CommunityServiceNotDeleted: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_005",
 			Message: "Community-Service association not deleted",
+		},
+	}
+
+	// For 409 Conflict errors
+	ConflictError = struct {
+		CommunityPlanAlreadyExists    Error
+		CommunityServiceAlreadyExists Error
+	}{
+		CommunityPlanAlreadyExists: Error{
+			Code:    "COMMUNITY_PLAN_ERROR_006",
+			Message: "Community-Plan association already exists",
+		},
+		CommunityServiceAlreadyExists: Error{
+			Code:    "COMMUNITY_SERVICE_ERROR_006",
+			Message: "Community-Service association already exists",
 		},
 	}
 
@@ -318,6 +328,9 @@ func HandleError(err Error, c echo.Context) error {
 
 	case isInErrorGroup(err, BadRequestError):
 		statusCode = http.StatusBadRequest
+
+	case isInErrorGroup(err, ConflictError):
+		statusCode = http.StatusConflict
 
 	case isInErrorGroup(err, InternalServerError):
 		statusCode = http.StatusInternalServerError

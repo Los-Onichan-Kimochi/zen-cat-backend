@@ -133,7 +133,7 @@ func (p *Professional) BulkCreateProfessionals(professionals []*model.Profession
 // Batch deletes multiple professionals given their IDs.
 func (p *Professional) BulkDeleteProfessionals(professionalIds []uuid.UUID) error {
 	if len(professionalIds) == 0 {
-		return nil // No professionals to delete
+		return nil
 	}
 
 	result := p.PostgresqlDB.Where("id IN ?", professionalIds).Delete(&model.Professional{})

@@ -38,9 +38,6 @@ func (a *Api) CreateCommunityService(c echo.Context) error {
 
 	response, err := a.BllController.CommunityService.CreateCommunityService(request, updatedBy)
 	if err != nil {
-		if err.Code == errors.BadRequestError.CommunityServiceAlreadyExists.Code {
-			return c.JSON(http.StatusConflict, err)
-		}
 		return errors.HandleError(*err, c)
 	}
 
@@ -105,4 +102,92 @@ func (a *Api) DeleteCommunityService(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Create CommunityServices.
+// @Description 		Creates multiple community-service associations.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request body schemas.BatchCreateCommunityServiceRequest true "Bulk Create CommunityServices Request"
+// @Success 			201 {object} schemas.CommunityServices "Created"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid updatedBy)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Community or Service does not exist)"
+// @Failure 			409 {object} errors.Error "Conflict (Association already exists)"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/bulk/ [post]
+func (a *Api) BulkCreateCommunityServices(c echo.Context) error {
+	updatedBy := "ADMIN"
+
+	var request schemas.BatchCreateCommunityServiceRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, err := a.BllController.CommunityService.BulkCreateCommunityServices(
+		request.CommunityServices,
+		updatedBy,
+	)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
+
+// @Summary 			Bulk Delete CommunityServices.
+// @Description 		Bulk deletes community-service associations.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteCommunityServiceRequest true  "Bulk Delete CommunityService Request"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/bulk/ [delete]
+func (a *Api) BulkDeleteCommunityServices(c echo.Context) error {
+	var request schemas.BulkDeleteCommunityServiceRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.CommunityService.BulkDeleteCommunityServices(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Fetch CommunityServices.
+// @Description 		Fetch all community-service associations, filtered by params.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				communityId query string false "Community ID"
+// @Param 				serviceId query string false "Service ID"
+// @Success 			200 {object} schemas.CommunityServices "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Community or Service does not exist)"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/ [get]
+func (a *Api) FetchCommunityServices(c echo.Context) error {
+	communityId := c.QueryParam("communityId")
+	serviceId := c.QueryParam("serviceId")
+
+	response, err := a.BllController.CommunityService.FetchCommunityServices(communityId, serviceId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

@@ -47,7 +47,7 @@ func (cs *CommunityService) CreateCommunityService(
 
 	_, err = cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
 	if err == nil {
-		return nil, &errors.BadRequestError.CommunityServiceAlreadyExists
+		return nil, &errors.ConflictError.CommunityServiceAlreadyExists
 	} else if err.Code != errors.ObjectNotFoundError.CommunityServiceNotFound.Code {
 		return nil, &errors.InternalServerError.Default
 	}
@@ -98,4 +98,78 @@ func (cs *CommunityService) DeleteCommunityService(
 	}
 
 	return cs.Adapter.CommunityService.DeletePostgresqlCommunityService(communityId, serviceId)
+}
+
+// Bulk creates community-service associations.
+func (cs *CommunityService) BulkCreateCommunityServices(
+	createCommunityServicesData []*schemas.CreateCommunityServiceRequest,
+	updatedBy string,
+) (*schemas.CommunityServices, *errors.Error) {
+	communityServices, err := cs.Adapter.CommunityService.BulkCreatePostgresqlCommunityServices(
+		createCommunityServicesData,
+		updatedBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.CommunityServices{CommunityServices: communityServices}, nil
+}
+
+// Bulk deletes community-service associations.
+func (cs *CommunityService) BulkDeleteCommunityServices(
+	bulkDeleteCommunityServiceData schemas.BulkDeleteCommunityServiceRequest,
+) *errors.Error {
+	return cs.Adapter.CommunityService.BulkDeletePostgresqlCommunityServices(
+		bulkDeleteCommunityServiceData.CommunityServices,
+	)
+}
+
+// Fetch all community-service associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `serviceId` if provided.
+func (cs *CommunityService) FetchCommunityServices(
+	communityIdString string,
+	serviceIdString string,
+) (*schemas.CommunityServices, *errors.Error) {
+	var communityId *uuid.UUID
+	var serviceId *uuid.UUID
+
+	// Validate and convert params to UUIDs if provided
+	if communityIdString != "" {
+		parsedId, err := uuid.Parse(communityIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidCommunityId
+		}
+		communityId = &parsedId
+
+		_, newErr := cs.Adapter.Community.GetPostgresqlCommunity(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	if serviceIdString != "" {
+		parsedId, err := uuid.Parse(serviceIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidServiceId
+		}
+		serviceId = &parsedId
+
+		_, newErr := cs.Adapter.Service.GetPostgresqlService(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	communityServices, err := cs.Adapter.CommunityService.FetchPostgresqlCommunityServices(
+		communityId,
+		serviceId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.CommunityServices{CommunityServices: communityServices}, nil
 }
