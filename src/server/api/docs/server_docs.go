@@ -233,6 +233,70 @@ const docTemplateserver = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes community-plan associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityPlan"
+                ],
+                "summary": "Bulk Delete CommunityPlans.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete CommunityPlan Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
             }
         },
         "/community-plan/{communityId}/{planId}/": {
@@ -2970,6 +3034,17 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.BulkDeleteCommunityPlanRequest": {
+            "type": "object",
+            "properties": {
+                "community_plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CommunityPlan"
+                    }
+                }
+            }
+        },
         "schemas.BulkDeleteCommunityServiceRequest": {
             "type": "object",
             "properties": {
@@ -3029,6 +3104,9 @@ const docTemplateserver = `{
                 "community_id": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "plan_id": {
                     "type": "string"
                 }
@@ -3049,6 +3127,9 @@ const docTemplateserver = `{
             "type": "object",
             "properties": {
                 "community_id": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "service_id": {
