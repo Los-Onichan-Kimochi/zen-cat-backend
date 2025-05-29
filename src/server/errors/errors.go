@@ -136,28 +136,29 @@ var (
 
 	// For 400 Bad Request errors
 	BadRequestError = struct {
-		InvalidUpdatedByValue         Error
-		CommunityNotCreated           Error
-		CommunityNotUpdated           Error
-		CommunityNotSoftDeleted       Error
-		LocalNotCreated               Error
-		LocalNotUpdated               Error
-		LocalNotSoftDeleted           Error
-		ProfessionalNotCreated        Error
-		ProfessionalNotUpdated        Error
-		ServiceNotCreated             Error
-		ServiceNotUpdated             Error
-		PlanNotCreated                Error
-		PlanNotUpdated                Error
-		PlanNotSoftDeleted            Error
-		InvalidPlanType               Error
-		MembershipNotCreated          Error
-		MembershipNotUpdated          Error
-		OnboardingNotCreated          Error
-		OnboardingNotUpdated          Error
-		UserNotCreated                Error
-		UserNotUpdated                Error
-		UserNotSoftDeleted            Error
+		InvalidUpdatedByValue  Error
+		CommunityNotCreated    Error
+		CommunityNotUpdated    Error
+		CommunityNotSoftDeleted Error
+		LocalNotCreated        Error
+		LocalNotUpdated        Error
+		LocalNotSoftDeleted    Error
+		ProfessionalNotCreated Error
+		ProfessionalNotUpdated Error
+		ServiceNotCreated      Error
+		ServiceNotUpdated      Error
+		ServiceNotSoftDeleted  Error
+		PlanNotCreated         Error
+		PlanNotUpdated         Error
+		PlanNotSoftDeleted     Error
+		InvalidPlanType        Error
+		MembershipNotCreated   Error
+		MembershipNotUpdated   Error
+		OnboardingNotCreated   Error
+		OnboardingNotUpdated   Error
+		UserNotCreated         Error
+		UserNotUpdated         Error
+		UserNotSoftDeleted     Error
 		CommunityPlanNotCreated       Error
 		CommunityPlanAlreadyExists    Error
 		CommunityPlanNotDeleted       Error
@@ -232,6 +233,10 @@ var (
 		ServiceNotUpdated: Error{
 			Code:    "SERVICE_ERROR_003",
 			Message: "Service not updated",
+		},
+		ServiceNotSoftDeleted: Error{
+			Code:    "SERVICE_ERROR_005",
+			Message: "Service not soft deleted",
 		},
 		PlanNotCreated: Error{
 			Code:    "PLAN_ERROR_002",

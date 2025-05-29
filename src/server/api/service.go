@@ -126,3 +126,31 @@ func (a *Api) UpdateService(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+
+// @Summary 			Delete Service.
+// @Description 		Deletes a service given its id.
+// @Tags 				Service
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               serviceId    path   string  true  "Service ID"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/service/{serviceId}/ [delete]
+func (a *Api) DeleteService(c echo.Context) error {
+	serviceId, parseErr := uuid.Parse(c.Param("serviceId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidServiceId, c)
+	}
+
+	if err := a.BllController.Service.DeleteService(serviceId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
