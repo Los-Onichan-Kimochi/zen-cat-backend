@@ -1547,6 +1547,14 @@ paths:
       consumes:
       - application/json
       description: Fetch all plans, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: Plan IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
       produces:
       - application/json
       responses:
@@ -2055,6 +2063,14 @@ paths:
       consumes:
       - application/json
       description: Fetch all services, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: Service IDs
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
       produces:
       - application/json
       responses:

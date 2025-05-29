@@ -42,8 +42,8 @@ func (p *Plan) GetPostgresqlPlan(planId uuid.UUID) (*schemas.Plan, *errors.Error
 }
 
 // Fetches plans from postgresql DB and adapts them to Plan schemas.
-func (p *Plan) FetchPostgresqlPlans() ([]*schemas.Plan, *errors.Error) {
-	planModels, err := p.DaoPostgresql.Plan.FetchPlans()
+func (p *Plan) FetchPostgresqlPlans(ids []uuid.UUID) ([]*schemas.Plan, *errors.Error) {
+	planModels, err := p.DaoPostgresql.Plan.FetchPlans(ids)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.PlanNotFound
 	}

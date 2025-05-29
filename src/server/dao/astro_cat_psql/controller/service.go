@@ -33,14 +33,18 @@ func (c *Service) GetService(serviceId uuid.UUID) (*model.Service, error) {
 	return service, nil
 }
 
-// TODO: Add filters and sorting.
-// Fetch all services
-func (c *Service) FetchServices() ([]*model.Service, error) {
+// Fetch all services, filtered by `ids` if provided.
+func (c *Service) FetchServices(ids []uuid.UUID) ([]*model.Service, error) {
 	services := []*model.Service{}
 
-	result := c.PostgresqlDB.Find(&services)
-	if result.Error != nil {
-		return nil, result.Error
+	query := c.PostgresqlDB.Model(&model.Service{})
+
+	if len(ids) > 0 {
+		query = query.Where("id IN (?)", ids)
+	}
+
+	if err := query.Find(&services).Error; err != nil {
+		return nil, err
 	}
 
 	return services, nil

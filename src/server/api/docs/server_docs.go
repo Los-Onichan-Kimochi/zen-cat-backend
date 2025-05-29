@@ -1599,6 +1599,18 @@ const docTemplateserver = `{
                     "Plan"
                 ],
                 "summary": "Fetch Plans.",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Plan IDs",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2390,6 +2402,18 @@ const docTemplateserver = `{
                     "Service"
                 ],
                 "summary": "Fetch Services.",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Service IDs",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

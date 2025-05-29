@@ -32,9 +32,22 @@ func (p *Plan) GetPlan(planId uuid.UUID) (*schemas.Plan, *errors.Error) {
 	return p.Adapter.Plan.GetPostgresqlPlan(planId)
 }
 
-// Fetch all plans.
-func (p *Plan) FetchPlans() (*schemas.Plans, *errors.Error) {
-	plans, err := p.Adapter.Plan.FetchPostgresqlPlans()
+// Fetch all plans, filtered by `ids` if provided.
+func (p *Plan) FetchPlans(ids []string) (*schemas.Plans, *errors.Error) {
+	// Validate and convert ids to UUIDs if provided.
+	parsedIds := []uuid.UUID{}
+	if len(ids) > 0 {
+		for _, id := range ids {
+			parsedId, err := uuid.Parse(id)
+			if err != nil {
+				return nil, &errors.UnprocessableEntityError.InvalidPlanId
+			}
+
+			parsedIds = append(parsedIds, parsedId)
+		}
+	}
+
+	plans, err := p.Adapter.Plan.FetchPostgresqlPlans(parsedIds)
 	if err != nil {
 		return nil, err
 	}
