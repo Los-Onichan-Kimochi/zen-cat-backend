@@ -100,10 +100,6 @@ func (cs *CommunityService) BulkCreateCommunityServices(
 func (cs *CommunityService) BulkDeleteCommunityServices(
 	communityServices []*model.CommunityService,
 ) error {
-	if len(communityServices) == 0 {
-		return nil
-	}
-
 	// Build the WHERE clause for the bulk delete
 	var conditions []string
 	var args []interface{}

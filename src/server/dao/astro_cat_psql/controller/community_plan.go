@@ -126,10 +126,6 @@ func (cp *CommunityPlan) FetchCommunityPlans(
 func (cp *CommunityPlan) BulkDeleteCommunityPlans(
 	communityPlans []*model.CommunityPlan,
 ) error {
-	if len(communityPlans) == 0 {
-		return nil
-	}
-
 	// Build the WHERE clause for the bulk delete
 	var conditions []string
 	var args []interface{}
