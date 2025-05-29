@@ -135,7 +135,7 @@ func (cs *CommunityService) BulkCreatePostgresqlCommunityServices(
 
 // Bulk deletes community-service associations from postgresql DB.
 func (cs *CommunityService) BulkDeletePostgresqlCommunityServices(
-	communityServices []*schemas.CommunityService,
+	communityServices []*schemas.DeleteCommunityServiceRequest,
 ) *errors.Error {
 	if len(communityServices) == 0 {
 		return nil
@@ -149,7 +149,6 @@ func (cs *CommunityService) BulkDeletePostgresqlCommunityServices(
 		}
 
 		communityServiceModels[i] = &model.CommunityService{
-			Id:          communityService.Id,
 			CommunityId: communityService.CommunityId,
 			ServiceId:   communityService.ServiceId,
 		}

@@ -156,7 +156,7 @@ func (cp *CommunityPlan) FetchPostgresqlCommunityPlans(
 
 // Bulk deletes community-plan associations from postgresql DB.
 func (cp *CommunityPlan) BulkDeletePostgresqlCommunityPlans(
-	communityPlans []*schemas.CommunityPlan,
+	communityPlans []*schemas.DeleteCommunityPlanRequest,
 ) *errors.Error {
 	if len(communityPlans) == 0 {
 		return nil
@@ -170,7 +170,6 @@ func (cp *CommunityPlan) BulkDeletePostgresqlCommunityPlans(
 		}
 
 		communityPlanModels[i] = &model.CommunityPlan{
-			Id:          communityPlan.Id,
 			CommunityId: communityPlan.CommunityId,
 			PlanId:      communityPlan.PlanId,
 		}

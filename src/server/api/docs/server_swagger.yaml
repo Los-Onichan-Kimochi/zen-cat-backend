@@ -47,14 +47,14 @@ definitions:
     properties:
       community_plans:
         items:
-          $ref: '#/definitions/schemas.CommunityPlan'
+          $ref: '#/definitions/schemas.DeleteCommunityPlanRequest'
         type: array
     type: object
   schemas.BulkDeleteCommunityServiceRequest:
     properties:
       community_services:
         items:
-          $ref: '#/definitions/schemas.CommunityService'
+          $ref: '#/definitions/schemas.DeleteCommunityServiceRequest'
         type: array
     type: object
   schemas.BulkDeleteProfessionalRequest:
@@ -227,6 +227,26 @@ definitions:
         type: string
       second_last_name:
         type: string
+    type: object
+  schemas.DeleteCommunityPlanRequest:
+    properties:
+      community_id:
+        type: string
+      plan_id:
+        type: string
+    required:
+    - community_id
+    - plan_id
+    type: object
+  schemas.DeleteCommunityServiceRequest:
+    properties:
+      community_id:
+        type: string
+      service_id:
+        type: string
+    required:
+    - community_id
+    - service_id
     type: object
   schemas.IdentificationDocument:
     properties:

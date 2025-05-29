@@ -3040,7 +3040,7 @@ const docTemplateserver = `{
                 "community_plans": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/schemas.CommunityPlan"
+                        "$ref": "#/definitions/schemas.DeleteCommunityPlanRequest"
                     }
                 }
             }
@@ -3051,7 +3051,7 @@ const docTemplateserver = `{
                 "community_services": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/schemas.CommunityService"
+                        "$ref": "#/definitions/schemas.DeleteCommunityServiceRequest"
                     }
                 }
             }
@@ -3315,6 +3315,36 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "second_last_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteCommunityPlanRequest": {
+            "type": "object",
+            "required": [
+                "community_id",
+                "plan_id"
+            ],
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteCommunityServiceRequest": {
+            "type": "object",
+            "required": [
+                "community_id",
+                "service_id"
+            ],
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "service_id": {
                     "type": "string"
                 }
             }

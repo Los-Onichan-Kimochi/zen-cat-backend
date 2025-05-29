@@ -21,6 +21,11 @@ type BatchCreateCommunityServiceRequest struct {
 	CommunityServices []*CreateCommunityServiceRequest `json:"community_services"`
 }
 
+type DeleteCommunityServiceRequest struct {
+	CommunityId uuid.UUID `json:"community_id" validate:"required"`
+	ServiceId   uuid.UUID `json:"service_id"   validate:"required"`
+}
+
 type BulkDeleteCommunityServiceRequest struct {
-	CommunityServices []*CommunityService `json:"community_services"`
+	CommunityServices []*DeleteCommunityServiceRequest `json:"community_services"`
 }
