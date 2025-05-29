@@ -3,9 +3,10 @@ package model
 import "github.com/google/uuid"
 
 type CommunityService struct {
-	CommunityId uuid.UUID `gorm:"primaryKey"`
+	Id          uuid.UUID `gorm:"type:uuid;primaryKey"`
+	CommunityId uuid.UUID `gorm:"type:uuid"`
 	Community   Community `gorm:"foreignKey:CommunityId;references:Id"`
-	ServiceId   uuid.UUID `gorm:"primaryKey"`
+	ServiceId   uuid.UUID `gorm:"type:uuid"`
 	Service     Service   `gorm:"foreignKey:ServiceId;references:Id"`
 	AuditFields
 }

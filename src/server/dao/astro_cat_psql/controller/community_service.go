@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -30,6 +29,7 @@ func (cs *CommunityService) CreateCommunityService(communityService *model.Commu
 }
 
 // Gets a specific community-service association.
+// Gorm does not return the Id of a soft deleted record.
 func (cs *CommunityService) GetCommunityService(
 	communityId uuid.UUID,
 	serviceId uuid.UUID,
@@ -66,14 +66,36 @@ func (cs *CommunityService) DeleteCommunityService(
 func (cs *CommunityService) BulkCreateCommunityServices(
 	communityServices []*model.CommunityService,
 ) error {
+	if len(communityServices) == 0 {
+		return nil
+	}
+
+	var conditions []string
+	var args []interface{}
+	var count int64
+
+	for _, communityService := range communityServices {
+		conditions = append(conditions, "(community_id = ? AND service_id = ?)")
+		args = append(args, communityService.CommunityId, communityService.ServiceId)
+	}
+	result := cs.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Find(&model.CommunityService{}).
+		Count(&count)
+	if result.Error != nil {
+		fmt.Println("!result.Error", result.Error)
+		return result.Error
+	}
+	if count > 0 {
+		fmt.Println("!Count error", count)
+		return fmt.Errorf("one or more community-service associations already exist")
+	}
+
 	err := cs.PostgresqlDB.Create(communityServices).Error
+	fmt.Println("!err", err)
 	if err != nil {
-		// Check if it's a duplicate key error
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return fmt.Errorf("one or more community-service associations already exist: %w", err)
-		}
 		return err
 	}
+
 	return nil
 }
 

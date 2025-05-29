@@ -40,6 +40,7 @@ func (cs *CommunityService) CreatePostgresqlCommunityService(
 	}
 
 	communityServiceModel := &model.CommunityService{
+		Id:          uuid.New(),
 		CommunityId: communityId,
 		ServiceId:   serviceId,
 		AuditFields: model.AuditFields{
@@ -53,6 +54,7 @@ func (cs *CommunityService) CreatePostgresqlCommunityService(
 	}
 
 	return &schemas.CommunityService{
+		Id:          communityServiceModel.Id,
 		CommunityId: communityServiceModel.CommunityId,
 		ServiceId:   communityServiceModel.ServiceId,
 	}, nil
@@ -63,7 +65,7 @@ func (cs *CommunityService) GetPostgresqlCommunityService(
 	communityId uuid.UUID,
 	serviceId uuid.UUID,
 ) (*schemas.CommunityService, *errors.Error) {
-	associationModel, err := cs.DaoPostgresql.CommunityService.GetCommunityService(
+	communityServiceModel, err := cs.DaoPostgresql.CommunityService.GetCommunityService(
 		communityId,
 		serviceId,
 	)
@@ -72,8 +74,9 @@ func (cs *CommunityService) GetPostgresqlCommunityService(
 	}
 
 	return &schemas.CommunityService{
-		CommunityId: associationModel.CommunityId,
-		ServiceId:   associationModel.ServiceId,
+		Id:          communityServiceModel.Id,
+		CommunityId: communityServiceModel.CommunityId,
+		ServiceId:   communityServiceModel.ServiceId,
 	}, nil
 }
 
@@ -102,6 +105,7 @@ func (cs *CommunityService) BulkCreatePostgresqlCommunityServices(
 	communityServiceModels := make([]*model.CommunityService, len(communityServices))
 	for i, communityService := range communityServices {
 		communityServiceModels[i] = &model.CommunityService{
+			Id:          uuid.New(),
 			CommunityId: communityService.CommunityId,
 			ServiceId:   communityService.ServiceId,
 			AuditFields: model.AuditFields{
@@ -120,6 +124,7 @@ func (cs *CommunityService) BulkCreatePostgresqlCommunityServices(
 	communityServicesResponse := make([]*schemas.CommunityService, len(communityServices))
 	for i, communityService := range communityServiceModels {
 		communityServicesResponse[i] = &schemas.CommunityService{
+			Id:          communityService.Id,
 			CommunityId: communityService.CommunityId,
 			ServiceId:   communityService.ServiceId,
 		}
@@ -144,6 +149,7 @@ func (cs *CommunityService) BulkDeletePostgresqlCommunityServices(
 		}
 
 		communityServiceModels[i] = &model.CommunityService{
+			Id:          communityService.Id,
 			CommunityId: communityService.CommunityId,
 			ServiceId:   communityService.ServiceId,
 		}
@@ -172,6 +178,7 @@ func (cs *CommunityService) FetchPostgresqlCommunityServices(
 	communityServices := make([]*schemas.CommunityService, len(communityServiceModels))
 	for i, communityService := range communityServiceModels {
 		communityServices[i] = &schemas.CommunityService{
+			Id:          communityService.Id,
 			CommunityId: communityService.CommunityId,
 			ServiceId:   communityService.ServiceId,
 		}
