@@ -82,16 +82,13 @@ func (cs *CommunityService) BulkCreateCommunityServices(
 		Find(&model.CommunityService{}).
 		Count(&count)
 	if result.Error != nil {
-		fmt.Println("!result.Error", result.Error)
 		return result.Error
 	}
 	if count > 0 {
-		fmt.Println("!Count error", count)
 		return fmt.Errorf("one or more community-service associations already exist")
 	}
 
 	err := cs.PostgresqlDB.Create(communityServices).Error
-	fmt.Println("!err", err)
 	if err != nil {
 		return err
 	}
