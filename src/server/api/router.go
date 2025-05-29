@@ -87,6 +87,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
+	service.DELETE("/:serviceId/", a.DeleteService)
 
 	// Session endpoints
 
