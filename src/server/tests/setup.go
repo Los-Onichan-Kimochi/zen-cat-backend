@@ -142,7 +142,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Type:             model.PlanTypeMonthly,
 			ReservationLimit: &reservationLimit,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -151,7 +151,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Type:             model.PlanTypeAnual,
 			ReservationLimit: nil,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -171,7 +171,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ImageUrl:            "test-image",
 			NumberSubscriptions: 0,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -181,7 +181,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ImageUrl:            "test-image",
 			NumberSubscriptions: 0,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -204,7 +204,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -217,7 +217,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Rol:            model.UserRolAdmin,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -237,7 +237,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ImageUrl:    "test-image",
 			IsVirtual:   false,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -247,7 +247,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ImageUrl:    "test-image",
 			IsVirtual:   false,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -257,7 +257,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ImageUrl:    "test-image",
 			IsVirtual:   true,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -281,7 +281,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Type:           model.ProfessionalTypeYogaTrainer,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -295,7 +295,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Type:           model.ProfessionalTypeMedic,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -320,7 +320,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Capacity:       20,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -335,7 +335,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Capacity:       15,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -355,7 +355,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
 			UserId:      users[0].Id,
@@ -368,7 +368,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			EndDate:     time.Now().AddDate(1, 0, 0),
 			Status:      model.MembershipStatusActive,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[1].Id,
 			UserId:      users[1].Id,
@@ -385,17 +385,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	// Create dummy community services
 	communityServices := []*model.CommunityService{
 		{
+			Id:          uuid.New(),
 			CommunityId: communities[0].Id,
 			ServiceId:   services[0].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
+			Id:          uuid.New(),
 			CommunityId: communities[1].Id,
 			ServiceId:   services[1].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -409,17 +411,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	// Create dummy community plans
 	communityPlans := []*model.CommunityPlan{
 		{
+			Id:          uuid.New(),
 			CommunityId: communities[0].Id,
 			PlanId:      plans[0].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
+			Id:          uuid.New(),
 			CommunityId: communities[1].Id,
 			PlanId:      plans[1].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -445,7 +449,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ProfessionalId:  professionals[0].Id,
 			LocalId:         &locals[0].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -461,7 +465,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ProfessionalId:  professionals[1].Id,
 			LocalId:         &locals[1].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -483,7 +487,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			UserId:           users[0].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -495,7 +499,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			UserId:           users[1].Id,
 			SessionId:        sessions[1].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -513,7 +517,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Link:           "https://example.com/medic-template",
 			ProfessionalId: professionals[1].Id, // Medic
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
@@ -539,7 +543,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Reference:      "Near Central Park",
 			UserId:         users[0].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 		{
@@ -555,7 +559,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Reference:      "Near Business Center",
 			UserId:         users[1].Id,
 			AuditFields: model.AuditFields{
-				UpdatedBy: "system",
+				UpdatedBy: "ADMIN",
 			},
 		},
 	}
