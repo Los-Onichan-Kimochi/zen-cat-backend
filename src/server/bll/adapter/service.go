@@ -134,3 +134,12 @@ func (c *Service) UpdatePostgresqlService(
 		IsVirtual:   serviceModel.IsVirtual,
 	}, nil
 }
+
+// Delets a service from postgresql BD
+func (l *Service) DeletePostgresqlService(serviceId uuid.UUID) *errors.Error {
+	if err := l.DaoPostgresql.Service.DeleteService(serviceId); err != nil {
+		return &errors.BadRequestError.ServiceNotSoftDeleted
+	}
+
+	return nil
+}

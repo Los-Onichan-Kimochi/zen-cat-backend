@@ -101,3 +101,16 @@ func (c *Service) UpdateService(
 
 	return &service, nil
 }
+
+// Deletes a service given its id.
+func (l *Service) DeleteService(id uuid.UUID) error {
+	result := l.PostgresqlDB.Delete(&model.Service{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}

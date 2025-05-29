@@ -2131,6 +2131,42 @@ paths:
       tags:
       - Service
   /service/{serviceId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a service given its id.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Service.
+      tags:
+      - Service
     get:
       consumes:
       - application/json

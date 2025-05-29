@@ -148,6 +148,7 @@ var (
 		ProfessionalNotSoftDeleted Error
 		ServiceNotCreated          Error
 		ServiceNotUpdated          Error
+		ServiceNotSoftDeleted      Error
 		PlanNotCreated             Error
 		PlanNotUpdated             Error
 		PlanNotSoftDeleted         Error
@@ -235,6 +236,10 @@ var (
 		ServiceNotUpdated: Error{
 			Code:    "SERVICE_ERROR_003",
 			Message: "Service not updated",
+		},
+		ServiceNotSoftDeleted: Error{
+			Code:    "SERVICE_ERROR_005",
+			Message: "Service not soft deleted",
 		},
 		PlanNotCreated: Error{
 			Code:    "PLAN_ERROR_002",
