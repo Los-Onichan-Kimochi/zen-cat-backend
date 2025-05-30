@@ -90,6 +90,18 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.DELETE("/:serviceId/", a.DeleteService)
 
 	// Session endpoints
+	session := a.Echo.Group("/session")
+	session.GET("/:sessionId/", a.GetSession)
+	session.GET("/", a.FetchSessions)
+	session.POST("/", a.CreateSession)
+	session.PATCH("/:sessionId/", a.UpdateSession)
+	session.DELETE("/:sessionId/", a.DeleteSession)
+	session.POST("/bulk/", a.BulkCreateSessions)
+
+	// Reservation endpoints (read-only)
+	reservation := a.Echo.Group("/reservation")
+	reservation.GET("/:reservationId/", a.GetReservation)
+	reservation.GET("/", a.FetchReservations)
 
 	// CommunityPlan endpoints
 	communityPlan := a.Echo.Group("/community-plan")

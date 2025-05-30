@@ -18,6 +18,8 @@ type AdapterCollection struct {
 	Plan             *Plan
 	CommunityPlan    *CommunityPlan
 	CommunityService *CommunityService
+	Session          *Session
+	Reservation      *Reservation
 }
 
 // Create bll adapter collection
@@ -36,5 +38,7 @@ func NewAdapterCollection(
 		Plan:             NewPlanAdapter(logger, daoAstroCatPsql),
 		CommunityPlan:    NewCommunityPlanAdapter(logger, daoAstroCatPsql),
 		CommunityService: NewCommunityServiceAdapter(logger, daoAstroCatPsql),
+		Session:          NewSessionAdapter(logger, daoAstroCatPsql),
+		Reservation:      NewReservationAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }
