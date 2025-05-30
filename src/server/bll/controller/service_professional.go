@@ -49,7 +49,7 @@ func (cp *ServiceProfessional) CreateServiceProfessional(
 
 	_, err = cp.Adapter.ServiceProfessional.GetPostgresqlServiceProfessional(serviceId, professionalId)
 	if err == nil {
-		return nil, &errors.BadRequestError.ServiceProfessionalAlreadyExists
+		return nil, &errors.ConflictError.ServiceProfessionalAlreadyExists
 	} else if err.Code != errors.ObjectNotFoundError.ServiceProfessionalNotFound.Code {
 		return nil, &errors.InternalServerError.Default
 	}
@@ -96,4 +96,78 @@ func (cp *ServiceProfessional) DeleteServiceProfessional(
 	}
 
 	return cp.Adapter.ServiceProfessional.DeletePostgresqlServiceProfessional(serviceId, professionalId)
+}
+
+// Bulk creates service-professional associations.
+func (cp *ServiceProfessional) BulkCreateServiceProfessionals(
+	createServiceProfessionalsData []*schemas.CreateServiceProfessionalRequest,
+	updatedBy string,
+) (*schemas.ServiceProfessionals, *errors.Error) {
+	serviceProfessionals, err := cp.Adapter.ServiceProfessional.BulkCreatePostgresqlServiceProfessionals(
+		createServiceProfessionalsData,
+		updatedBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.ServiceProfessionals{ServiceProfessionals: serviceProfessionals}, nil
+}
+
+// Fetch all service-professional associations, filtered by
+//
+//   - `serviceId` if provided.
+//   - `professionalId` if provided.
+func (cp *ServiceProfessional) FetchServiceProfessionals(
+	serviceIdString string,
+	professionalIdString string,
+) (*schemas.ServiceProfessionals, *errors.Error) {
+	var serviceId *uuid.UUID
+	var professionalId *uuid.UUID
+
+	// Validate and convert params to UUIDs if provided
+	if serviceIdString != "" {
+		parsedId, err := uuid.Parse(serviceIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidServiceId
+		}
+		serviceId = &parsedId
+
+		_, newErr := cp.Adapter.Service.GetPostgresqlService(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	if professionalIdString != "" {
+		parsedId, err := uuid.Parse(professionalIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidProfessionalId
+		}
+		professionalId = &parsedId
+
+		_, newErr := cp.Adapter.Professional.GetPostgresqlProfessional(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	serviceProfessionals, err := cp.Adapter.ServiceProfessional.FetchPostgresqlServiceProfessionals(
+		serviceId,
+		professionalId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.ServiceProfessionals{ServiceProfessionals: serviceProfessionals}, nil
+}
+
+// Bulk deletes service-professional associations.
+func (cp *ServiceProfessional) BulkDeleteServiceProfessionals(
+	bulkDeleteServiceProfessionalData schemas.BulkDeleteServiceProfessionalRequest,
+) *errors.Error {
+	return cp.Adapter.ServiceProfessional.BulkDeletePostgresqlServiceProfessionals(
+		bulkDeleteServiceProfessionalData.ServiceProfessionals,
+	)
 }

@@ -49,7 +49,7 @@ func (cp *ServiceLocal) CreateServiceLocal(
 
 	_, err = cp.Adapter.ServiceLocal.GetPostgresqlServiceLocal(serviceId, localId)
 	if err == nil {
-		return nil, &errors.BadRequestError.ServiceLocalAlreadyExists
+		return nil, &errors.ConflictError.ServiceLocalAlreadyExists
 	} else if err.Code != errors.ObjectNotFoundError.ServiceLocalNotFound.Code {
 		return nil, &errors.InternalServerError.Default
 	}
@@ -96,4 +96,78 @@ func (cp *ServiceLocal) DeleteServiceLocal(
 	}
 
 	return cp.Adapter.ServiceLocal.DeletePostgresqlServiceLocal(serviceId, localId)
+}
+
+// Bulk creates service-local associations.
+func (cp *ServiceLocal) BulkCreateServiceLocals(
+	createServiceLocalsData []*schemas.CreateServiceLocalRequest,
+	updatedBy string,
+) (*schemas.ServiceLocals, *errors.Error) {
+	serviceLocals, err := cp.Adapter.ServiceLocal.BulkCreatePostgresqlServiceLocals(
+		createServiceLocalsData,
+		updatedBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.ServiceLocals{ServiceLocals: serviceLocals}, nil
+}
+
+// Fetch all service-local associations, filtered by
+//
+//   - `serviceId` if provided.
+//   - `localId` if provided.
+func (cp *ServiceLocal) FetchServiceLocals(
+	serviceIdString string,
+	localIdString string,
+) (*schemas.ServiceLocals, *errors.Error) {
+	var serviceId *uuid.UUID
+	var localId *uuid.UUID
+
+	// Validate and convert params to UUIDs if provided
+	if serviceIdString != "" {
+		parsedId, err := uuid.Parse(serviceIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidServiceId
+		}
+		serviceId = &parsedId
+
+		_, newErr := cp.Adapter.Service.GetPostgresqlService(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	if localIdString != "" {
+		parsedId, err := uuid.Parse(localIdString)
+		if err != nil {
+			return nil, &errors.UnprocessableEntityError.InvalidLocalId
+		}
+		localId = &parsedId
+
+		_, newErr := cp.Adapter.Local.GetPostgresqlLocal(parsedId)
+		if newErr != nil {
+			return nil, newErr
+		}
+	}
+
+	serviceLocals, err := cp.Adapter.ServiceLocal.FetchPostgresqlServiceLocals(
+		serviceId,
+		localId,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.ServiceLocals{ServiceLocals: serviceLocals}, nil
+}
+
+// Bulk deletes service-local associations.
+func (cp *ServiceLocal) BulkDeleteServiceLocals(
+	bulkDeleteServiceLocalData schemas.BulkDeleteServiceLocalRequest,
+) *errors.Error {
+	return cp.Adapter.ServiceLocal.BulkDeletePostgresqlServiceLocals(
+		bulkDeleteServiceLocalData.ServiceLocals,
+	)
 }
