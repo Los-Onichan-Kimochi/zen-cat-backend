@@ -3,9 +3,9 @@ package schemas
 import "github.com/google/uuid"
 
 type ServiceProfessional struct {
-	Id               uuid.UUID `json:"id"`
-	ServiceId        uuid.UUID `json:"service_id"`
-	ProfessionalId   uuid.UUID `json:"local_id"`
+	Id             uuid.UUID `json:"id"`
+	ServiceId      uuid.UUID `json:"service_id"`
+	ProfessionalId uuid.UUID `json:"professional_id"`
 }
 
 type ServiceProfessionals struct {
@@ -13,8 +13,8 @@ type ServiceProfessionals struct {
 }
 
 type CreateServiceProfessionalRequest struct {
-	ServiceId        uuid.UUID `json:"service_id" validate:"required"`
-	ProfessionalId   uuid.UUID `json:"local_id"   validate:"required"`
+	ServiceId      uuid.UUID `json:"service_id" validate:"required"`
+	ProfessionalId uuid.UUID `json:"professional_id"   validate:"required"`
 }
 
 type BatchCreateServiceProfessionalRequest struct {
@@ -22,8 +22,8 @@ type BatchCreateServiceProfessionalRequest struct {
 }
 
 type DeleteServiceProfessionalRequest struct {
-	ServiceId           uuid.UUID `json:"service_id" validate:"required"`
-	ProfessionalId      uuid.UUID `json:"plan_id"      validate:"required"`
+	ServiceId      uuid.UUID `json:"service_id" validate:"required"`
+	ProfessionalId uuid.UUID `json:"professional_id"      validate:"required"`
 }
 
 type BulkDeleteServiceProfessionalRequest struct {

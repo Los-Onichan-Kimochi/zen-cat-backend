@@ -10,8 +10,8 @@ type Service struct {
 	IsVirtual   bool
 	AuditFields
 
-	Locals        []Local        `gorm:"many2many:astro_cat_service_local;"`
-	Professionals []Professional `gorm:"many2many:astro_cat_service_professional;"`
+	Locals               []Local               `gorm:"many2many:astro_cat_service_local;"`
+	ServiceProfessionals []ServiceProfessional `gorm:"foreignKey:ServiceId"`
 }
 
 func (Service) TableName() string {
