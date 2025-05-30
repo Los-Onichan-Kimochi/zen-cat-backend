@@ -148,6 +148,26 @@ definitions:
       type:
         type: string
     type: object
+  schemas.CreateServiceLocalRequest:
+    properties:
+      local_id:
+        type: string
+      service_id:
+        type: string
+    required:
+    - local_id
+    - service_id
+    type: object
+  schemas.CreateServiceProfessionalRequest:
+    properties:
+      professional_id:
+        type: string
+      service_id:
+        type: string
+    required:
+    - professional_id
+    - service_id
+    type: object
   schemas.CreateServiceRequest:
     properties:
       description:
@@ -322,6 +342,20 @@ definitions:
       is_virtual:
         type: boolean
       name:
+        type: string
+    type: object
+  schemas.ServiceLocal:
+    properties:
+      local_id:
+        type: string
+      service_id:
+        type: string
+    type: object
+  schemas.ServiceProfessional:
+    properties:
+      professional_id:
+        type: string
+      service_id:
         type: string
     type: object
   schemas.Services:
@@ -1716,6 +1750,272 @@ paths:
       summary: Bulk Delete Professionals.
       tags:
       - Professional
+  /service-local/:
+    post:
+      consumes:
+      - application/json
+      description: Associates a service with a local.
+      parameters:
+      - description: Service-Local Association Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateServiceLocalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.ServiceLocal'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Service or Local does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create ServiceLocal.
+      tags:
+      - ServiceLocal
+  /service-local/{serviceId}/{localId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific service-local association.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error (e.g., deletion failed)
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete ServiceLocal.
+      tags:
+      - ServiceLocal
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific service-local association.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ServiceLocal'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get ServiceLocal.
+      tags:
+      - ServiceLocal
+  /service-professional/:
+    post:
+      consumes:
+      - application/json
+      description: Associates a service with a professional.
+      parameters:
+      - description: Service-Professional Association Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateServiceProfessionalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.ServiceProfessional'
+        "400":
+          description: Bad Request (e.g., invalid updatedBy)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Service or Professional does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict (Association already exists)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity (Invalid UUIDs or request body)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create ServiceProfessional.
+      tags:
+      - ServiceProfessional
+  /service-professional/{serviceId}/{professionalId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a specific service-professional association.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Professional ID
+        in: path
+        name: professionalId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error (e.g., deletion failed)
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete ServiceProfessional.
+      tags:
+      - ServiceProfessional
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific service-professional association.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      - description: Professional ID
+        in: path
+        name: professionalId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ServiceProfessional'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get ServiceProfessional.
+      tags:
+      - ServiceProfessional
   /service/:
     get:
       consumes:
