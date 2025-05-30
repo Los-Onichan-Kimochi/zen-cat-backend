@@ -97,6 +97,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	session.PATCH("/:sessionId/", a.UpdateSession)
 	session.DELETE("/:sessionId/", a.DeleteSession)
 	session.POST("/bulk/", a.BulkCreateSessions)
+	session.DELETE("/bulk-delete/", a.BulkDeleteSessions)
 
 	// Reservation endpoints (read-only)
 	reservation := a.Echo.Group("/reservation")

@@ -71,6 +71,13 @@ definitions:
           type: string
         type: array
     type: object
+  schemas.BulkDeleteSessionRequest:
+    properties:
+      sessions:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.Communities:
     properties:
       communities:
@@ -2596,6 +2603,8 @@ paths:
       responses:
         "204":
           description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Session'
         "400":
           description: Bad Request
           schema:
@@ -2606,6 +2615,10 @@ paths:
             $ref: '#/definitions/errors.Error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
           schema:
             $ref: '#/definitions/errors.Error'
         "500":
@@ -2705,6 +2718,50 @@ paths:
       security:
       - JWT: []
       summary: Update Session.
+      tags:
+      - Session
+  /session/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes sessions given their ids.
+      parameters:
+      - description: Bulk Delete Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Sessions.
       tags:
       - Session
   /session/bulk/:

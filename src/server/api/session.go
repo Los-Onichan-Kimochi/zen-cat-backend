@@ -157,10 +157,11 @@ func (a *Api) UpdateSession(c echo.Context) error {
 // @Produce 			json
 // @Security			JWT
 // @Param               sessionId    path   string  true  "Session ID"
-// @Success 			204 "No Content"
+// @Success 			204 {object} schemas.Session "No Content"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/session/{sessionId}/ [delete]
 func (a *Api) DeleteSession(c echo.Context) error {
@@ -170,6 +171,33 @@ func (a *Api) DeleteSession(c echo.Context) error {
 	}
 
 	if err := a.BllController.Session.DeleteSession(sessionId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Delete Sessions.
+// @Description 		Bulk deletes sessions given their ids.
+// @Tags 				Session
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteSessionRequest true  "Bulk Delete Session Request"
+// @Success 			204 {object} schemas.Session "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/session/bulk-delete/ [delete]
+func (a *Api) BulkDeleteSessions(c echo.Context) error {
+	var request schemas.BulkDeleteSessionRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.Session.BulkDeleteSessions(request); err != nil {
 		return errors.HandleError(*err, c)
 	}
 

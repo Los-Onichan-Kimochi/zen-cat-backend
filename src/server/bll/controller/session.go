@@ -103,13 +103,16 @@ func (s *Session) UpdateSession(
 
 // Soft deletes a session.
 func (s *Session) DeleteSession(sessionId uuid.UUID) *errors.Error {
-	// Check if session exists
-	_, err := s.Adapter.Session.GetPostgresqlSession(sessionId)
-	if err != nil {
-		return err
-	}
-
 	return s.Adapter.Session.DeletePostgresqlSession(sessionId)
+}
+
+// Bulk deletes sessions.
+func (s *Session) BulkDeleteSessions(
+	bulkDeleteSessionData schemas.BulkDeleteSessionRequest,
+) *errors.Error {
+	return s.Adapter.Session.BulkDeletePostgresqlSessions(
+		bulkDeleteSessionData.Sessions,
+	)
 }
 
 // Fetch all sessions, filtered by params.

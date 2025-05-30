@@ -50,3 +50,7 @@ type UpdateSessionRequest struct {
 type BatchCreateSessionRequest struct {
 	Sessions []*CreateSessionRequest `json:"sessions"`
 }
+
+type BulkDeleteSessionRequest struct {
+	Sessions []uuid.UUID `json:"sessions"`
+}

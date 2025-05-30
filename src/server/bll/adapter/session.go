@@ -247,3 +247,14 @@ func (s *Session) BulkCreatePostgresqlSessions(
 
 	return sessions, nil
 }
+
+// Bulk deletes sessions from postgresql DB.
+func (s *Session) BulkDeletePostgresqlSessions(
+	sessionIds []uuid.UUID,
+) *errors.Error {
+	if err := s.DaoPostgresql.Session.BulkDeleteSessions(sessionIds); err != nil {
+		return &errors.BadRequestError.SessionNotSoftDeleted
+	}
+
+	return nil
+}

@@ -111,7 +111,23 @@ func (s *Session) UpdateSession(
 
 // Soft deletes a session given its ID.
 func (s *Session) DeleteSession(sessionId uuid.UUID) error {
-	result := s.PostgresqlDB.Where("id = ?", sessionId).Delete(&model.Session{})
+	result := s.PostgresqlDB.Delete(&model.Session{}, "id = ?", sessionId)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+// Batch deletes multiple sessions given their IDs.
+func (s *Session) BulkDeleteSessions(sessionIds []uuid.UUID) error {
+	if len(sessionIds) == 0 {
+		return nil
+	}
+
+	result := s.PostgresqlDB.Where("id IN ?", sessionIds).Delete(&model.Session{})
 	if result.Error != nil {
 		return result.Error
 	}
