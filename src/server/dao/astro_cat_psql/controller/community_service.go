@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
@@ -26,6 +29,7 @@ func (cs *CommunityService) CreateCommunityService(communityService *model.Commu
 }
 
 // Gets a specific community-service association.
+// Gorm does not return the Id of a soft deleted record.
 func (cs *CommunityService) GetCommunityService(
 	communityId uuid.UUID,
 	serviceId uuid.UUID,
@@ -56,4 +60,86 @@ func (cs *CommunityService) DeleteCommunityService(
 	}
 
 	return nil
+}
+
+// Creates multiple community-service associations.
+func (cs *CommunityService) BulkCreateCommunityServices(
+	communityServices []*model.CommunityService,
+) error {
+	if len(communityServices) == 0 {
+		return nil
+	}
+
+	var conditions []string
+	var args []any
+	var count int64
+
+	for _, communityService := range communityServices {
+		conditions = append(conditions, "(community_id = ? AND service_id = ?)")
+		args = append(args, communityService.CommunityId, communityService.ServiceId)
+	}
+	result := cs.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Find(&model.CommunityService{}).
+		Count(&count)
+	if result.Error != nil {
+		return result.Error
+	}
+	if count > 0 {
+		return fmt.Errorf("one or more community-service associations already exist")
+	}
+
+	err := cs.PostgresqlDB.Create(communityServices).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Bulk deletes multiple community-service associations.
+func (cs *CommunityService) BulkDeleteCommunityServices(
+	communityServices []*model.CommunityService,
+) error {
+	// Build the WHERE clause for the bulk delete
+	var conditions []string
+	var args []interface{}
+	for _, communityService := range communityServices {
+		conditions = append(conditions, "(community_id = ? AND service_id = ?)")
+		args = append(args, communityService.CommunityId, communityService.ServiceId)
+	}
+
+	// Execute the bulk delete
+	result := cs.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Delete(&model.CommunityService{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+// Fetch all community-service associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `serviceId` if provided.
+func (cs *CommunityService) FetchCommunityServices(
+	communityId *uuid.UUID,
+	serviceId *uuid.UUID,
+) ([]*model.CommunityService, error) {
+	var communityServices []*model.CommunityService
+
+	query := cs.PostgresqlDB.Model(&model.CommunityService{})
+
+	if communityId != nil {
+		query = query.Where("community_id = ?", communityId)
+	}
+	if serviceId != nil {
+		query = query.Where("service_id = ?", serviceId)
+	}
+
+	if err := query.Find(&communityServices).Error; err != nil {
+		return nil, err
+	}
+
+	return communityServices, nil
 }

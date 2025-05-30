@@ -169,22 +169,19 @@ func (p *Professional) UpdatePostgresqlProfessional(
 // Deletes a professional from postgresql DB.
 func (p *Professional) DeletePostgresqlProfessional(id uuid.UUID) *errors.Error {
 	if err := p.DaoPostgresql.Professional.DeleteProfessional(id); err != nil {
-		return &errors.ObjectNotFoundError.ProfessionalNotFound
+		return &errors.BadRequestError.ProfessionalNotSoftDeleted
 	}
 	return nil
 }
 
 // Bulk deletes professionals from postgresql DB.
 func (p *Professional) BulkDeletePostgresqlProfessionals(
-	professionals []uuid.UUID,
+	professionalIds []uuid.UUID,
 ) *errors.Error {
-	if len(professionals) == 0 {
-		return &errors.BadRequestError.InvalidUpdatedByValue
+	if err := p.DaoPostgresql.Professional.BulkDeleteProfessionals(professionalIds); err != nil {
+		return &errors.BadRequestError.ProfessionalNotSoftDeleted
 	}
 
-	if err := p.DaoPostgresql.Professional.BulkDeleteProfessionals(professionals); err != nil {
-		return &errors.ObjectNotFoundError.ProfessionalNotFound
-	}
 	return nil
 }
 
@@ -223,6 +220,7 @@ func (p *Professional) BulkCreatePostgresqlProfessionals(
 	if err := p.DaoPostgresql.Professional.BulkCreateProfessionals(professionalsModel); err != nil {
 		return nil, &errors.BadRequestError.ProfessionalNotCreated
 	}
+
 	professionals := make([]*schemas.Professional, len(professionalsModel))
 	for i, professionalModel := range professionalsModel {
 		professionals[i] = &schemas.Professional{
@@ -237,5 +235,6 @@ func (p *Professional) BulkCreatePostgresqlProfessionals(
 			ImageUrl:       professionalModel.ImageUrl,
 		}
 	}
+
 	return professionals, nil
 }

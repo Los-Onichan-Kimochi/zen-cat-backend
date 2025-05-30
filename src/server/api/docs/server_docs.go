@@ -16,6 +16,76 @@ const docTemplateserver = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/community-plan/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all community-plan associations, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityPlan"
+                ],
+                "summary": "Fetch CommunityPlans.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Plan ID",
+                        "name": "planId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityPlans"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Plan does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -77,6 +147,145 @@ const docTemplateserver = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community-plan/bulk/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple community-plan associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityPlan"
+                ],
+                "summary": "Bulk Create CommunityPlans.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create CommunityPlans Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BatchCreateCommunityPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityPlans"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Plan does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes community-plan associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityPlan"
+                ],
+                "summary": "Bulk Delete CommunityPlans.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete CommunityPlan Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -222,6 +431,76 @@ const docTemplateserver = `{
             }
         },
         "/community-service/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all community-service associations, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Fetch CommunityServices.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityServices"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Service does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -283,6 +562,145 @@ const docTemplateserver = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community-service/bulk/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple community-service associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Bulk Create CommunityServices.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create CommunityServices Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BatchCreateCommunityServiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityServices"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Community or Service does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes community-service associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Bulk Delete CommunityServices.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete CommunityService Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityServiceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -1181,6 +1599,18 @@ const docTemplateserver = `{
                     "Plan"
                 ],
                 "summary": "Fetch Plans.",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Plan IDs",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2384,6 +2814,18 @@ const docTemplateserver = `{
                     "Service"
                 ],
                 "summary": "Fetch Services.",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Service IDs",
+                        "name": "ids",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -3040,6 +3482,17 @@ const docTemplateserver = `{
                 "PlanTypeAnual"
             ]
         },
+        "schemas.BatchCreateCommunityPlanRequest": {
+            "type": "object",
+            "properties": {
+                "community_plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateCommunityPlanRequest"
+                    }
+                }
+            }
+        },
         "schemas.BatchCreateCommunityRequest": {
             "type": "object",
             "properties": {
@@ -3051,6 +3504,17 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.BatchCreateCommunityServiceRequest": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateCommunityServiceRequest"
+                    }
+                }
+            }
+        },
         "schemas.BulkCreateProfessionalRequest": {
             "type": "object",
             "properties": {
@@ -3058,6 +3522,28 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CreateProfessionalRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteCommunityPlanRequest": {
+            "type": "object",
+            "properties": {
+                "community_plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.DeleteCommunityPlanRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteCommunityServiceRequest": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.DeleteCommunityServiceRequest"
                     }
                 }
             }
@@ -3110,8 +3596,22 @@ const docTemplateserver = `{
                 "community_id": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "plan_id": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.CommunityPlans": {
+            "type": "object",
+            "properties": {
+                "community_plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CommunityPlan"
+                    }
                 }
             }
         },
@@ -3121,8 +3621,22 @@ const docTemplateserver = `{
                 "community_id": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "service_id": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.CommunityServices": {
+            "type": "object",
+            "properties": {
+                "community_services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CommunityService"
+                    }
                 }
             }
         },
@@ -3323,6 +3837,36 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "second_last_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteCommunityPlanRequest": {
+            "type": "object",
+            "required": [
+                "community_id",
+                "plan_id"
+            ],
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteCommunityServiceRequest": {
+            "type": "object",
+            "required": [
+                "community_id",
+                "service_id"
+            ],
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "service_id": {
                     "type": "string"
                 }
             }

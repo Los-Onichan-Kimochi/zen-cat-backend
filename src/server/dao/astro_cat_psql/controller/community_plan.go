@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
@@ -26,6 +29,7 @@ func (cp *CommunityPlan) CreateCommunityPlan(communityPlan *model.CommunityPlan)
 }
 
 // Gets a specific community-plan association.
+// Gorm does not return the Id of a soft deleted record.
 func (cp *CommunityPlan) GetCommunityPlan(
 	communityId uuid.UUID,
 	planId uuid.UUID,
@@ -53,6 +57,88 @@ func (cp *CommunityPlan) DeleteCommunityPlan(
 	}
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound // Indicate that no record was deleted
+	}
+
+	return nil
+}
+
+// Creates multiple community-plan associations.
+func (cp *CommunityPlan) BulkCreateCommunityPlans(
+	communityPlans []*model.CommunityPlan,
+) error {
+	if len(communityPlans) == 0 {
+		return nil
+	}
+
+	var conditions []string
+	var args []interface{}
+	var count int64
+
+	for _, communityPlan := range communityPlans {
+		conditions = append(conditions, "(community_id = ? AND plan_id = ?)")
+		args = append(args, communityPlan.CommunityId, communityPlan.PlanId)
+	}
+	result := cp.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Find(&model.CommunityPlan{}).
+		Count(&count)
+	if result.Error != nil {
+		return result.Error
+	}
+	if count > 0 {
+		return fmt.Errorf("one or more community-plan associations already exist")
+	}
+
+	err := cp.PostgresqlDB.Create(communityPlans).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Fetch all community-plan associations, filtered by
+//
+//   - `communityId` if provided.
+//   - `planId` if provided.
+func (cp *CommunityPlan) FetchCommunityPlans(
+	communityId *uuid.UUID,
+	planId *uuid.UUID,
+) ([]*model.CommunityPlan, error) {
+	var communityPlans []*model.CommunityPlan
+
+	query := cp.PostgresqlDB.Model(&model.CommunityPlan{})
+
+	if communityId != nil {
+		query = query.Where("community_id = ?", communityId)
+	}
+	if planId != nil {
+		query = query.Where("plan_id = ?", planId)
+	}
+
+	if err := query.Find(&communityPlans).Error; err != nil {
+		return nil, err
+	}
+
+	return communityPlans, nil
+}
+
+// Bulk deletes multiple community-plan associations.
+func (cp *CommunityPlan) BulkDeleteCommunityPlans(
+	communityPlans []*model.CommunityPlan,
+) error {
+	// Build the WHERE clause for the bulk delete
+	var conditions []string
+	var args []interface{}
+	for _, communityPlan := range communityPlans {
+		conditions = append(conditions, "(community_id = ? AND plan_id = ?)")
+		args = append(args, communityPlan.CommunityId, communityPlan.PlanId)
+	}
+
+	// Execute the bulk delete
+	result := cp.PostgresqlDB.Where(strings.Join(conditions, " OR "), args...).
+		Delete(&model.CommunityPlan{})
+	if result.Error != nil {
+		return result.Error
 	}
 
 	return nil

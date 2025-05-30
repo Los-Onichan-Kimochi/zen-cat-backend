@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -43,6 +44,7 @@ func (a *Api) GetService(c echo.Context) error {
 // @Accept 				json
 // @Produce 			json
 // @Security			JWT
+// @Param 				ids query []string false "Service IDs"
 // @Success 			200 {object} schemas.Services "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
@@ -51,7 +53,14 @@ func (a *Api) GetService(c echo.Context) error {
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/service/ [get]
 func (a *Api) FetchServices(c echo.Context) error {
-	response, err := a.BllController.Service.FetchServices()
+	idsString := c.QueryParam("ids")
+
+	ids := []string{}
+	if idsString != "" {
+		ids = strings.Split(idsString, ",")
+	}
+
+	response, err := a.BllController.Service.FetchServices(ids)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}
@@ -127,7 +136,6 @@ func (a *Api) UpdateService(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-
 // @Summary 			Delete Service.
 // @Description 		Deletes a service given its id.
 // @Tags 				Service
@@ -153,4 +161,3 @@ func (a *Api) DeleteService(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
-

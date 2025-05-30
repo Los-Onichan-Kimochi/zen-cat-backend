@@ -28,7 +28,9 @@ func NewProfessionalController(
 }
 
 // Gets a professional.
-func (p *Professional) GetProfessional(professionalId uuid.UUID) (*schemas.Professional, *errors.Error) {
+func (p *Professional) GetProfessional(
+	professionalId uuid.UUID,
+) (*schemas.Professional, *errors.Error) {
 	return p.Adapter.Professional.GetPostgresqlProfessional(professionalId)
 }
 
@@ -93,7 +95,10 @@ func (p *Professional) BulkCreateProfessionals(
 	createProfessionalsData []*schemas.CreateProfessionalRequest,
 	updatedBy string,
 ) ([]*schemas.Professional, *errors.Error) {
-	return p.Adapter.Professional.BulkCreatePostgresqlProfessionals(createProfessionalsData, updatedBy)
+	return p.Adapter.Professional.BulkCreatePostgresqlProfessionals(
+		createProfessionalsData,
+		updatedBy,
+	)
 }
 
 // Bulk deletes professionals.

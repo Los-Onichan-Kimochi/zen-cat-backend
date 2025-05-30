@@ -173,7 +173,10 @@ func (a *Api) BulkCreateProfessionals(c echo.Context) error {
 	}
 
 	updateBy := "ADMIN"
-	response, err := a.BllController.Professional.BulkCreateProfessionals(request.Professionals, updateBy)
+	response, err := a.BllController.Professional.BulkCreateProfessionals(
+		request.Professionals,
+		updateBy,
+	)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

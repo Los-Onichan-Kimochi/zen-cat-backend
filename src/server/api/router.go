@@ -96,12 +96,18 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityPlan.POST("/", a.CreateCommunityPlan)
 	communityPlan.GET("/:communityId/:planId/", a.GetCommunityPlan)
 	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
+	communityPlan.POST("/bulk/", a.BulkCreateCommunityPlans)
+	communityPlan.GET("/", a.FetchCommunityPlans)
+	communityPlan.DELETE("/bulk/", a.BulkDeleteCommunityPlans)
 
 	// CommunityService endpoints
 	communityService := a.Echo.Group("/community-service")
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
+	communityService.POST("/bulk/", a.BulkCreateCommunityServices)
+	communityService.GET("/", a.FetchCommunityServices)
+	communityService.DELETE("/bulk/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints
 	serviceLocal := a.Echo.Group("/service-local")

@@ -45,8 +45,8 @@ func (c *Service) GetPostgresqlService(
 }
 
 // Fetch services from postgresql DB and adapts them to a Service schema.
-func (c *Service) FetchPostgresqlServices() ([]*schemas.Service, *errors.Error) {
-	servicesModel, err := c.DaoPostgresql.Service.FetchServices()
+func (c *Service) FetchPostgresqlServices(ids []uuid.UUID) ([]*schemas.Service, *errors.Error) {
+	servicesModel, err := c.DaoPostgresql.Service.FetchServices(ids)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.ServiceNotFound
 	}
@@ -143,4 +143,3 @@ func (l *Service) DeletePostgresqlService(serviceId uuid.UUID) *errors.Error {
 
 	return nil
 }
-

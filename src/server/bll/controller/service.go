@@ -32,9 +32,22 @@ func (c *Service) GetService(serviceId uuid.UUID) (*schemas.Service, *errors.Err
 	return c.Adapter.Service.GetPostgresqlService(serviceId)
 }
 
-// Fetch all services.
-func (c *Service) FetchServices() (*schemas.Services, *errors.Error) {
-	services, err := c.Adapter.Service.FetchPostgresqlServices()
+// Fetch all services, filtered by `ids` if provided.
+func (c *Service) FetchServices(ids []string) (*schemas.Services, *errors.Error) {
+	// Validate and convert ids to UUIDs if provided.
+	parsedIds := []uuid.UUID{}
+	if len(ids) > 0 {
+		for _, id := range ids {
+			parsedId, err := uuid.Parse(id)
+			if err != nil {
+				return nil, &errors.UnprocessableEntityError.InvalidServiceId
+			}
+
+			parsedIds = append(parsedIds, parsedId)
+		}
+	}
+
+	services, err := c.Adapter.Service.FetchPostgresqlServices(parsedIds)
 	if err != nil {
 		return nil, err
 	}
