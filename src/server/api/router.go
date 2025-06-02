@@ -46,6 +46,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.PATCH("/:communityId/", a.UpdateCommunity)
 	community.DELETE("/:communityId/", a.DeleteCommunity)
 	community.POST("/bulk/", a.BulkCreateCommunities)
+	community.DELETE("/bulk-delete/", a.BulkDeleteCommunities)
 
 	// Professional endpoints
 	professional := a.Echo.Group("/professional")
