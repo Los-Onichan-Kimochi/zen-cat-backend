@@ -128,7 +128,7 @@ func (a *Api) UpdateUser(c echo.Context) error {
 // @Produce 			json
 // @Security			JWT
 // @Param               userId    path   string  true  "User ID"
-// @Success 			204 "No Content"
+// @Success 			200 {object} schemas.User "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found"
@@ -141,6 +141,59 @@ func (a *Api) DeleteUser(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
 	}
 	if err := a.BllController.User.DeleteUser(userId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Create Users.
+// @Description 		Bulk creates users.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkCreateUserRequest true  "Bulk Create User Request"
+// @Success 			200 {object} schemas.User "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/bulk-create/ [post]
+func (a *Api) BulkCreateUsers(c echo.Context) error {
+	updateBy := "ADMIN"
+
+	var request schemas.BulkCreateUserRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+	response, err := a.BllController.User.BulkCreateUsers(request.Users, updateBy)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.JSON(http.StatusCreated, response)
+}
+
+// @Summary 			Bulk Delete Users.
+// @Description 		Bulk deletes users given their ids.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteUserRequest true  "Bulk Delete User Request"
+// @Success 			200 {object} schemas.User "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/bulk-delete/ [delete]
+func (a *Api) BulkDeleteUsers(c echo.Context) error {
+	var request schemas.BulkDeleteUserRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+	if err := a.BllController.User.BulkDeleteUsers(request); err != nil {
 		return errors.HandleError(*err, c)
 	}
 	return c.NoContent(http.StatusNoContent)

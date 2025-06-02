@@ -207,8 +207,68 @@ func (u *User) UpdatePostgresqlUser(
 }
 
 func (u *User) DeletePostgresqlUser(userId uuid.UUID) *errors.Error {
-	err := u.DaoPostgresql.User.DeleteUser(userId)
-	if err != nil {
+	if err := u.DaoPostgresql.User.DeleteUser(userId); err != nil {
+		return &errors.BadRequestError.UserNotSoftDeleted
+	}
+	return nil
+}
+
+func (u *User) BulkCreatePostgresqlUser(
+	usersData []*schemas.CreateUserRequest,
+	updatedBy string,
+) ([]*schemas.User, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	usersModel := make([]*model.User, len(usersData))
+	for i, userData := range usersData {
+		var secondLastNamePtr *string
+		if userData.SecondLastName != "" {
+			secondLastNamePtr = &userData.SecondLastName
+		} else {
+			secondLastNamePtr = nil
+		}
+		usersModel[i] = &model.User{
+			Id:             uuid.New(),
+			Name:           userData.Name,
+			FirstLastName:  userData.FirstLastName,
+			SecondLastName: secondLastNamePtr,
+			Password:       userData.Password,
+			Email:          userData.Email,
+			Rol:            model.UserRol(userData.Rol),
+			ImageUrl:       userData.ImageUrl,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+	if err := u.DaoPostgresql.User.BulkCreateUsers(usersModel); err != nil {
+		return nil, &errors.BadRequestError.UserNotCreated
+	}
+
+	users := make([]*schemas.User, len(usersModel))
+	for i, userModel := range usersModel {
+		users[i] = &schemas.User{
+			Id:             userModel.Id,
+			Name:           userModel.Name,
+			FirstLastName:  userModel.FirstLastName,
+			SecondLastName: userModel.SecondLastName,
+			Password:       userModel.Password,
+			Email:          userModel.Email,
+			Rol:            schemas.UserRol(userModel.Rol),
+			ImageUrl:       userModel.ImageUrl,
+			// Memberships:    userModel.Memberships,
+		}
+	}
+
+	return users, nil
+}
+
+func (u *User) BulkDeletePostgresqlUser(
+	userIds []uuid.UUID,
+) *errors.Error {
+	if err := u.DaoPostgresql.User.BulkDeleteUsers(userIds); err != nil {
 		return &errors.BadRequestError.UserNotSoftDeleted
 	}
 	return nil

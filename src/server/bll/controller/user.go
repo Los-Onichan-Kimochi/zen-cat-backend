@@ -84,4 +84,20 @@ func (u *User) DeleteUser(userId uuid.UUID) *errors.Error {
 	return u.Adapter.User.DeletePostgresqlUser(userId)
 }
 
-// todo : bulk-create-users
+func (u *User) BulkCreateUsers(
+	createUsersData []*schemas.CreateUserRequest,
+	updatedBy string,
+) ([]*schemas.User, *errors.Error) {
+	return u.Adapter.User.BulkCreatePostgresqlUser(
+		createUsersData,
+		updatedBy,
+	)
+}
+
+func (u *User) BulkDeleteUsers(
+	bulkDeleteUsersData schemas.BulkDeleteUserRequest,
+) *errors.Error {
+	return u.Adapter.User.BulkDeletePostgresqlUser(
+		bulkDeleteUsersData.Users,
+	)
+}
