@@ -35,11 +35,26 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 		a.Echo.GET("/swagger/*", echoSwagger.EchoWrapHandler(echoSwagger.InstanceName("server")))
 	}
 
+	// ===== PUBLIC ENDPOINTS (No authentication required) =====
 	healthCheck := a.Echo.Group("/health-check")
 	healthCheck.GET("/", a.HealthCheck)
 
-	// Community endpoints
+	// Login endpoints (public)
+	a.Echo.POST("/login/", a.Login)
+	a.Echo.POST("/register/", a.Register)
+
+	// ===== PROTECTED ENDPOINTS (JWT Authentication required) =====
+
+	// Protected auth endpoints
+	a.Echo.GET("/me/", a.GetCurrentUser, a.JWTMiddleware)
+
+	auth := a.Echo.Group("/auth")
+	auth.Use(a.JWTMiddleware) // Apply JWT middleware to all auth routes
+	auth.POST("/refresh/", a.RefreshToken)
+
+	// Community endpoints (all protected)
 	community := a.Echo.Group("/community")
+	community.Use(a.JWTMiddleware) // Apply JWT middleware to all community routes
 	community.GET("/:communityId/", a.GetCommunity)
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
@@ -47,8 +62,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.DELETE("/:communityId/", a.DeleteCommunity)
 	community.POST("/bulk/", a.BulkCreateCommunities)
 
-	// Professional endpoints
+	// Professional endpoints (all protected)
 	professional := a.Echo.Group("/professional")
+	professional.Use(a.JWTMiddleware) // Apply JWT middleware to all professional routes
 	professional.GET("/:professionalId/", a.GetProfessional)
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
@@ -57,32 +73,36 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	professional.POST("/bulk-create/", a.BulkCreateProfessionals)
 	professional.DELETE("/bulk-delete/", a.BulkDeleteProfessionals)
 
-	// Local endpoints
+	// Local endpoints (all protected)
 	local := a.Echo.Group("/local")
+	local.Use(a.JWTMiddleware) // Apply JWT middleware to all local routes
 	local.GET("/:localId/", a.GetLocal)
 	local.GET("/", a.FetchLocals)
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
 
-	// Plan endpoints
+	// Plan endpoints (all protected)
 	plan := a.Echo.Group("/plan")
+	plan.Use(a.JWTMiddleware) // Apply JWT middleware to all plan routes
 	plan.GET("/:planId/", a.GetPlan)
 	plan.GET("/", a.FetchPlans)
 	plan.POST("/", a.CreatePlan)
 	plan.PATCH("/:planId/", a.UpdatePlan)
 	plan.DELETE("/:planId/", a.DeletePlan)
 
-	// User endpoints
+	// User endpoints (all protected)
 	user := a.Echo.Group("/user")
+	user.Use(a.JWTMiddleware) // Apply JWT middleware to all user routes
 	user.GET("/:userId/", a.GetUser)
 	user.GET("/", a.FetchUsers)
 	user.POST("/", a.CreateUser)
 	user.PATCH("/:userId/", a.UpdateUser)
 	user.DELETE("/:userId/", a.DeleteUser)
 
-	// Service Endpoints
+	// Service Endpoints (all protected)
 	service := a.Echo.Group("/service")
+	service.Use(a.JWTMiddleware) // Apply JWT middleware to all service routes
 	service.GET("/:serviceId/", a.GetService)
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
@@ -91,8 +111,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 
 	// Session endpoints
 
-	// CommunityPlan endpoints
+	// CommunityPlan endpoints (all protected)
 	communityPlan := a.Echo.Group("/community-plan")
+	communityPlan.Use(a.JWTMiddleware) // Apply JWT middleware to all community-plan routes
 	communityPlan.POST("/", a.CreateCommunityPlan)
 	communityPlan.GET("/:communityId/:planId/", a.GetCommunityPlan)
 	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
@@ -100,8 +121,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityPlan.GET("/", a.FetchCommunityPlans)
 	communityPlan.DELETE("/bulk/", a.BulkDeleteCommunityPlans)
 
-	// CommunityService endpoints
+	// CommunityService endpoints (all protected)
 	communityService := a.Echo.Group("/community-service")
+	communityService.Use(a.JWTMiddleware) // Apply JWT middleware to all community-service routes
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)

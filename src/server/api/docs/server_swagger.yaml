@@ -355,6 +355,23 @@ definitions:
           $ref: '#/definitions/schemas.Local'
         type: array
     type: object
+  schemas.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  schemas.LoginResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/schemas.TokenResponse'
+      user:
+        $ref: '#/definitions/schemas.UserProfile'
+    type: object
   schemas.Membership:
     properties:
       community:
@@ -445,6 +462,27 @@ definitions:
           $ref: '#/definitions/schemas.Professional'
         type: array
     type: object
+  schemas.RegisterRequest:
+    properties:
+      email:
+        type: string
+      first_last_name:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      second_last_name:
+        type: string
+    required:
+    - email
+    - first_last_name
+    - name
+    - password
+    type: object
   schemas.Service:
     properties:
       description:
@@ -496,6 +534,15 @@ definitions:
         items:
           $ref: '#/definitions/schemas.Service'
         type: array
+    type: object
+  schemas.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        $ref: '#/definitions/time.Duration'
+      refresh_token:
+        type: string
     type: object
   schemas.UpdateCommunityRequest:
     properties:
@@ -614,6 +661,23 @@ definitions:
       second_last_name:
         type: string
     type: object
+  schemas.UserProfile:
+    properties:
+      email:
+        type: string
+      first_last_name:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      rol:
+        $ref: '#/definitions/schemas.UserRol'
+      second_last_name:
+        type: string
+    type: object
   schemas.UserRol:
     enum:
     - ADMINISTRATOR
@@ -629,12 +693,53 @@ definitions:
           $ref: '#/definitions/schemas.User'
         type: array
     type: object
+  time.Duration:
+    enum:
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    type: integer
+    x-enum-varnames:
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
 info:
   contact: {}
   description: AstroCat API sample for clients
   title: AstroCat API
   version: "1.0"
 paths:
+  /auth/refresh/:
+    post:
+      consumes:
+      - application/json
+      description: Refresh player access token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.TokenResponse'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Refresh player access token.
+      tags:
+      - Auth
   /community-plan/:
     get:
       consumes:
@@ -1642,6 +1747,70 @@ paths:
       summary: Update Local.
       tags:
       - Local
+  /login/:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password, returns user info and
+        tokens
+      parameters:
+      - description: Login Request
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/schemas.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Unauthorized - Invalid credentials
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: User Login
+      tags:
+      - Login
+  /me/:
+    get:
+      consumes:
+      - application/json
+      description: Get current authenticated user information from token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User info
+          schema:
+            $ref: '#/definitions/schemas.UserProfile'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Current User Info
+      tags:
+      - Login
   /plan/:
     get:
       consumes:
@@ -2158,6 +2327,45 @@ paths:
       summary: Bulk Delete Professionals.
       tags:
       - Professional
+  /register/:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with email and password, returns user info
+        and tokens
+      parameters:
+      - description: Register Request
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Registration successful
+          schema:
+            $ref: '#/definitions/schemas.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "409":
+          description: Conflict - User already exists
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: User Registration
+      tags:
+      - Login
   /service-local/:
     get:
       consumes:

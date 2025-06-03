@@ -93,6 +93,7 @@ var (
 		InvalidUserId             Error
 		InvalidCommunityPlanId    Error
 		InvalidCommunityServiceId Error
+		InvalidParsingInteger     Error
 		InvalidServiceLocalId        Error
 		InvalidServiceProfessionalId Error
 	}{
@@ -143,6 +144,10 @@ var (
 		InvalidCommunityServiceId: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_004",
 			Message: "Invalid community_id or service_id for association",
+		},
+		InvalidParsingInteger: Error{
+			Code:    "REQUEST_ERROR_004",
+			Message: "Invalid parsing integer",
 		},
 		InvalidServiceLocalId: Error{
 			Code:    "SERVICE_LOCAL_ERROR_004",
@@ -319,12 +324,34 @@ var (
 		},
 	}
 
+
+	// For 401 Unauthorized errors
+	AuthenticationError = struct {
+		UnauthorizedUser    Error
+		InvalidRefreshToken Error
+		InvalidAccessToken  Error
+	}{
+		UnauthorizedUser: Error{
+			Code:    "AUTHENTICATION_ERROR_001",
+			Message: "Unauthorized",
+		},
+		InvalidRefreshToken: Error{
+			Code:    "AUTHENTICATION_ERROR_002",
+			Message: "Invalid refresh token",
+		},
+		InvalidAccessToken: Error{
+			Code:    "AUTHENTICATION_ERROR_003",
+			Message: "Invalid access token",
+		},
+	}
+
 	// For 409 Conflict errors
 	ConflictError = struct {
 		CommunityPlanAlreadyExists       Error
 		CommunityServiceAlreadyExists    Error
 		ServiceProfessionalAlreadyExists Error
 		ServiceLocalAlreadyExists        Error
+		UserAlreadyExists             Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -333,6 +360,10 @@ var (
 		CommunityServiceAlreadyExists: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_006",
 			Message: "Community-Service association already exists",
+		},
+		UserAlreadyExists: Error{
+			Code:    "USER_ERROR_006",
+			Message: "User already exists with this email",
 		},
 		ServiceLocalAlreadyExists: Error{
 			Code:    "SERVICE_LOCAL_ERROR_003",
