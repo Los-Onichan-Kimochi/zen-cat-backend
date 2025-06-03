@@ -87,12 +87,16 @@ func (a *Auth) AccessTokenValidation(
 		return nil, nil, &errors.AuthenticationError.UnauthorizedUser
 	}
 
-	accessToken, tokenErr := jwt.ParseWithClaims(tokenString, &schemas.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method")
-		}
-		return []byte(a.EnvSettings.TokenSignatureKey), nil
-	})
+	accessToken, tokenErr := jwt.ParseWithClaims(
+		tokenString,
+		&schemas.CustomClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method")
+			}
+			return []byte(a.EnvSettings.TokenSignatureKey), nil
+		},
+	)
 
 	if tokenErr != nil || !accessToken.Valid {
 		return nil, nil, &errors.AuthenticationError.UnauthorizedUser

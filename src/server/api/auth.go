@@ -8,8 +8,8 @@ import (
 )
 
 // RefreshToken 		godoc
-// @Summary 			Refresh player access token.
-// @Description 		Refresh player access token.
+// @Summary 			Refresh user access token.
+// @Description 		Refresh user access token.
 // @Tags 				Auth
 // @Accept 				json
 // @Produce 			json

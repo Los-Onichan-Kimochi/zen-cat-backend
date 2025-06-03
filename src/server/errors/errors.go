@@ -28,6 +28,7 @@ var (
 		CommunityServiceNotFound Error
 		ServiceLocalNotFound        Error
 		ServiceProfessionalNotFound Error
+		SessionNotFound          Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -77,6 +78,10 @@ var (
 			Code:    "SERVICE_PROFESSIONAL_ERROR_001",
 			Message: "Service-Professional association not found",
 		},
+		SessionNotFound: Error{
+			Code:    "SESSION_ERROR_001",
+			Message: "Session not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
@@ -96,6 +101,8 @@ var (
 		InvalidParsingInteger     Error
 		InvalidServiceLocalId        Error
 		InvalidServiceProfessionalId Error
+		InvalidSessionId          Error
+		InvalidReservationId      Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -157,6 +164,14 @@ var (
 			Code:    "SERVICE_PROFESSIONAL_ERROR_004",
 			Message: "Invalid service_id or professional_id for association",
 		},
+		InvalidSessionId: Error{
+			Code:    "SESSION_ERROR_004",
+			Message: "Invalid session id",
+		},
+		InvalidReservationId: Error{
+			Code:    "RESERVATION_ERROR_004",
+			Message: "Invalid reservation id",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -193,6 +208,9 @@ var (
 		ServiceLocalNotDeleted           Error
 		ServiceProfessionalNotCreated    Error
 		ServiceProfessionalNotDeleted    Error
+		SessionNotCreated          Error
+		SessionNotUpdated          Error
+		SessionNotSoftDeleted      Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -321,6 +339,18 @@ var (
 		ServiceProfessionalNotDeleted: Error{
 			Code:    "SERVICE_PROFESSIONAL_ERROR_005",
 			Message: "Service-Professional association not deleted",
+		},
+		SessionNotCreated: Error{
+			Code:    "SESSION_ERROR_002",
+			Message: "Session not created",
+		},
+		SessionNotUpdated: Error{
+			Code:    "SESSION_ERROR_003",
+			Message: "Session not updated",
+		},
+		SessionNotSoftDeleted: Error{
+			Code:    "SESSION_ERROR_005",
+			Message: "Session not soft deleted",
 		},
 	}
 

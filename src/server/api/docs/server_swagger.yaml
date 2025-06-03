@@ -50,6 +50,13 @@ definitions:
           $ref: '#/definitions/schemas.CreateServiceProfessionalRequest'
         type: array
     type: object
+  schemas.BatchCreateSessionRequest:
+    properties:
+      sessions:
+        items:
+          $ref: '#/definitions/schemas.CreateSessionRequest'
+        type: array
+    type: object
   schemas.BulkCreateProfessionalRequest:
     properties:
       professionals:
@@ -90,6 +97,13 @@ definitions:
       service_professionals:
         items:
           $ref: '#/definitions/schemas.DeleteServiceProfessionalRequest'
+        type: array
+    type: object
+  schemas.BulkDeleteSessionRequest:
+    properties:
+      sessions:
+        items:
+          type: string
         type: array
     type: object
   schemas.Communities:
@@ -251,6 +265,25 @@ definitions:
       is_virtual:
         type: boolean
       name:
+        type: string
+    type: object
+  schemas.CreateSessionRequest:
+    properties:
+      capacity:
+        type: integer
+      date:
+        type: string
+      end_time:
+        type: string
+      local_id:
+        type: string
+      professional_id:
+        type: string
+      session_link:
+        type: string
+      start_time:
+        type: string
+      title:
         type: string
     type: object
   schemas.CreateUserRequest:
@@ -483,6 +516,30 @@ definitions:
     - name
     - password
     type: object
+  schemas.Reservation:
+    properties:
+      id:
+        type: string
+      last_modification:
+        type: string
+      name:
+        type: string
+      reservation_time:
+        type: string
+      session_id:
+        type: string
+      state:
+        type: string
+      user_id:
+        type: string
+    type: object
+  schemas.Reservations:
+    properties:
+      reservations:
+        items:
+          $ref: '#/definitions/schemas.Reservation'
+        type: array
+    type: object
   schemas.Service:
     properties:
       description:
@@ -533,6 +590,38 @@ definitions:
       services:
         items:
           $ref: '#/definitions/schemas.Service'
+        type: array
+    type: object
+  schemas.Session:
+    properties:
+      capacity:
+        type: integer
+      date:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: string
+      local_id:
+        type: string
+      professional_id:
+        type: string
+      registered_count:
+        type: integer
+      session_link:
+        type: string
+      start_time:
+        type: string
+      state:
+        type: string
+      title:
+        type: string
+    type: object
+  schemas.Sessions:
+    properties:
+      sessions:
+        items:
+          $ref: '#/definitions/schemas.Session'
         type: array
     type: object
   schemas.TokenResponse:
@@ -611,6 +700,27 @@ definitions:
       is_virtual:
         type: boolean
       name:
+        type: string
+    type: object
+  schemas.UpdateSessionRequest:
+    properties:
+      capacity:
+        type: integer
+      date:
+        type: string
+      end_time:
+        type: string
+      local_id:
+        type: string
+      professional_id:
+        type: string
+      session_link:
+        type: string
+      start_time:
+        type: string
+      state:
+        type: string
+      title:
         type: string
     type: object
   schemas.UpdateUserRequest:
@@ -695,6 +805,16 @@ definitions:
     type: object
   time.Duration:
     enum:
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -703,6 +823,16 @@ definitions:
     - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2366,6 +2496,108 @@ paths:
       summary: User Registration
       tags:
       - Login
+  /reservation/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all reservations, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: User IDs
+        in: query
+        items:
+          type: string
+        name: userIds
+        type: array
+      - collectionFormat: csv
+        description: Session IDs
+        in: query
+        items:
+          type: string
+        name: sessionIds
+        type: array
+      - collectionFormat: csv
+        description: Reservation States
+        in: query
+        items:
+          type: string
+        name: states
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Reservations'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Reservations.
+      tags:
+      - Reservation
+  /reservation/{reservationId}/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a reservation given its id.
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: reservationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Reservation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Reservation.
+      tags:
+      - Reservation
   /service-local/:
     get:
       consumes:
@@ -3115,6 +3347,329 @@ paths:
       summary: Update Service.
       tags:
       - Service
+  /session/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all sessions, filtered by params.
+      parameters:
+      - collectionFormat: csv
+        description: Professional IDs
+        in: query
+        items:
+          type: string
+        name: professionalIds
+        type: array
+      - collectionFormat: csv
+        description: Local IDs
+        in: query
+        items:
+          type: string
+        name: localIds
+        type: array
+      - collectionFormat: csv
+        description: Session States
+        in: query
+        items:
+          type: string
+        name: states
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Sessions'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Sessions.
+      tags:
+      - Session
+    post:
+      consumes:
+      - application/json
+      description: Create the session information.
+      parameters:
+      - description: Create Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Session.
+      tags:
+      - Session
+  /session/{sessionId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a session given its id.
+      parameters:
+      - description: Session ID
+        in: path
+        name: sessionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Session.
+      tags:
+      - Session
+    get:
+      consumes:
+      - application/json
+      description: Gets a session given its id.
+      parameters:
+      - description: Session ID
+        in: path
+        name: sessionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Session.
+      tags:
+      - Session
+    patch:
+      consumes:
+      - application/json
+      description: Update the session information.
+      parameters:
+      - description: Session ID
+        in: path
+        name: sessionId
+        required: true
+        type: string
+      - description: Update Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Session.
+      tags:
+      - Session
+  /session/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes sessions given their ids.
+      parameters:
+      - description: Bulk Delete Session Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Session'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Sessions.
+      tags:
+      - Session
+  /session/bulk/:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple sessions in a single.
+      parameters:
+      - description: Bulk Create Sessions Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateSessionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Sessions'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Session.
+      tags:
+      - Session
   /user/:
     get:
       consumes:

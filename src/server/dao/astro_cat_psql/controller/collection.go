@@ -24,6 +24,8 @@ type AstroCatPsqlCollection struct {
 	CommunityService *CommunityService
 	ServiceLocal      *ServiceLocal
 	ServiceProfessional *ServiceProfessional
+	Session          *Session
+	Reservation      *Reservation
 }
 
 // Create dao controller collection
@@ -61,6 +63,8 @@ func NewAstroCatPsqlCollection(
 		CommunityService: NewCommunityServiceController(logger, postgresqlDB),
 		ServiceLocal: 	  NewServiceLocalController(logger, postgresqlDB),
 		ServiceProfessional: NewServiceProfessionalController(logger, postgresqlDB),
+		Session:          NewSessionController(logger, postgresqlDB),
+		Reservation:      NewReservationController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 
