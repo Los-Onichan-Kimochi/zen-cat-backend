@@ -38,6 +38,15 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	healthCheck := a.Echo.Group("/health-check")
 	healthCheck.GET("/", a.HealthCheck)
 
+	// Login endpoints
+	a.Echo.POST("/login/", a.Login)
+	a.Echo.POST("/register/", a.Register)
+	a.Echo.GET("/me/", a.GetCurrentUser)
+
+	// Auth endpoints
+	auth := a.Echo.Group("/auth")
+	auth.POST("/refresh/", a.RefreshToken)
+
 	// Community endpoints
 	community := a.Echo.Group("/community")
 	community.GET("/:communityId/", a.GetCommunity)

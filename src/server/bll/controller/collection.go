@@ -11,6 +11,7 @@ type ControllerCollection struct {
 	Logger           logging.Logger
 	EnvSettings      *schemas.EnvSettings
 	Auth             *Auth
+	Login            *Login
 	Community        *Community
 	Professional     *Professional
 	Local            *Local
@@ -31,6 +32,7 @@ func NewControllerCollection(
 		envSettings,
 	)
 	auth := NewAuthController(logger, bllAdapter, envSettings)
+	login := NewLoginController(logger, bllAdapter, envSettings, auth)
 	community := NewCommunityController(logger, bllAdapter, envSettings)
 	professional := NewProfessionalController(logger, bllAdapter, envSettings)
 	local := NewLocalController(logger, bllAdapter, envSettings)
@@ -44,6 +46,7 @@ func NewControllerCollection(
 		Logger:           logger,
 		EnvSettings:      envSettings,
 		Auth:             auth,
+		Login:            login,
 		Community:        community,
 		Professional:     professional,
 		Local:            local,

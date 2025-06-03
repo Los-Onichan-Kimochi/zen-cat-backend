@@ -286,9 +286,9 @@ var (
 
 	// For 401 Unauthorized errors
 	AuthenticationError = struct {
-		UnauthorizedUser Error
+		UnauthorizedUser    Error
 		InvalidRefreshToken Error
-		InvalidAccessToken Error
+		InvalidAccessToken  Error
 	}{
 		UnauthorizedUser: Error{
 			Code:    "AUTHENTICATION_ERROR_001",
@@ -308,6 +308,7 @@ var (
 	ConflictError = struct {
 		CommunityPlanAlreadyExists    Error
 		CommunityServiceAlreadyExists Error
+		UserAlreadyExists             Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -316,6 +317,10 @@ var (
 		CommunityServiceAlreadyExists: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_006",
 			Message: "Community-Service association already exists",
+		},
+		UserAlreadyExists: Error{
+			Code:    "USER_ERROR_006",
+			Message: "User already exists with this email",
 		},
 	}
 
