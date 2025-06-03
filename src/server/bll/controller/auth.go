@@ -32,22 +32,19 @@ func NewAuthController(
 	}
 }
 
-// Generates a new token for a player with extended user information
+// Generates a new token for a user
 func (a *Auth) GenerateToken(
 	userId uuid.UUID,
 	userEmail string,
 	userPassword string,
 	userRoles []string,
 	expirationDelta time.Duration,
-) schemas.TokenResponse {
-	// Get user details for extended claims
+) (schemas.TokenResponse, *errors.Error) {
 	user, err := a.Adapter.User.GetPostgresqlUser(userId)
 	if err != nil {
-		// Fallback to basic claims if user details can't be retrieved
-		return a.generateBasicToken(userId, userEmail, userPassword, userRoles, expirationDelta)
+		return schemas.TokenResponse{}, &errors.InternalServerError.Default
 	}
 
-	// Set custom claim with extended user info
 	expirationTime := time.Now().Add(expirationDelta)
 
 	claims := &schemas.CustomClaims{
@@ -65,47 +62,16 @@ func (a *Auth) GenerateToken(
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, _ := token.SignedString(a.EnvSettings.TokenSignatureKey)
+	accessToken, tokenErr := token.SignedString(a.EnvSettings.TokenSignatureKey)
+	if tokenErr != nil {
+		return schemas.TokenResponse{}, &errors.InternalServerError.Default
+	}
 
 	return schemas.TokenResponse{
 		AccessToken:  accessToken,
 		RefreshToken: accessToken,
 		ExpiresIn:    expirationDelta,
-	}
-}
-
-// Fallback method for basic token generation
-func (a *Auth) generateBasicToken(
-	userId uuid.UUID,
-	userEmail string,
-	userPassword string,
-	userRoles []string,
-	expirationDelta time.Duration,
-) schemas.TokenResponse {
-	expirationTime := time.Now().Add(expirationDelta)
-
-	claims := &schemas.CustomClaims{
-		UserId:        userId,
-		UserEmail:     userEmail,
-		UserPassword:  userPassword,
-		UserRoles:     userRoles,
-		UserName:      "",
-		UserFirstName: "",
-		UserLastName:  nil,
-		UserImageUrl:  "",
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	accessToken, _ := token.SignedString(a.EnvSettings.TokenSignatureKey)
-
-	return schemas.TokenResponse{
-		AccessToken:  accessToken,
-		RefreshToken: accessToken,
-		ExpiresIn:    expirationDelta,
-	}
+	}, nil
 }
 
 func (a *Auth) AccessTokenValidation(
@@ -183,13 +149,16 @@ func (a *Auth) RefreshToken(accessToken *jwt.Token) (*schemas.TokenResponse, *er
 	if err != nil {
 		return nil, &errors.AuthenticationError.UnauthorizedUser
 	}
-	newToken := a.GenerateToken(
+	newToken, tokenErr := a.GenerateToken(
 		credentials.UserId,
 		credentials.UserEmail,
 		credentials.UserPassword,
 		credentials.UserRoles,
 		time.Hour*2,
 	)
+	if tokenErr != nil {
+		return nil, tokenErr
+	}
 
 	return &newToken, nil
 }
