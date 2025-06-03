@@ -13,3 +13,6 @@ redis-data/
 
 # Serverless
 .serverless
+
+# Python enviroment
+/src/server/tests/libs

@@ -3,23 +3,34 @@ init-vscode:
 	cd src/server && cp .env.sample .env && cd .. && cd .. && \
 	cd .vscode && cp settings.json.sample settings.json
 
-# Set up database
+# Set up database (run with sudo)
 set-up-db:
 	docker compose down && \
 	docker compose up astro-cat-postgres -d --wait
-	cd src/server/ && go run tests/commands/clear_database.go
+	cd src/server/ && go run tests/set_dummy_data.go
 
-# Test commands
-test:
-	make set-up-db && \
-	make test-go
-
-test-go:
-	go test -p 1 -count=1 ./src/server/tests/...
+# Set up testing enviroment for python
+setup-test:
+	cd src/server/tests && \
+	python3 -m venv libs && \
+	source libs/bin/activate && \
+	pip install -r requirements.txt && \
+	deactivate
 
 # Runners
 run:
 	cd src/server && go run main.go
+
+# Test commands
+test:
+	make set-up-db && \
+	make run && \
+	make use-python && \
+
+# Switch to python enviroment for development
+use-python:
+	cd src/server/tests && \
+	source libs/bin/activate
 
 # Swagger documentation
 swag-docs:
