@@ -4239,11 +4239,11 @@ const docTemplateserver = `{
         "schemas.CreateServiceProfessionalRequest": {
             "type": "object",
             "required": [
-                "local_id",
+                "professional_id",
                 "service_id"
             ],
             "properties": {
-                "local_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4336,11 +4336,11 @@ const docTemplateserver = `{
         "schemas.DeleteServiceLocalRequest": {
             "type": "object",
             "required": [
-                "plan_id",
+                "local_id",
                 "service_id"
             ],
             "properties": {
-                "plan_id": {
+                "local_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4351,11 +4351,11 @@ const docTemplateserver = `{
         "schemas.DeleteServiceProfessionalRequest": {
             "type": "object",
             "required": [
-                "plan_id",
+                "professional_id",
                 "service_id"
             ],
             "properties": {
-                "plan_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4610,7 +4610,7 @@ const docTemplateserver = `{
                 "id": {
                     "type": "string"
                 },
-                "local_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {

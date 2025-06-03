@@ -234,12 +234,12 @@ definitions:
     type: object
   schemas.CreateServiceProfessionalRequest:
     properties:
-      local_id:
+      professional_id:
         type: string
       service_id:
         type: string
     required:
-    - local_id
+    - professional_id
     - service_id
     type: object
   schemas.CreateServiceRequest:
@@ -298,22 +298,22 @@ definitions:
     type: object
   schemas.DeleteServiceLocalRequest:
     properties:
-      plan_id:
+      local_id:
         type: string
       service_id:
         type: string
     required:
-    - plan_id
+    - local_id
     - service_id
     type: object
   schemas.DeleteServiceProfessionalRequest:
     properties:
-      plan_id:
+      professional_id:
         type: string
       service_id:
         type: string
     required:
-    - plan_id
+    - professional_id
     - service_id
     type: object
   schemas.IdentificationDocument:
@@ -478,7 +478,7 @@ definitions:
     properties:
       id:
         type: string
-      local_id:
+      professional_id:
         type: string
       service_id:
         type: string

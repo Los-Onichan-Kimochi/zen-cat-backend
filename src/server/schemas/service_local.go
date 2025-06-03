@@ -23,7 +23,7 @@ type BatchCreateServiceLocalRequest struct {
 
 type DeleteServiceLocalRequest struct {
 	ServiceId uuid.UUID `json:"service_id" validate:"required"`
-	LocalId      uuid.UUID `json:"plan_id"      validate:"required"`
+	LocalId      uuid.UUID `json:"local_id"      validate:"required"`
 }
 
 type BulkDeleteServiceLocalRequest struct {

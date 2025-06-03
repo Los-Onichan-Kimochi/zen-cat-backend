@@ -4232,11 +4232,11 @@
         "schemas.CreateServiceProfessionalRequest": {
             "type": "object",
             "required": [
-                "local_id",
+                "professional_id",
                 "service_id"
             ],
             "properties": {
-                "local_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4329,11 +4329,11 @@
         "schemas.DeleteServiceLocalRequest": {
             "type": "object",
             "required": [
-                "plan_id",
+                "local_id",
                 "service_id"
             ],
             "properties": {
-                "plan_id": {
+                "local_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4344,11 +4344,11 @@
         "schemas.DeleteServiceProfessionalRequest": {
             "type": "object",
             "required": [
-                "plan_id",
+                "professional_id",
                 "service_id"
             ],
             "properties": {
-                "plan_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4603,7 +4603,7 @@
                 "id": {
                     "type": "string"
                 },
-                "local_id": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
