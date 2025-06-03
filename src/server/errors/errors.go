@@ -83,6 +83,7 @@ var (
 		InvalidUserId             Error
 		InvalidCommunityPlanId    Error
 		InvalidCommunityServiceId Error
+		InvalidParsingInteger     Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -131,6 +132,10 @@ var (
 		InvalidCommunityServiceId: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_004",
 			Message: "Invalid community_id or service_id for association",
+		},
+		InvalidParsingInteger: Error{
+			Code:    "REQUEST_ERROR_004",
+			Message: "Invalid parsing integer",
 		},
 	}
 
@@ -276,6 +281,26 @@ var (
 		CommunityServiceNotDeleted: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_005",
 			Message: "Community-Service association not deleted",
+		},
+	}
+
+	// For 401 Unauthorized errors
+	AuthenticationError = struct {
+		UnauthorizedUser Error
+		InvalidRefreshToken Error
+		InvalidAccessToken Error
+	}{
+		UnauthorizedUser: Error{
+			Code:    "AUTHENTICATION_ERROR_001",
+			Message: "Unauthorized",
+		},
+		InvalidRefreshToken: Error{
+			Code:    "AUTHENTICATION_ERROR_002",
+			Message: "Invalid refresh token",
+		},
+		InvalidAccessToken: Error{
+			Code:    "AUTHENTICATION_ERROR_003",
+			Message: "Invalid access token",
 		},
 	}
 
