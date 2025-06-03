@@ -26,6 +26,8 @@ var (
 		OnboardingNotFound       Error
 		CommunityPlanNotFound    Error
 		CommunityServiceNotFound Error
+		ServiceLocalNotFound        Error
+		ServiceProfessionalNotFound Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -67,6 +69,14 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_001",
 			Message: "Community-Service association not found",
 		},
+		ServiceLocalNotFound: Error{
+			Code:    "SERVICE_LOCAL_ERROR_001",
+			Message: "Service-Local association not found",
+		},
+		ServiceProfessionalNotFound: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_001",
+			Message: "Service-Professional association not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
@@ -84,6 +94,8 @@ var (
 		InvalidCommunityPlanId    Error
 		InvalidCommunityServiceId Error
 		InvalidParsingInteger     Error
+		InvalidServiceLocalId        Error
+		InvalidServiceProfessionalId Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -137,6 +149,14 @@ var (
 			Code:    "REQUEST_ERROR_004",
 			Message: "Invalid parsing integer",
 		},
+		InvalidServiceLocalId: Error{
+			Code:    "SERVICE_LOCAL_ERROR_004",
+			Message: "Invalid service_id or local_id for association",
+		},
+		InvalidServiceProfessionalId: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_004",
+			Message: "Invalid service_id or professional_id for association",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -169,6 +189,10 @@ var (
 		CommunityPlanNotDeleted    Error
 		CommunityServiceNotCreated Error
 		CommunityServiceNotDeleted Error
+		ServiceLocalNotCreated        	 Error
+		ServiceLocalNotDeleted           Error
+		ServiceProfessionalNotCreated    Error
+		ServiceProfessionalNotDeleted    Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -282,7 +306,24 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_005",
 			Message: "Community-Service association not deleted",
 		},
+		ServiceLocalNotCreated: Error{
+			Code:    "SERVICE_LOCAL_ERROR_002",
+			Message: "Service-Local association not created",
+		},
+		ServiceLocalNotDeleted: Error{
+			Code:    "SERVICE_LOCAL_ERROR_005",
+			Message: "Service-Local association not deleted",
+		},
+		ServiceProfessionalNotCreated: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_002",
+			Message: "Service-Professional association not created",
+		},
+		ServiceProfessionalNotDeleted: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_005",
+			Message: "Service-Professional association not deleted",
+		},
 	}
+
 
 	// For 401 Unauthorized errors
 	AuthenticationError = struct {
@@ -306,8 +347,10 @@ var (
 
 	// For 409 Conflict errors
 	ConflictError = struct {
-		CommunityPlanAlreadyExists    Error
-		CommunityServiceAlreadyExists Error
+		CommunityPlanAlreadyExists       Error
+		CommunityServiceAlreadyExists    Error
+		ServiceProfessionalAlreadyExists Error
+		ServiceLocalAlreadyExists        Error
 		UserAlreadyExists             Error
 	}{
 		CommunityPlanAlreadyExists: Error{
@@ -321,6 +364,14 @@ var (
 		UserAlreadyExists: Error{
 			Code:    "USER_ERROR_006",
 			Message: "User already exists with this email",
+		},
+		ServiceLocalAlreadyExists: Error{
+			Code:    "SERVICE_LOCAL_ERROR_003",
+			Message: "Service-Local association already exists",
+		},
+		ServiceProfessionalAlreadyExists: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_003",
+			Message: "Service-Professional association already exists",
 		},
 	}
 
