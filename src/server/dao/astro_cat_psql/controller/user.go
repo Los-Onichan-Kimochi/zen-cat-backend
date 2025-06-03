@@ -35,6 +35,20 @@ func (u *User) GetUser(userId uuid.UUID) (*model.User, error) {
 	return user, nil
 }
 
+func (u *User) GetUserByEmail(email string) (*model.User, error) {
+	user := &model.User{}
+	result := u.PostgresqlDB.
+		Preload("Memberships").
+		Preload("Memberships.Community").
+		Preload("Memberships.Plan").
+		First(&user, "email = ?", email)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
 func (u *User) FetchUsers() ([]*model.User, error) {
 	users := []*model.User{}
 	result := u.PostgresqlDB.
