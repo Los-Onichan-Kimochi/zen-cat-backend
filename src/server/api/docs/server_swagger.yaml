@@ -849,7 +849,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Refresh player access token.
+      description: Refresh user access token.
       produces:
       - application/json
       responses:
@@ -867,7 +867,7 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Refresh player access token.
+      summary: Refresh user access token.
       tags:
       - Auth
   /community-plan/:
