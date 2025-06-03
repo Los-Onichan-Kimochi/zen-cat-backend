@@ -18,6 +18,8 @@ type ControllerCollection struct {
 	Plan             *Plan
 	CommunityPlan    *CommunityPlan
 	CommunityService *CommunityService
+	ServiceLocal     *ServiceLocal
+	ServiceProfessional *ServiceProfessional
 	Session          *Session
 	Reservation      *Reservation
 }
@@ -39,6 +41,8 @@ func NewControllerCollection(
 	plan := NewPlanController(logger, bllAdapter, envSettings)
 	communityPlan := NewCommunityPlanController(logger, bllAdapter, envSettings)
 	communityService := NewCommunityServiceController(logger, bllAdapter, envSettings)
+	serviceLocal := NewServiceLocalController(logger, bllAdapter, envSettings)
+	serviceProfessional := NewServiceProfessionalController(logger, bllAdapter, envSettings)
 	session := NewSessionController(logger, bllAdapter, envSettings)
 	reservation := NewReservationController(logger, bllAdapter, envSettings)
 
@@ -53,6 +57,8 @@ func NewControllerCollection(
 		Plan:             plan,
 		CommunityPlan:    communityPlan,
 		CommunityService: communityService,
+		ServiceLocal:     serviceLocal,
+		ServiceProfessional: serviceProfessional,
 		Session:          session,
 		Reservation:      reservation,
 	}, astroCatPsqlDB

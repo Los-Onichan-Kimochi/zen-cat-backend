@@ -2384,6 +2384,836 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/service-local/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all service-local associations, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Fetch ServiceLocals.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceLocals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Local does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Associates a service with a local.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Create ServiceLocal.",
+                "parameters": [
+                    {
+                        "description": "Service-Local Association Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateServiceLocalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceLocal"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Local does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-local/bulk/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple service-local associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Bulk Create ServiceLocals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create ServiceLocals Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BatchCreateServiceLocalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceLocals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Local does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes service-local associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Bulk Delete ServiceLocals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete ServiceLocal Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteServiceLocalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-local/{serviceId}/{localId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves a specific service-local association.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Get ServiceLocal.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceLocal"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Deletes a specific service-local association.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceLocal"
+                ],
+                "summary": "Delete ServiceLocal.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error (e.g., deletion failed)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-professional/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all service-professional associations, filtered by params.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Fetch ServiceProfessionals.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Professional ID",
+                        "name": "professionalId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceProfessionals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Professional does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Associates a service with a professional.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Create ServiceProfessional.",
+                "parameters": [
+                    {
+                        "description": "Service-Professional Association Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateServiceProfessionalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceProfessional"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Professional does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-professional/bulk/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple service-professional associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Bulk Create ServiceProfessionals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create ServiceProfessionals Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BatchCreateServiceProfessionalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceProfessionals"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid updatedBy)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Service or Professional does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict (Association already exists)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity (Invalid UUIDs or request body)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes service-professional associations.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Bulk Delete ServiceProfessionals.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete ServiceProfessional Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteServiceProfessionalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/service-professional/{serviceId}/{professionalId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves a specific service-professional association.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Get ServiceProfessional.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Professional ID",
+                        "name": "professionalId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceProfessional"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Deletes a specific service-professional association.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ServiceProfessional"
+                ],
+                "summary": "Delete ServiceProfessional.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Professional ID",
+                        "name": "professionalId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error (e.g., deletion failed)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/reservation/": {
             "get": {
                 "security": [
@@ -3761,6 +4591,28 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.BatchCreateServiceLocalRequest": {
+            "type": "object",
+            "properties": {
+                "service_locals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateServiceLocalRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BatchCreateServiceProfessionalRequest": {
+            "type": "object",
+            "properties": {
+                "service_professionals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateServiceProfessionalRequest"
+                    }
+                }
+            }
+        },
         "schemas.BatchCreateSessionRequest": {
             "type": "object",
             "properties": {
@@ -3812,6 +4664,28 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteServiceLocalRequest": {
+            "type": "object",
+            "properties": {
+                "service_locals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.DeleteServiceLocalRequest"
+                    }
+                }
+            }
+        },
+        "schemas.BulkDeleteServiceProfessionalRequest": {
+            "type": "object",
+            "properties": {
+                "service_professionals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.DeleteServiceProfessionalRequest"
                     }
                 }
             }
@@ -4027,6 +4901,36 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CreateServiceLocalRequest": {
+            "type": "object",
+            "required": [
+                "local_id",
+                "service_id"
+            ],
+            "properties": {
+                "local_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.CreateServiceProfessionalRequest": {
+            "type": "object",
+            "required": [
+                "professional_id",
+                "service_id"
+            ],
+            "properties": {
+                "professional_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.CreateServiceRequest": {
             "type": "object",
             "properties": {
@@ -4131,6 +5035,36 @@ const docTemplateserver = `{
             ],
             "properties": {
                 "community_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteServiceLocalRequest": {
+            "type": "object",
+            "required": [
+                "local_id",
+                "service_id"
+            ],
+            "properties": {
+                "local_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.DeleteServiceProfessionalRequest": {
+            "type": "object",
+            "required": [
+                "professional_id",
+                "service_id"
+            ],
+            "properties": {
+                "professional_id": {
                     "type": "string"
                 },
                 "service_id": {
@@ -4388,6 +5322,56 @@ const docTemplateserver = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.ServiceLocal": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "local_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.ServiceLocals": {
+            "type": "object",
+            "properties": {
+                "service_locals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ServiceLocal"
+                    }
+                }
+            }
+        },
+        "schemas.ServiceProfessional": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "professional_id": {
+                    "type": "string"
+                },
+                "service_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.ServiceProfessionals": {
+            "type": "object",
+            "properties": {
+                "service_professionals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ServiceProfessional"
+                    }
                 }
             }
         },
