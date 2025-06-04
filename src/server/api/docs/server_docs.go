@@ -575,7 +575,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-service/bulk/": {
+        "/community-service/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -648,7 +648,9 @@ const docTemplateserver = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/community-service/bulk-delete/": {
             "delete": {
                 "security": [
                     {
@@ -970,14 +972,14 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community/bulk-delete/": {
-            "delete": {
+        "/community/bulk-create/": {
+            "post": {
                 "security": [
                     {
                         "JWT": []
                     }
                 ],
-                "description": "Bulk deletes communities given their ids.",
+                "description": "Create multiple communities in a single.",
                 "consumes": [
                     "application/json"
                 ],
@@ -987,23 +989,23 @@ const docTemplateserver = `{
                 "tags": [
                     "Community"
                 ],
-                "summary": "Bulk Delete Communities.",
+                "summary": "Bulk Create Community.",
                 "parameters": [
                     {
-                        "description": "Bulk Delete Community Request",
+                        "description": "Bulk Create Communities Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.BulkDeleteCommunityRequest"
+                            "$ref": "#/definitions/schemas.BatchCreateCommunityRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "No Content",
+                    "201": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Community"
+                            "$ref": "#/definitions/schemas.Communities"
                         }
                     },
                     "400": {
@@ -1039,14 +1041,14 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community/bulk/": {
-            "post": {
+        "/community/bulk-delete/": {
+            "delete": {
                 "security": [
                     {
                         "JWT": []
                     }
                 ],
-                "description": "Create multiple communities in a single.",
+                "description": "Bulk deletes communities given their ids.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1056,23 +1058,23 @@ const docTemplateserver = `{
                 "tags": [
                     "Community"
                 ],
-                "summary": "Bulk Create Community.",
+                "summary": "Bulk Delete Communities.",
                 "parameters": [
                     {
-                        "description": "Bulk Create Communities Request",
+                        "description": "Bulk Delete Community Request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/schemas.BatchCreateCommunityRequest"
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
-                            "$ref": "#/definitions/schemas.Communities"
+                            "$ref": "#/definitions/schemas.Community"
                         }
                     },
                     "400": {

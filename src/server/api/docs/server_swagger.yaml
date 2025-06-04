@@ -987,48 +987,7 @@ paths:
       summary: Get CommunityService.
       tags:
       - CommunityService
-  /community-service/bulk/:
-    delete:
-      consumes:
-      - application/json
-      description: Bulk deletes community-service associations.
-      parameters:
-      - description: Bulk Delete CommunityService Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.BulkDeleteCommunityServiceRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Bulk Delete CommunityServices.
-      tags:
-      - CommunityService
+  /community-service/bulk-create/:
     post:
       consumes:
       - application/json
@@ -1074,6 +1033,48 @@ paths:
       security:
       - JWT: []
       summary: Bulk Create CommunityServices.
+      tags:
+      - CommunityService
+  /community-service/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes community-service associations.
+      parameters:
+      - description: Bulk Delete CommunityService Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteCommunityServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete CommunityServices.
       tags:
       - CommunityService
   /community/:
@@ -1283,6 +1284,50 @@ paths:
       summary: Update Community.
       tags:
       - Community
+  /community/bulk-create/:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple communities in a single.
+      parameters:
+      - description: Bulk Create Communities Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateCommunityRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Communities'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Community.
+      tags:
+      - Community
   /community/bulk-delete/:
     delete:
       consumes:
@@ -1325,50 +1370,6 @@ paths:
       security:
       - JWT: []
       summary: Bulk Delete Communities.
-      tags:
-      - Community
-  /community/bulk/:
-    post:
-      consumes:
-      - application/json
-      description: Create multiple communities in a single.
-      parameters:
-      - description: Bulk Create Communities Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.BatchCreateCommunityRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.Communities'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Bulk Create Community.
       tags:
       - Community
   /health-check/:

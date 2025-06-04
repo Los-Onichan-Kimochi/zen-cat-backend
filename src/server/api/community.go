@@ -103,7 +103,7 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 // @Failure 			404 {object} errors.Error "Not Found"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community/bulk/ [post]
+// @Router 				/community/bulk-create/ [post]
 func (a *Api) BulkCreateCommunities(c echo.Context) error {
 	updatedBy := "ADMIN"
 
