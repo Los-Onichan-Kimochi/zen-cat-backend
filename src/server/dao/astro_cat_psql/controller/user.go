@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/clause"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
-	"onichankimochi.com/astro_cat_backend/src/utils"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
