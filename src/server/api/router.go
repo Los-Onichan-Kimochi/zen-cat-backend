@@ -91,6 +91,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	plan.POST("/", a.CreatePlan)
 	plan.PATCH("/:planId/", a.UpdatePlan)
 	plan.DELETE("/:planId/", a.DeletePlan)
+	plan.POST("/bulk-create/", a.BulkCreatePlans)
+	plan.DELETE("/bulk-delete/", a.BulkDeletePlans)
 
 	// User endpoints (all protected)
 	user := a.Echo.Group("/user")

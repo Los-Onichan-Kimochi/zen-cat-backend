@@ -15,6 +15,24 @@ definitions:
     x-enum-varnames:
     - PlanTypeMonthly
     - PlanTypeAnual
+  schemas.AvailabilityRequest:
+    properties:
+      date:
+        type: string
+      local_id:
+        type: string
+      professional_id:
+        type: string
+    type: object
+  schemas.AvailabilityResult:
+    properties:
+      busy_slots:
+        items:
+          $ref: '#/definitions/schemas.TimeSlot'
+        type: array
+      is_available:
+        type: boolean
+    type: object
   schemas.BatchCreateCommunityPlanRequest:
     properties:
       community_plans:
@@ -57,6 +75,13 @@ definitions:
           $ref: '#/definitions/schemas.CreateSessionRequest'
         type: array
     type: object
+  schemas.BulkCreatePlanRequest:
+    properties:
+      plans:
+        items:
+          $ref: '#/definitions/schemas.CreatePlanRequest'
+        type: array
+    type: object
   schemas.BulkCreateProfessionalRequest:
     properties:
       professionals:
@@ -83,6 +108,13 @@ definitions:
       community_services:
         items:
           $ref: '#/definitions/schemas.DeleteCommunityServiceRequest'
+        type: array
+    type: object
+  schemas.BulkDeletePlanRequest:
+    properties:
+      plans:
+        items:
+          type: string
         type: array
     type: object
   schemas.BulkDeleteProfessionalRequest:
@@ -112,6 +144,22 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  schemas.CheckConflictRequest:
+    properties:
+      date:
+        type: string
+      end_time:
+        type: string
+      exclude_id:
+        description: Para excluir sesión en modo edición
+        type: string
+      local_id:
+        type: string
+      professional_id:
+        type: string
+      start_time:
+        type: string
     type: object
   schemas.Communities:
     properties:
@@ -163,6 +211,19 @@ definitions:
       community_services:
         items:
           $ref: '#/definitions/schemas.CommunityService'
+        type: array
+    type: object
+  schemas.ConflictResult:
+    properties:
+      has_conflict:
+        type: boolean
+      local_conflicts:
+        items:
+          $ref: '#/definitions/schemas.Session'
+        type: array
+      professional_conflicts:
+        items:
+          $ref: '#/definitions/schemas.Session'
         type: array
     type: object
   schemas.CreateCommunityPlanRequest:
@@ -631,6 +692,18 @@ definitions:
           $ref: '#/definitions/schemas.Session'
         type: array
     type: object
+  schemas.TimeSlot:
+    properties:
+      end:
+        type: string
+      start:
+        type: string
+      title:
+        type: string
+      type:
+        description: '"professional" | "local"'
+        type: string
+    type: object
   schemas.TokenResponse:
     properties:
       access_token:
@@ -856,7 +929,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Refresh player access token.
+      description: Refresh user access token.
       produces:
       - application/json
       responses:
@@ -874,7 +947,7 @@ paths:
             $ref: '#/definitions/errors.Error'
       security:
       - JWT: []
-      summary: Refresh player access token.
+      summary: Refresh user access token.
       tags:
       - Auth
   /community-plan/:
@@ -2206,6 +2279,94 @@ paths:
       security:
       - JWT: []
       summary: Update Plan.
+      tags:
+      - Plan
+  /plan/bulk-create/:
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple plans in a batch.
+      parameters:
+      - description: Bulk Create Plan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkCreatePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Plans'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Plans.
+      tags:
+      - Plan
+  /plan/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes plans given their ids.
+      parameters:
+      - description: Bulk Delete Plan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeletePlanRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.Plan'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Plans.
       tags:
       - Plan
   /professional/:
@@ -3634,6 +3795,46 @@ paths:
       summary: Update Session.
       tags:
       - Session
+  /session/availability/:
+    post:
+      consumes:
+      - application/json
+      description: Get availability information for a specific date.
+      parameters:
+      - description: Availability Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.AvailabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.AvailabilityResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Day Availability.
+      tags:
+      - Session
   /session/bulk-delete/:
     delete:
       consumes:
@@ -3720,6 +3921,46 @@ paths:
       security:
       - JWT: []
       summary: Bulk Create Session.
+      tags:
+      - Session
+  /session/check-conflicts/:
+    post:
+      consumes:
+      - application/json
+      description: Check for time conflicts with existing sessions.
+      parameters:
+      - description: Check Conflict Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CheckConflictRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ConflictResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Check Session Conflicts.
       tags:
       - Session
   /user/:
