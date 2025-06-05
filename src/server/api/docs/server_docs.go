@@ -22,7 +22,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Refresh user access token.",
+                "description": "Refresh player access token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -32,7 +32,7 @@ const docTemplateserver = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Refresh user access token.",
+                "summary": "Refresh player access token.",
                 "responses": {
                     "200": {
                         "description": "Ok",

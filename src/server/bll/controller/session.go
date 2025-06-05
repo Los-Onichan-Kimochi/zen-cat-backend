@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
@@ -190,4 +192,119 @@ func (s *Session) BulkCreateSessions(
 	}
 
 	return s.Adapter.Session.BulkCreatePostgresqlSessions(createSessionsData, updatedBy)
+}
+
+// Checks for session conflicts
+func (s *Session) CheckConflicts(req schemas.CheckConflictRequest) (*schemas.ConflictResult, *errors.Error) {
+	// Get all sessions for the specific date
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions([]uuid.UUID{}, []uuid.UUID{}, []string{})
+	if err != nil {
+		return nil, err
+	}
+
+	professionalConflicts := []*schemas.Session{}
+	localConflicts := []*schemas.Session{}
+
+	for _, session := range sessions {
+		// Skip if it's the session we're excluding (for edit mode)
+		if req.ExcludeId != nil && session.Id == *req.ExcludeId {
+			continue
+		}
+
+		// Skip cancelled or completed sessions
+		if session.State == "CANCELLED" || session.State == "COMPLETED" {
+			continue
+		}
+
+		// Check if it's the same date
+		if !s.isSameDate(session.Date, req.Date) {
+			continue
+		}
+
+		// Check for time overlap
+		if s.hasTimeOverlap(session.StartTime, session.EndTime, req.StartTime, req.EndTime) {
+			// Check professional conflict
+			if session.ProfessionalId == req.ProfessionalId {
+				professionalConflicts = append(professionalConflicts, session)
+			}
+
+			// Check local conflict (if both sessions are presential)
+			if req.LocalId != nil && session.LocalId != nil && *session.LocalId == *req.LocalId {
+				localConflicts = append(localConflicts, session)
+			}
+		}
+	}
+
+	hasConflict := len(professionalConflicts) > 0 || len(localConflicts) > 0
+
+	return &schemas.ConflictResult{
+		HasConflict:           hasConflict,
+		ProfessionalConflicts: professionalConflicts,
+		LocalConflicts:        localConflicts,
+	}, nil
+}
+
+// Gets availability information for a specific date
+func (s *Session) GetAvailability(req schemas.AvailabilityRequest) (*schemas.AvailabilityResult, *errors.Error) {
+	// Get all sessions for the specific date
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions([]uuid.UUID{}, []uuid.UUID{}, []string{})
+	if err != nil {
+		return nil, err
+	}
+
+	busySlots := []schemas.TimeSlot{}
+
+	for _, session := range sessions {
+		// Skip cancelled or completed sessions
+		if session.State == "CANCELLED" || session.State == "COMPLETED" {
+			continue
+		}
+
+		// Check if it's the same date
+		if !s.isSameDate(session.Date, req.Date) {
+			continue
+		}
+
+		// Add busy slot if matches criteria
+		slotType := ""
+		shouldAdd := false
+
+		if req.ProfessionalId != nil && session.ProfessionalId == *req.ProfessionalId {
+			slotType = "professional"
+			shouldAdd = true
+		}
+
+		if req.LocalId != nil && session.LocalId != nil && *session.LocalId == *req.LocalId {
+			slotType = "local"
+			shouldAdd = true
+		}
+
+		if shouldAdd {
+			busySlots = append(busySlots, schemas.TimeSlot{
+				Start: session.StartTime.Format("15:04"),
+				End:   session.EndTime.Format("15:04"),
+				Title: session.Title,
+				Type:  slotType,
+			})
+		}
+	}
+
+	isAvailable := len(busySlots) == 0
+
+	return &schemas.AvailabilityResult{
+		IsAvailable: isAvailable,
+		BusySlots:   busySlots,
+	}, nil
+}
+
+// Helper function to check if two dates are the same day
+func (s *Session) isSameDate(date1, date2 time.Time) bool {
+	y1, m1, d1 := date1.Date()
+	y2, m2, d2 := date2.Date()
+	return y1 == y2 && m1 == m2 && d1 == d2
+}
+
+// Helper function to check if two time ranges overlap
+func (s *Session) hasTimeOverlap(start1, end1, start2, end2 time.Time) bool {
+	return start1.Before(end2) && end1.After(start2)
 }
