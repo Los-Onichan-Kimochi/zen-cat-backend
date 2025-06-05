@@ -3,7 +3,7 @@ package adapter
 import (
 	"strings"
 
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
+
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -21,7 +21,7 @@ type CommunityService struct {
 // Create CommunityService adapter
 func NewCommunityServiceAdapter(
 	logger logging.Logger,
-	daoPostgresql *controller.AstroCatPsqlCollection,
+	daoPostgresql *daoPsql.AstroCatPsqlCollection,
 ) *CommunityService {
 	return &CommunityService{
 		logger:        logger,

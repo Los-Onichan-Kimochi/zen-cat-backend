@@ -26,6 +26,9 @@ var (
 		OnboardingNotFound       Error
 		CommunityPlanNotFound    Error
 		CommunityServiceNotFound Error
+		ServiceLocalNotFound        Error
+		ServiceProfessionalNotFound Error
+		SessionNotFound          Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -67,6 +70,18 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_001",
 			Message: "Community-Service association not found",
 		},
+		ServiceLocalNotFound: Error{
+			Code:    "SERVICE_LOCAL_ERROR_001",
+			Message: "Service-Local association not found",
+		},
+		ServiceProfessionalNotFound: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_001",
+			Message: "Service-Professional association not found",
+		},
+		SessionNotFound: Error{
+			Code:    "SESSION_ERROR_001",
+			Message: "Session not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
@@ -83,6 +98,11 @@ var (
 		InvalidUserId             Error
 		InvalidCommunityPlanId    Error
 		InvalidCommunityServiceId Error
+		InvalidParsingInteger     Error
+		InvalidServiceLocalId        Error
+		InvalidServiceProfessionalId Error
+		InvalidSessionId          Error
+		InvalidReservationId      Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -132,6 +152,26 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_004",
 			Message: "Invalid community_id or service_id for association",
 		},
+		InvalidParsingInteger: Error{
+			Code:    "REQUEST_ERROR_004",
+			Message: "Invalid parsing integer",
+		},
+		InvalidServiceLocalId: Error{
+			Code:    "SERVICE_LOCAL_ERROR_004",
+			Message: "Invalid service_id or local_id for association",
+		},
+		InvalidServiceProfessionalId: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_004",
+			Message: "Invalid service_id or professional_id for association",
+		},
+		InvalidSessionId: Error{
+			Code:    "SESSION_ERROR_004",
+			Message: "Invalid session id",
+		},
+		InvalidReservationId: Error{
+			Code:    "RESERVATION_ERROR_004",
+			Message: "Invalid reservation id",
+		},
 	}
 
 	// For 400 Bad Request errors
@@ -164,6 +204,13 @@ var (
 		CommunityPlanNotDeleted    Error
 		CommunityServiceNotCreated Error
 		CommunityServiceNotDeleted Error
+		ServiceLocalNotCreated        	 Error
+		ServiceLocalNotDeleted           Error
+		ServiceProfessionalNotCreated    Error
+		ServiceProfessionalNotDeleted    Error
+		SessionNotCreated          Error
+		SessionNotUpdated          Error
+		SessionNotSoftDeleted      Error
 	}{
 		InvalidUpdatedByValue: Error{
 			Code:    "REQUEST_ERROR_002",
@@ -277,12 +324,64 @@ var (
 			Code:    "COMMUNITY_SERVICE_ERROR_005",
 			Message: "Community-Service association not deleted",
 		},
+		ServiceLocalNotCreated: Error{
+			Code:    "SERVICE_LOCAL_ERROR_002",
+			Message: "Service-Local association not created",
+		},
+		ServiceLocalNotDeleted: Error{
+			Code:    "SERVICE_LOCAL_ERROR_005",
+			Message: "Service-Local association not deleted",
+		},
+		ServiceProfessionalNotCreated: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_002",
+			Message: "Service-Professional association not created",
+		},
+		ServiceProfessionalNotDeleted: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_005",
+			Message: "Service-Professional association not deleted",
+		},
+		SessionNotCreated: Error{
+			Code:    "SESSION_ERROR_002",
+			Message: "Session not created",
+		},
+		SessionNotUpdated: Error{
+			Code:    "SESSION_ERROR_003",
+			Message: "Session not updated",
+		},
+		SessionNotSoftDeleted: Error{
+			Code:    "SESSION_ERROR_005",
+			Message: "Session not soft deleted",
+		},
+	}
+
+
+	// For 401 Unauthorized errors
+	AuthenticationError = struct {
+		UnauthorizedUser    Error
+		InvalidRefreshToken Error
+		InvalidAccessToken  Error
+	}{
+		UnauthorizedUser: Error{
+			Code:    "AUTHENTICATION_ERROR_001",
+			Message: "Unauthorized",
+		},
+		InvalidRefreshToken: Error{
+			Code:    "AUTHENTICATION_ERROR_002",
+			Message: "Invalid refresh token",
+		},
+		InvalidAccessToken: Error{
+			Code:    "AUTHENTICATION_ERROR_003",
+			Message: "Invalid access token",
+		},
 	}
 
 	// For 409 Conflict errors
 	ConflictError = struct {
-		CommunityPlanAlreadyExists    Error
-		CommunityServiceAlreadyExists Error
+		CommunityPlanAlreadyExists       Error
+		CommunityServiceAlreadyExists    Error
+		ServiceProfessionalAlreadyExists Error
+		ServiceLocalAlreadyExists        Error
+		UserAlreadyExists             Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -291,6 +390,18 @@ var (
 		CommunityServiceAlreadyExists: Error{
 			Code:    "COMMUNITY_SERVICE_ERROR_006",
 			Message: "Community-Service association already exists",
+		},
+		UserAlreadyExists: Error{
+			Code:    "USER_ERROR_006",
+			Message: "User already exists with this email",
+		},
+		ServiceLocalAlreadyExists: Error{
+			Code:    "SERVICE_LOCAL_ERROR_003",
+			Message: "Service-Local association already exists",
+		},
+		ServiceProfessionalAlreadyExists: Error{
+			Code:    "SERVICE_PROFESSIONAL_ERROR_003",
+			Message: "Service-Professional association already exists",
 		},
 	}
 

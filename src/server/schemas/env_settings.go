@@ -25,6 +25,9 @@ type EnvSettings struct {
 	AstroCatPostgresUser     string
 	AstroCatPostgresPassword string
 	AstroCatPostgresName     string
+
+	// JWT
+	TokenSignatureKey []byte
 }
 
 // Create a new env settings defined on .env file
@@ -56,6 +59,8 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 	astroCatPostgresPassword := os.Getenv("ASTRO_CAT_POSTGRES_PASSWORD")
 	astroCatPostgresName := os.Getenv("ASTRO_CAT_POSTGRES_NAME")
 
+	tokenSignatureKey := []byte(os.Getenv("TOKEN_SIGNATURE_KEY"))
+
 	return &EnvSettings{
 		EnableSqlLogs: enableSqlLogs,
 
@@ -68,5 +73,7 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 		AstroCatPostgresUser:     astroCatPostgresUser,
 		AstroCatPostgresPassword: astroCatPostgresPassword,
 		AstroCatPostgresName:     astroCatPostgresName,
+
+		TokenSignatureKey: tokenSignatureKey,
 	}
 }

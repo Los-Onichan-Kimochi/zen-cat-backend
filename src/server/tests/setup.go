@@ -85,6 +85,8 @@ func ClearPostgresqlDatabase(
 			{"Membership", &model.Membership{}},
 			{"CommunityPlan", &model.CommunityPlan{}},
 			{"CommunityService", &model.CommunityService{}},
+			{"ServiceProfessional", &model.ServiceProfessional{}},
+			{"ServiceLocal", &model.ServiceLocal{}},
 			{"Reservation", &model.Reservation{}},
 			{"Session", &model.Session{}},
 			{"Onboarding", &model.Onboarding{}},

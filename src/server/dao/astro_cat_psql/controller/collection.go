@@ -22,6 +22,10 @@ type AstroCatPsqlCollection struct {
 	Plan             *Plan
 	CommunityPlan    *CommunityPlan
 	CommunityService *CommunityService
+	ServiceLocal      *ServiceLocal
+	ServiceProfessional *ServiceProfessional
+	Session          *Session
+	Reservation      *Reservation
 }
 
 // Create dao controller collection
@@ -57,6 +61,10 @@ func NewAstroCatPsqlCollection(
 		Plan:             NewPlanController(logger, postgresqlDB),
 		CommunityPlan:    NewCommunityPlanController(logger, postgresqlDB),
 		CommunityService: NewCommunityServiceController(logger, postgresqlDB),
+		ServiceLocal: 	  NewServiceLocalController(logger, postgresqlDB),
+		ServiceProfessional: NewServiceProfessionalController(logger, postgresqlDB),
+		Session:          NewSessionController(logger, postgresqlDB),
+		Reservation:      NewReservationController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 
@@ -95,11 +103,17 @@ func createTables(astroCatPsqlDB *gorm.DB) {
 	if err := astroCatPsqlDB.AutoMigrate(&model.Reservation{}); err != nil {
 		panic(err)
 	}
-
 	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityService{}); err != nil {
 		panic(err)
 	}
 	if err := astroCatPsqlDB.AutoMigrate(&model.CommunityPlan{}); err != nil {
+		panic(err)
+	}
+
+	if err := astroCatPsqlDB.AutoMigrate(&model.ServiceLocal{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.ServiceProfessional{}); err != nil {
 		panic(err)
 	}
 }
