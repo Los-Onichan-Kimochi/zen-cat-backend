@@ -82,3 +82,12 @@ func (c *Community) BulkCreateCommunities(
 ) ([]*schemas.Community, *errors.Error) {
 	return c.Adapter.Community.BulkCreatePostgresqlCommunities(createCommunitiesData, updatedBy)
 }
+
+// Bulk deletes communities.
+func (c *Community) BulkDeleteCommunities(
+	bulkDeleteCommunityData schemas.BulkDeleteCommunityRequest,
+) *errors.Error {
+	return c.Adapter.Community.BulkDeletePostgresqlCommunities(
+		bulkDeleteCommunityData.Communities,
+	)
+}

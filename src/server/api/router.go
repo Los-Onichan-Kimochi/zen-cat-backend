@@ -60,7 +60,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
 	community.DELETE("/:communityId/", a.DeleteCommunity)
-	community.POST("/bulk/", a.BulkCreateCommunities)
+	community.POST("/bulk-create/", a.BulkCreateCommunities)
+	community.DELETE("/bulk-delete/", a.BulkDeleteCommunities)
 
 	// Professional endpoints (all protected)
 	professional := a.Echo.Group("/professional")
@@ -90,6 +91,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	plan.POST("/", a.CreatePlan)
 	plan.PATCH("/:planId/", a.UpdatePlan)
 	plan.DELETE("/:planId/", a.DeletePlan)
+	plan.POST("/bulk-create/", a.BulkCreatePlans)
+	plan.DELETE("/bulk-delete/", a.BulkDeletePlans)
 
 	// User endpoints (all protected)
 	user := a.Echo.Group("/user")
@@ -134,9 +137,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityPlan.POST("/", a.CreateCommunityPlan)
 	communityPlan.GET("/:communityId/:planId/", a.GetCommunityPlan)
 	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
-	communityPlan.POST("/bulk/", a.BulkCreateCommunityPlans)
+	communityPlan.POST("/bulk-create/", a.BulkCreateCommunityPlans)
 	communityPlan.GET("/", a.FetchCommunityPlans)
-	communityPlan.DELETE("/bulk/", a.BulkDeleteCommunityPlans)
+	communityPlan.DELETE("/bulk-delete/", a.BulkDeleteCommunityPlans)
 
 	// CommunityService endpoints (all protected)
 	communityService := a.Echo.Group("/community-service")
@@ -144,9 +147,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
-	communityService.POST("/bulk/", a.BulkCreateCommunityServices)
+	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
-	communityService.DELETE("/bulk/", a.BulkDeleteCommunityServices)
+	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints
 	serviceLocal := a.Echo.Group("/service-local")
