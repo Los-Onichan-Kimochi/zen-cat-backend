@@ -42,11 +42,3 @@ type UpdateLocalRequest struct {
 	Capacity       *int    `json:"capacity"`
 	ImageUrl       *string `json:"image_url"`
 }
-
-type BulkCreateLocalRequest struct {
-	Locals []*CreateLocalRequest `json:"locals"`
-}
-
-type BulkDeleteLocalRequest struct {
-	Locals []uuid.UUID `json:"locals"`
-}
