@@ -12,6 +12,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type CustomLogger struct{}
@@ -198,6 +199,13 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			return
 		}
 	}
+	// contrasenha test123
+	// lo hasheo
+	hashedPassword, err := utils.HashPassword("test123")
+	if err != nil {
+		appLogger.Errorf("Error hashing password: %v", err)
+		return
+	}
 
 	// Create dummy users
 	users := []*model.User{
@@ -206,7 +214,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Name:           "Test-1",
 			FirstLastName:  "User",
 			SecondLastName: nil,
-			Password:       "test123",
+			Password:       hashedPassword,
 			Email:          "test-1@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -216,11 +224,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:             uuid.New(),
-			Name:           "Test-2",
+			Name:           "TestAdmin",
 			FirstLastName:  "User",
 			SecondLastName: nil,
-			Password:       "test123",
-			Email:          "test-2@zen-cat.com",
+			Password:       hashedPassword,
+			Email:          "testAdmin@zen-cat.com",
 			Rol:            model.UserRolAdmin,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
