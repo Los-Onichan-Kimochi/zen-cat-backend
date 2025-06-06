@@ -124,6 +124,57 @@ func (l *Local) CreatePostgresqlLocal(
 	}, nil
 }
 
+// Creates multiple locals into postgresql DB and returns them.
+func (l *Local) BulkCreatePostgresqlLocals(
+	localsData []*schemas.CreateLocalRequest,
+	updatedBy string,
+) ([]*schemas.Local, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	localsModel := make([]*model.Local, len(localsData))
+	for i, localData := range localsData {
+		localsModel[i] = &model.Local{
+			Id:             uuid.New(),
+			LocalName:      localData.LocalName,
+			StreetName:     localData.StreetName,
+			BuildingNumber: localData.BuildingNumber,
+			District:       localData.District,
+			Province:       localData.Province,
+			Region:         localData.Region,
+			Reference:      localData.Reference,
+			Capacity:       localData.Capacity,
+			ImageUrl:       localData.ImageUrl,
+			AuditFields: model.AuditFields{
+				UpdatedBy: updatedBy,
+			},
+		}
+	}
+
+	if err := l.DaoPostgresql.Local.BulkCreateLocals(localsModel); err != nil {
+		return nil, &errors.BadRequestError.LocalNotCreated
+	}
+
+	locals := make([]*schemas.Local, len(localsModel))
+	for i, localModel := range localsModel {
+		locals[i] = &schemas.Local{
+			Id:             localModel.Id,
+			LocalName:      localModel.LocalName,
+			StreetName:     localModel.StreetName,
+			BuildingNumber: localModel.BuildingNumber,
+			District:       localModel.District,
+			Province:       localModel.Province,
+			Region:         localModel.Region,
+			Reference:      localModel.Reference,
+			Capacity:       localModel.Capacity,
+			ImageUrl:       localModel.ImageUrl,
+		}
+	}
+
+	return locals, nil
+}
+
 // Updates a local given fields in postgresql DB and returns it.
 func (l *Local) UpdatePostgresqlLocal(
 	id uuid.UUID,
@@ -176,6 +227,25 @@ func (l *Local) UpdatePostgresqlLocal(
 // Delets a plan from postgresql BD
 func (l *Local) DeletePostgresqlLocal(localId uuid.UUID) *errors.Error {
 	if err := l.DaoPostgresql.Local.DeleteLocal(localId); err != nil {
+		return &errors.BadRequestError.LocalNotSoftDeleted
+	}
+
+	return nil
+}
+
+// Bulk deletes locals from postgresql DB
+func (l *Local) BulkDeletePostgresqlLocals(localIds []string) *errors.Error {
+	// Convert string IDs to UUIDs
+	uuidIds := make([]uuid.UUID, len(localIds))
+	for i, id := range localIds {
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			return &errors.UnprocessableEntityError.InvalidLocalId
+		}
+		uuidIds[i] = parsedId
+	}
+
+	if err := l.DaoPostgresql.Local.BulkDeleteLocals(uuidIds); err != nil {
 		return &errors.BadRequestError.LocalNotSoftDeleted
 	}
 

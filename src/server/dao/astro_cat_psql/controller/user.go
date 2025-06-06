@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm/clause"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
@@ -66,6 +67,11 @@ func (u *User) FetchUsers() ([]*model.User, error) {
 }
 
 func (u *User) CreateUser(user *model.User) error {
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashedPassword
 	return u.PostgresqlDB.Create(user).Error
 }
 
@@ -135,6 +141,20 @@ func (u *User) DeleteUser(userId uuid.UUID) error {
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
+
+	return nil
+}
+
+func (u *User) BulkDeleteUsers(userIds []uuid.UUID) error {
+	if len(userIds) == 0 {
+		return nil
+	}
+
+	result := u.PostgresqlDB.Delete(&model.User{}, "id IN (?)", userIds)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
 

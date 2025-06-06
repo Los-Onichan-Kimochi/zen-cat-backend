@@ -479,3 +479,22 @@ func (u *User) BulkDeletePostgresqlUser(
 	}
 	return nil
 }
+
+// Bulk deletes users from postgresql DB
+func (u *User) BulkDeletePostgresqlUsers(userIds []string) *errors.Error {
+	// Convert string IDs to UUIDs
+	uuidIds := make([]uuid.UUID, len(userIds))
+	for i, id := range userIds {
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			return &errors.UnprocessableEntityError.InvalidUserId
+		}
+		uuidIds[i] = parsedId
+	}
+
+	if err := u.DaoPostgresql.User.BulkDeleteUsers(uuidIds); err != nil {
+		return &errors.BadRequestError.UserNotSoftDeleted
+	}
+
+	return nil
+}

@@ -132,7 +132,6 @@ func (a *Api) UpdateUser(c echo.Context) error {
 // @Failure 			400 {object} errors.Error "Bad Request"
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			404 {object} errors.Error "Not Found"
-// @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
 // @Router 				/user/{userId}/ [delete]
 func (a *Api) DeleteUser(c echo.Context) error {
@@ -140,9 +139,37 @@ func (a *Api) DeleteUser(c echo.Context) error {
 	if parseErr != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
 	}
+
 	if err := a.BllController.User.DeleteUser(userId); err != nil {
 		return errors.HandleError(*err, c)
 	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Delete Users.
+// @Description 		Bulk delete users given their ids.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteUserRequest true  "Bulk Delete User Request"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/bulk-delete/ [delete]
+func (a *Api) BulkDeleteUsers(c echo.Context) error {
+	var request schemas.BulkDeleteUserRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.User.BulkDeleteUsers(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
 	return c.NoContent(http.StatusNoContent)
 }
 
