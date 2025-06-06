@@ -28,3 +28,11 @@ type UpdatePlanRequest struct {
 	Type             *model.PlanType `json:"type"`
 	ReservationLimit *int            `json:"reservation_limit"`
 }
+
+type BulkCreatePlanRequest struct {
+	Plans []*CreatePlanRequest `json:"plans"`
+}
+
+type BulkDeletePlanRequest struct {
+	Plans []uuid.UUID `json:"plans"`
+}

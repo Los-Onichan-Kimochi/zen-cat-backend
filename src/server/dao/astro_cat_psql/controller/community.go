@@ -114,3 +114,21 @@ func (c *Community) DeleteCommunity(communityId uuid.UUID) error {
 func (c *Community) BulkCreateCommunities(communities []*model.Community) error {
 	return c.PostgresqlDB.Create(&communities).Error
 }
+
+// Batch deletes multiple communities given their IDs.
+func (c *Community) BulkDeleteCommunities(communityIds []uuid.UUID) error {
+	if len(communityIds) == 0 {
+		return nil
+	}
+
+	result := c.PostgresqlDB.Where("id IN ?", communityIds).Delete(&model.Community{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
