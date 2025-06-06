@@ -119,7 +119,11 @@ definitions:
     type: object
   schemas.BulkDeleteLocalRequest:
     properties:
-      locals:
+      ids:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.BulkDeletePlanRequest:
     properties:
       plans:

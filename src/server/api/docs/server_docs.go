@@ -5328,6 +5328,10 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CreateLocalRequest"
+                    }
+                }
+            }
+        },
         "schemas.BulkCreatePlanRequest": {
             "type": "object",
             "properties": {
@@ -5386,7 +5390,14 @@ const docTemplateserver = `{
         "schemas.BulkDeleteLocalRequest": {
             "type": "object",
             "properties": {
-                "locals": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "schemas.BulkDeletePlanRequest": {
             "type": "object",
             "properties": {

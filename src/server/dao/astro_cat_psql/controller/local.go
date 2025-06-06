@@ -131,3 +131,25 @@ func (l *Local) DeleteLocal(id uuid.UUID) error {
 
 	return nil
 }
+
+//Creates multiple locals in a batch.
+func (l *Local) BulkCreateLocals(locals []*model.Local) error {
+	return l.PostgresqlDB.Create(&locals).Error
+}
+
+// Batch deletes multiple professionals given their IDs.
+func (l *Local) BulkDeleteLocals(localIds []uuid.UUID) error {
+	if len(localIds) == 0 {
+		return nil
+	}
+
+	result := l.PostgresqlDB.Where("id IN ?", localIds).Delete(&model.Local{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
