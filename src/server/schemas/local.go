@@ -42,3 +42,7 @@ type UpdateLocalRequest struct {
 	Capacity       *int    `json:"capacity"`
 	ImageUrl       *string `json:"image_url"`
 }
+
+type BulkDeleteLocalRequest struct {
+	Locals []string `json:"locals"`
+}

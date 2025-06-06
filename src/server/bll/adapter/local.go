@@ -181,3 +181,22 @@ func (l *Local) DeletePostgresqlLocal(localId uuid.UUID) *errors.Error {
 
 	return nil
 }
+
+// Bulk deletes locals from postgresql DB
+func (l *Local) BulkDeletePostgresqlLocals(localIds []string) *errors.Error {
+	// Convert string IDs to UUIDs
+	uuidIds := make([]uuid.UUID, len(localIds))
+	for i, id := range localIds {
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			return &errors.UnprocessableEntityError.InvalidLocalId
+		}
+		uuidIds[i] = parsedId
+	}
+
+	if err := l.DaoPostgresql.Local.BulkDeleteLocals(uuidIds); err != nil {
+		return &errors.BadRequestError.LocalNotSoftDeleted
+	}
+
+	return nil
+}

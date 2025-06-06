@@ -123,14 +123,26 @@ func (u *User) UpdateUser(
 }
 
 func (u *User) DeleteUser(userId uuid.UUID) error {
-	result := u.PostgresqlDB.Model(&model.User{}).
-		Where("id = ?", userId).
-		Update("deleted_at", gorm.Expr("NOW()"))
+	result := u.PostgresqlDB.Delete(&model.User{}, "id = ?", userId)
 	if result.Error != nil {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
+
+	return nil
+}
+
+func (u *User) BulkDeleteUsers(userIds []uuid.UUID) error {
+	if len(userIds) == 0 {
+		return nil
+	}
+
+	result := u.PostgresqlDB.Delete(&model.User{}, "id IN (?)", userIds)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }

@@ -86,3 +86,12 @@ func (l *Local) UpdateLocal(
 func (l *Local) DeleteLocal(localId uuid.UUID) *errors.Error {
 	return l.Adapter.Local.DeletePostgresqlLocal(localId)
 }
+
+// Bulk deletes locals.
+func (l *Local) BulkDeleteLocals(
+	bulkDeleteLocalData schemas.BulkDeleteLocalRequest,
+) *errors.Error {
+	return l.Adapter.Local.BulkDeletePostgresqlLocals(
+		bulkDeleteLocalData.Locals,
+	)
+}

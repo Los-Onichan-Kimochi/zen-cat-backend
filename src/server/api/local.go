@@ -152,3 +152,29 @@ func (a *Api) DeleteLocal(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+// @Summary 			Bulk Delete Locals.
+// @Description 		Bulk delete locals given their ids.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteLocalRequest true  "Bulk Delete Local Request"
+// @Success 			204 "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/bulk-delete/ [delete]
+func (a *Api) BulkDeleteLocals(c echo.Context) error {
+	var request schemas.BulkDeleteLocalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.Local.BulkDeleteLocals(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
