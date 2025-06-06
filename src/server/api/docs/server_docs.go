@@ -200,7 +200,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-plan/bulk/": {
+        "/community-plan/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -273,7 +273,9 @@ const docTemplateserver = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/community-plan/bulk-delete/": {
             "delete": {
                 "security": [
                     {

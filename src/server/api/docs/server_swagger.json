@@ -193,7 +193,7 @@
                 }
             }
         },
-        "/community-plan/bulk/": {
+        "/community-plan/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -266,7 +266,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/community-plan/bulk-delete/": {
             "delete": {
                 "security": [
                     {
