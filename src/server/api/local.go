@@ -208,6 +208,5 @@ func (a *Api) BulkDeleteLocals(c echo.Context) error {
 	if err := a.BllController.Local.BulkDeleteLocals(request); err != nil {
 		return errors.HandleError(*err, c)
 	}
-
 	return c.NoContent(http.StatusNoContent)
 }
