@@ -51,5 +51,9 @@ type UpdateUserRequest struct {
 }
 
 type BulkDeleteUserRequest struct {
-	Users []string `json:"users"`
+	Users []uuid.UUID `json:"users"`
+}
+
+type BulkCreateUserRequest struct {
+	Users []*CreateUserRequest `json:"users"`
 }

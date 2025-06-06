@@ -93,6 +93,8 @@ func (l *Login) Register(
 		string(schemas.UserRolClient),
 		imageUrl,
 		"SYSTEM",
+		nil,
+		nil,
 	)
 	if err != nil {
 		return nil, err

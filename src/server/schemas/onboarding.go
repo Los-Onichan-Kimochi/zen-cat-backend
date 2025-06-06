@@ -1,6 +1,26 @@
 package schemas
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type DocumentType string
+
+const (
+	DocumentTypeDNI           DocumentType = "DNI"
+	DocumentTypeForeignerCard DocumentType = "FOREIGNER_CARD"
+	DocumentTypePassport      DocumentType = "PASSPORT"
+)
+
+type Gender string
+
+const (
+	GenderMale   Gender = "MALE"
+	GenderFemale Gender = "FEMALE"
+	GenderOther  Gender = "OTHER"
+)
 
 type IdentificationDocument struct {
 	Id             uuid.UUID `json:"id"`
@@ -9,13 +29,20 @@ type IdentificationDocument struct {
 }
 
 type Onboarding struct {
-	Id                     uuid.UUID              `json:"id"`
-	PhoneNumber            string                 `json:"phone_number"`
-	Address                string                 `json:"address"`
-	District               string                 `json:"district"`
-	City                   string                 `json:"city"`
-	PostalCode             string                 `json:"postal_code"`
-	IdentificationDocument IdentificationDocument `json:"identification_document"`
+	Id uuid.UUID `json:"id"`
+	// Documento
+	DocumentType   DocumentType `json:"document_type"`
+	DocumentNumber string       `json:"document_number"`
+	// Contacto
+	PhoneNumber string `json:"phone_number"`
+	// Datos personales adicionales
+	BirthDate *time.Time `json:"birth_date"`
+	Gender    *Gender    `json:"gender"`
+	// Dirección
+	City       string `json:"city"`
+	PostalCode string `json:"postal_code"`
+	District   string `json:"district"`
+	Address    string `json:"address"`
 }
 
 type Onboardings struct {
@@ -24,19 +51,33 @@ type Onboardings struct {
 }
 
 type CreateOnboardingRequest struct {
-	PhoneNumber            string                 `json:"phone_number"`
-	Address                string                 `json:"address"`
-	District               string                 `json:"district"`
-	City                   string                 `json:"city"`
-	PostalCode             string                 `json:"postal_code"`
-	IdentificationDocument IdentificationDocument `json:"identification_document"`
+	// Documento
+	DocumentType   DocumentType `json:"document_type" binding:"required"`
+	DocumentNumber string       `json:"document_number" binding:"required"`
+	// Contacto
+	PhoneNumber string `json:"phone_number" binding:"required"`
+	// Datos personales adicionales
+	BirthDate *time.Time `json:"birth_date"`
+	Gender    *Gender    `json:"gender"`
+	// Dirección
+	City       string `json:"city" binding:"required"`
+	PostalCode string `json:"postal_code" binding:"required"`
+	District   string `json:"district" binding:"required"`
+	Address    string `json:"address" binding:"required"`
 }
 
 type UpdateOnboardingRequest struct {
-	PhoneNumber            *string                 `json:"phone_number"`
-	Address                *string                 `json:"address"`
-	District               *string                 `json:"district"`
-	City                   *string                 `json:"city"`
-	PostalCode             *string                 `json:"postal_code"`
-	IdentificationDocument *IdentificationDocument `json:"identification_document"`
+	// Documento
+	DocumentType   *DocumentType `json:"document_type"`
+	DocumentNumber *string       `json:"document_number"`
+	// Contacto
+	PhoneNumber *string `json:"phone_number"`
+	// Datos personales adicionales
+	BirthDate *time.Time `json:"birth_date"`
+	Gender    *Gender    `json:"gender"`
+	// Dirección
+	City       *string `json:"city"`
+	PostalCode *string `json:"postal_code"`
+	District   *string `json:"district"`
+	Address    *string `json:"address"`
 }
