@@ -49,3 +49,11 @@ type UpdateUserRequest struct {
 	Onboarding     *Onboarding   `json:"onboarding,omitempty"`
 	Memberships    []*Membership `json:"memberships,omitempty"`
 }
+
+type BulkDeleteUserRequest struct {
+	Users []uuid.UUID `json:"users"`
+}
+
+type BulkCreateUserRequest struct {
+	Users []*CreateUserRequest `json:"users"`
+}

@@ -99,6 +99,38 @@ func (a *Api) CreatePlan(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
+// @Summary 			Bulk Create Plans.
+// @Description 		Creates multiple plans in a batch.
+// @Tags 				Plan
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkCreatePlanRequest true  "Bulk Create Plan Request"
+// @Success 			201 {object} schemas.Plans "Created"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/plan/bulk-create/ [post]
+func (a *Api) BulkCreatePlans(c echo.Context) error {
+	var request schemas.BulkCreatePlanRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	updateBy := "ADMIN"
+	response, err := a.BllController.Plan.BulkCreatePlans(
+		request.Plans,
+		updateBy,
+	)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
+
 // @Summary 			Update Plan.
 // @Description 		Update the plan information.
 // @Tags 				Plan
@@ -156,6 +188,33 @@ func (a *Api) DeletePlan(c echo.Context) error {
 	}
 
 	if err := a.BllController.Plan.DeletePlan(planId); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+// @Summary 			Bulk Delete Plans.
+// @Description 		Bulk deletes plans given their ids.
+// @Tags 				Plan
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeletePlanRequest true  "Bulk Delete Plan Request"
+// @Success 			204 {object} schemas.Plan "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/plan/bulk-delete/ [delete]
+func (a *Api) BulkDeletePlans(c echo.Context) error {
+	var request schemas.BulkDeletePlanRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.Plan.BulkDeletePlans(request); err != nil {
 		return errors.HandleError(*err, c)
 	}
 

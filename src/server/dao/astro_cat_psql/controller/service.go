@@ -118,3 +118,17 @@ func (l *Service) DeleteService(id uuid.UUID) error {
 
 	return nil
 }
+
+// Bulk deletes services given their ids.
+func (s *Service) BulkDeleteServices(serviceIds []uuid.UUID) error {
+	if len(serviceIds) == 0 {
+		return nil
+	}
+
+	result := s.PostgresqlDB.Delete(&model.Service{}, "id IN (?)", serviceIds)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}

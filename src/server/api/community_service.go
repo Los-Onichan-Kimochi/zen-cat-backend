@@ -118,7 +118,7 @@ func (a *Api) DeleteCommunityService(c echo.Context) error {
 // @Failure 			409 {object} errors.Error "Conflict (Association already exists)"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity (Invalid UUIDs or request body)"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-service/bulk/ [post]
+// @Router 				/community-service/bulk-create/ [post]
 func (a *Api) BulkCreateCommunityServices(c echo.Context) error {
 	updatedBy := "ADMIN"
 
@@ -151,7 +151,7 @@ func (a *Api) BulkCreateCommunityServices(c echo.Context) error {
 // @Failure 			404 {object} errors.Error "Not Found"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/community-service/bulk/ [delete]
+// @Router 				/community-service/bulk-delete/ [delete]
 func (a *Api) BulkDeleteCommunityServices(c echo.Context) error {
 	var request schemas.BulkDeleteCommunityServiceRequest
 	if err := c.Bind(&request); err != nil {

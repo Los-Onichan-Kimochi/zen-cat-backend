@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm/clause"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
@@ -26,7 +27,23 @@ func (u *User) GetUser(userId uuid.UUID) (*model.User, error) {
 		Preload("Memberships").
 		Preload("Memberships.Community").
 		Preload("Memberships.Plan").
+		Preload("Onboarding").
 		First(&user, "id = ?", userId)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
+}
+
+func (u *User) GetUserByEmail(email string) (*model.User, error) {
+	user := &model.User{}
+	result := u.PostgresqlDB.
+		Preload("Memberships").
+		Preload("Memberships.Community").
+		Preload("Memberships.Plan").
+		Preload("Onboarding").
+		First(&user, "email = ?", email)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -40,6 +57,7 @@ func (u *User) FetchUsers() ([]*model.User, error) {
 		Preload("Memberships").
 		Preload("Memberships.Community").
 		Preload("Memberships.Plan").
+		Preload("Onboarding").
 		Find(&users)
 	if result.Error != nil {
 		return nil, result.Error
@@ -49,6 +67,11 @@ func (u *User) FetchUsers() ([]*model.User, error) {
 }
 
 func (u *User) CreateUser(user *model.User) error {
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = hashedPassword
 	return u.PostgresqlDB.Create(user).Error
 }
 
@@ -104,18 +127,41 @@ func (u *User) UpdateUser(
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
 	return &user, nil
 }
 
 func (u *User) DeleteUser(userId uuid.UUID) error {
-	result := u.PostgresqlDB.Model(&model.User{}).
-		Where("id = ?", userId).
-		Update("deleted_at", gorm.Expr("NOW()"))
+	result := u.PostgresqlDB.Delete(&model.User{}, "id = ?", userId)
 	if result.Error != nil {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
+
+func (u *User) BulkCreateUsers(users []*model.User) error {
+	return u.PostgresqlDB.Create(&users).Error
+}
+
+func (u *User) BulkDeleteUsers(userIds []uuid.UUID) error {
+	if len(userIds) == 0 {
+		u.logger.Warn("BulkDeleteUsers - No user IDs provided")
+		return nil
+	}
+
+	result := u.PostgresqlDB.Where("id IN ?", userIds).Delete(&model.User{})
+	if result.Error != nil {
+		u.logger.Error("BulkDeleteUsers - Error deleting users: ", result.Error)
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		u.logger.Error("BulkDeleteUsers - No users deleted")
 		return gorm.ErrRecordNotFound
 	}
 	return nil

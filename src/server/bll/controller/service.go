@@ -90,4 +90,13 @@ func (l *Service) DeleteService(serviceId uuid.UUID) *errors.Error {
 	return l.Adapter.Service.DeletePostgresqlService(serviceId)
 }
 
+// Bulk deletes services.
+func (s *Service) BulkDeleteServices(
+	bulkDeleteServiceData schemas.BulkDeleteServiceRequest,
+) *errors.Error {
+	return s.Adapter.Service.BulkDeletePostgresqlServices(
+		bulkDeleteServiceData.Services,
+	)
+}
+
 // TODO: Add BulkCreateCommunities (Batch)
