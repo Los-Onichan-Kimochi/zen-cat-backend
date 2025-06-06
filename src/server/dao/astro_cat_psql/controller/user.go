@@ -145,19 +145,6 @@ func (u *User) DeleteUser(userId uuid.UUID) error {
 	return nil
 }
 
-func (u *User) BulkDeleteUsers(userIds []uuid.UUID) error {
-	if len(userIds) == 0 {
-		return nil
-	}
-
-	result := u.PostgresqlDB.Delete(&model.User{}, "id IN (?)", userIds)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
-}
-
 func (u *User) BulkCreateUsers(users []*model.User) error {
 	return u.PostgresqlDB.Create(&users).Error
 }

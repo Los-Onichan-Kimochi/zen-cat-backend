@@ -187,13 +187,6 @@ definitions:
           type: string
         type: array
     type: object
-  schemas.BulkDeleteUserRequest:
-    properties:
-      users:
-        items:
-          type: string
-        type: array
-    type: object
   schemas.CheckConflictRequest:
     properties:
       date:
@@ -5008,7 +5001,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Bulk deletes users given their ids.
+      description: Bulk delete users given their ids.
       parameters:
       - description: Bulk Delete User Request
         in: body
@@ -5019,20 +5012,14 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemas.User'
+        "204":
+          description: No Content
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.Error'
         "401":
           description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/errors.Error'
         "422":

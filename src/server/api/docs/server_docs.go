@@ -5916,7 +5916,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Bulk deletes users given their ids.",
+                "description": "Bulk delete users given their ids.",
                 "consumes": [
                     "application/json"
                 ],
@@ -5939,11 +5939,8 @@ const docTemplateserver = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.User"
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5953,12 +5950,6 @@ const docTemplateserver = `{
                     },
                     "401": {
                         "description": "Missing or malformed JWT",
-                        "schema": {
-                            "$ref": "#/definitions/errors.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
