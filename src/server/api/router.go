@@ -82,6 +82,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
+	local.POST("/bulk-create/", a.BulkCreateLocals)
+	local.DELETE("/bulk-delete/", a.BulkDeleteLocals)
 
 	// Plan endpoints (all protected)
 	plan := a.Echo.Group("/plan")

@@ -152,3 +152,58 @@ func (a *Api) DeleteLocal(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+
+// @Summary 			Bulk Create Locals.
+// @Description 		Creates multiple locals in a batch.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkCreateLocalRequest true  "Bulk Create Local Request"
+// @Success 			201 {object} schemas.Local "Created"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/bulk-create/ [post]
+func (a *Api) BulkCreateLocals(c echo.Context) error {
+	var request schemas.BulkCreateLocalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+	updateBy := "ADMIN"
+
+	response, err := a.BllController.Local.BulkCreateLocals(request.Locals, updateBy)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.JSON(http.StatusCreated, response)
+}
+
+// @Summary 			Bulk Delete Locals.
+// @Description 		Bulk deletes locals given their ids.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request	body   schemas.BulkDeleteLocalRequest true  "Bulk Delete Local Request"
+// @Success 			204 {object} schemas.Local "No Content"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/bulk-delete/ [delete]
+func (a *Api) BulkDeleteLocals(c echo.Context) error {
+	var request schemas.BulkDeleteLocalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	if err := a.BllController.Local.BulkDeleteLocals(request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
