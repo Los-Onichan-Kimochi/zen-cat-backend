@@ -17,6 +17,11 @@ import (
 
 type CustomLogger struct{}
 
+// Helper function to create string pointers
+func strPtr(s string) *string {
+	return &s
+}
+
 func (l *CustomLogger) LogMode(level logger.LogLevel) logger.Interface {
 	return l
 }
@@ -230,6 +235,58 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:             uuid.New(),
+			Name:           "María",
+			FirstLastName:  "González",
+			SecondLastName: strPtr("López"),
+			Password:       "maria123",
+			Email:          "maria.gonzalez@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Carlos",
+			FirstLastName:  "Mendoza",
+			SecondLastName: strPtr("Ruiz"),
+			Password:       "carlos123",
+			Email:          "carlos.mendoza@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Ana",
+			FirstLastName:  "Martínez",
+			SecondLastName: nil,
+			Password:       "ana123",
+			Email:          "ana.martinez@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Luis",
+			FirstLastName:  "Rodríguez",
+			SecondLastName: strPtr("Flores"),
+			Password:       "luis123",
+			Email:          "luis.rodriguez@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, user := range users {
 		if err := astroCatPsqlDB.Create(user).Error; err != nil {
@@ -308,6 +365,48 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:             uuid.New(),
+			Name:           "Pedro",
+			FirstLastName:  "Sánchez",
+			SecondLastName: strPtr("García"),
+			Specialty:      "Entrenamiento Personal",
+			Email:          "pedro.sanchez@gym.com",
+			PhoneNumber:    "555-0123",
+			Type:           model.ProfessionalTypeGymTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Laura",
+			FirstLastName:  "Fernández",
+			SecondLastName: nil,
+			Specialty:      "Yoga Avanzado",
+			Email:          "laura.fernandez@yoga.com",
+			PhoneNumber:    "555-0456",
+			Type:           model.ProfessionalTypeYogaTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Roberto",
+			FirstLastName:  "Díaz",
+			SecondLastName: strPtr("Morales"),
+			Specialty:      "Medicina General",
+			Email:          "roberto.diaz@medic.com",
+			PhoneNumber:    "555-0789",
+			Type:           model.ProfessionalTypeMedic,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, professional := range professionals {
 		if err := astroCatPsqlDB.Create(professional).Error; err != nil {
@@ -343,6 +442,36 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Region:         "Metropolitan",
 			Reference:      "Near Business Center",
 			Capacity:       15,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			LocalName:      "Studio Zen",
+			StreetName:     "Wellness Blvd",
+			BuildingNumber: "789",
+			District:       "Wellness",
+			Province:       "Central",
+			Region:         "Metropolitan",
+			Reference:      "Top floor wellness center",
+			Capacity:       12,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			LocalName:      "Fitness Plus",
+			StreetName:     "Sports Ave",
+			BuildingNumber: "321",
+			District:       "Sports",
+			Province:       "Central",
+			Region:         "Metropolitan",
+			Reference:      "Next to Sports Complex",
+			Capacity:       25,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -445,35 +574,140 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy sessions
+	// Obtener la zona horaria de Lima (UTC-5)
+	limaLocation, _ := time.LoadLocation("America/Lima")
+	now := time.Now().In(limaLocation)
+	baseDate := now.Truncate(24 * time.Hour) // Start of today in Lima timezone
+
 	sessions := []*model.Session{
+		// Sesión que ya terminó (ayer)
 		{
 			Id:              uuid.New(),
 			Title:           "Morning Yoga",
-			Date:            time.Now(),
-			StartTime:       time.Now(),
-			EndTime:         time.Now().Add(time.Hour),
-			State:           model.SessionStateOnGoing,
-			RegisteredCount: 5,
+			Date:            baseDate.Add(-24 * time.Hour),             // Ayer
+			StartTime:       baseDate.Add(-24*time.Hour + 8*time.Hour), // Ayer 8:00 AM
+			EndTime:         baseDate.Add(-24*time.Hour + 9*time.Hour), // Ayer 9:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 5, // Test-1, María, Carlos(anulled), Ana, Luis
 			Capacity:        20,
 			SessionLink:     nil,
-			ProfessionalId:  professionals[0].Id,
-			LocalId:         &locals[0].Id,
+			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
+			LocalId:         &locals[1].Id,       // Local Yoga
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Sesión de hoy por la tarde (futura si es mañana, pasada si es noche)
+		{
+			Id:              uuid.New(),
+			Title:           "Evening Gym",
+			Date:            baseDate,
+			StartTime:       baseDate.Add(18 * time.Hour), // Hoy 6:00 PM
+			EndTime:         baseDate.Add(19 * time.Hour), // Hoy 7:00 PM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 3, // Admin, María, Carlos(cancelled)
+			Capacity:        15,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[0].Id,       // Local Gym
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Sesión que está en curso (hora actual +/- 30 min)
+		{
+			Id:              uuid.New(),
+			Title:           "Advanced Yoga Workshop",
+			Date:            baseDate,
+			StartTime:       now.Add(-30 * time.Minute), // Empezó hace 30 minutos
+			EndTime:         now.Add(30 * time.Minute),  // Termina en 30 minutos
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 4, // Test-1, María, Ana, Luis(done)
+			Capacity:        12,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
+			LocalId:         &locals[2].Id,       // Studio Zen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Sesión futura para mañana
+		{
+			Id:              uuid.New(),
+			Title:           "Personal Training Session",
+			Date:            baseDate.Add(24 * time.Hour),              // Tomorrow
+			StartTime:       baseDate.Add(24*time.Hour + 16*time.Hour), // 4:00 PM tomorrow
+			EndTime:         baseDate.Add(24*time.Hour + 17*time.Hour), // 5:00 PM tomorrow
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 1, // Carlos
+			Capacity:        4,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[3].Id,       // Fitness Plus
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:              uuid.New(),
-			Title:           "Evening Gym",
-			Date:            time.Now().Add(time.Hour * 2),
-			StartTime:       time.Now().Add(time.Hour * 2),
-			EndTime:         time.Now().Add(time.Hour * 3),
+			Title:           "Medical Consultation",
+			Date:            baseDate.Add(48 * time.Hour),              // Day after tomorrow
+			StartTime:       baseDate.Add(48*time.Hour + 14*time.Hour), // 2:00 PM
+			EndTime:         baseDate.Add(48*time.Hour + 15*time.Hour), // 3:00 PM
 			State:           model.SessionStateScheduled,
-			RegisteredCount: 3,
+			RegisteredCount: 2, // Ana, Luis
+			Capacity:        5,
+			SessionLink:     strPtr("https://meet.example.com/medical-session"),
+			ProfessionalId:  professionals[1].Id, // Jane - Medic
+			LocalId:         nil,                 // Virtual session
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Weekend Yoga Flow",
+			Date:            baseDate.Add(72 * time.Hour),              // 3 days from now
+			StartTime:       baseDate.Add(72*time.Hour + 9*time.Hour),  // 9:00 AM
+			EndTime:         baseDate.Add(72*time.Hour + 10*time.Hour), // 10:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 5, // Test-1, Admin, María, Carlos, Ana
 			Capacity:        15,
 			SessionLink:     nil,
-			ProfessionalId:  professionals[1].Id,
-			LocalId:         &locals[1].Id,
+			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
+			LocalId:         &locals[1].Id,       // Local Yoga
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Strength Training Bootcamp",
+			Date:            baseDate.Add(96 * time.Hour),             // 4 days from now
+			StartTime:       baseDate.Add(96*time.Hour + 7*time.Hour), // 7:00 AM
+			EndTime:         baseDate.Add(96*time.Hour + 8*time.Hour), // 8:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 5, // Test-1, María, Carlos, Ana, Luis(done)
+			Capacity:        25,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[3].Id,       // Fitness Plus
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "General Health Checkup",
+			Date:            baseDate.Add(120 * time.Hour),              // 5 days from now
+			StartTime:       baseDate.Add(120*time.Hour + 11*time.Hour), // 11:00 AM
+			EndTime:         baseDate.Add(120*time.Hour + 12*time.Hour), // 12:00 PM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 1, // Admin
+			Capacity:        3,
+			SessionLink:     strPtr("https://meet.example.com/health-checkup"),
+			ProfessionalId:  professionals[4].Id, // Roberto - General Medicine
+			LocalId:         nil,                 // Virtual session
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -488,13 +722,14 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy reservations
 	reservations := []*model.Reservation{
+		// Reservations for Morning Yoga (sessions[0])
 		{
 			Id:               uuid.New(),
-			Name:             "Yoga Class Reservation",
-			ReservationTime:  time.Now().Add(time.Hour * 24),
+			Name:             "Morning Yoga - Test User",
+			ReservationTime:  baseDate.Add(8 * time.Hour), // Same as session start time
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id,
+			UserId:           users[0].Id, // Test-1
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -502,12 +737,314 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:               uuid.New(),
-			Name:             "Gym Session Reservation",
-			ReservationTime:  time.Now().Add(time.Hour * 48),
+			Name:             "Morning Yoga - María",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id,
+			UserId:           users[2].Id, // María
+			SessionId:        sessions[0].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Morning Yoga - Carlos",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
+			State:            model.ReservationStateAnulled,
+			LastModification: time.Now(),
+			UserId:           users[3].Id, // Carlos
+			SessionId:        sessions[0].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Morning Yoga - Ana",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[4].Id, // Ana
+			SessionId:        sessions[0].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Morning Yoga - Luis",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[5].Id, // Luis
+			SessionId:        sessions[0].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Evening Gym (sessions[1])
+		{
+			Id:               uuid.New(),
+			Name:             "Evening Gym - Admin User",
+			ReservationTime:  baseDate.Add(18 * time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[1].Id, // Test-2 (Admin)
 			SessionId:        sessions[1].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Evening Gym - María",
+			ReservationTime:  baseDate.Add(18 * time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[2].Id, // María
+			SessionId:        sessions[1].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Evening Gym - Carlos",
+			ReservationTime:  baseDate.Add(18 * time.Hour),
+			State:            model.ReservationStateCancelled,
+			LastModification: time.Now(),
+			UserId:           users[3].Id, // Carlos
+			SessionId:        sessions[1].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Advanced Yoga Workshop (sessions[2])
+		{
+			Id:               uuid.New(),
+			Name:             "Advanced Yoga Workshop - Test User",
+			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[0].Id, // Test-1
+			SessionId:        sessions[2].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Advanced Yoga Workshop - María",
+			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[2].Id, // María
+			SessionId:        sessions[2].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Advanced Yoga Workshop - Ana",
+			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[4].Id, // Ana
+			SessionId:        sessions[2].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Advanced Yoga Workshop - Luis",
+			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
+			State:            model.ReservationStateDone,
+			LastModification: time.Now(),
+			UserId:           users[5].Id, // Luis
+			SessionId:        sessions[2].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Personal Training Session (sessions[3])
+		{
+			Id:               uuid.New(),
+			Name:             "Personal Training - Carlos",
+			ReservationTime:  baseDate.Add(24*time.Hour + 16*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[3].Id, // Carlos
+			SessionId:        sessions[3].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Medical Consultation (sessions[4])
+		{
+			Id:               uuid.New(),
+			Name:             "Medical Consultation - Ana",
+			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[4].Id, // Ana
+			SessionId:        sessions[4].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Medical Consultation - Luis",
+			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[5].Id, // Luis
+			SessionId:        sessions[4].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Weekend Yoga Flow (sessions[5])
+		{
+			Id:               uuid.New(),
+			Name:             "Weekend Yoga Flow - Test User",
+			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[0].Id, // Test-1
+			SessionId:        sessions[5].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Weekend Yoga Flow - Admin",
+			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[1].Id, // Test-2 (Admin)
+			SessionId:        sessions[5].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Weekend Yoga Flow - María",
+			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[2].Id, // María
+			SessionId:        sessions[5].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Weekend Yoga Flow - Carlos",
+			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[3].Id, // Carlos
+			SessionId:        sessions[5].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Weekend Yoga Flow - Ana",
+			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[4].Id, // Ana
+			SessionId:        sessions[5].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for Strength Training Bootcamp (sessions[6])
+		{
+			Id:               uuid.New(),
+			Name:             "Strength Training Bootcamp - Test User",
+			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[0].Id, // Test-1
+			SessionId:        sessions[6].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Strength Training Bootcamp - María",
+			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[2].Id, // María
+			SessionId:        sessions[6].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Strength Training Bootcamp - Carlos",
+			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[3].Id, // Carlos
+			SessionId:        sessions[6].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Strength Training Bootcamp - Ana",
+			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[4].Id, // Ana
+			SessionId:        sessions[6].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Strength Training Bootcamp - Luis",
+			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateDone,
+			LastModification: time.Now(),
+			UserId:           users[5].Id, // Luis
+			SessionId:        sessions[6].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+
+		// Reservations for General Health Checkup (sessions[7])
+		{
+			Id:               uuid.New(),
+			Name:             "General Health Checkup - Admin",
+			ReservationTime:  baseDate.Add(120*time.Hour + 11*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[1].Id, // Test-2 (Admin)
+			SessionId:        sessions[7].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},

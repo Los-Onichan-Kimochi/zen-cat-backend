@@ -50,6 +50,15 @@ func (l *Local) CreateLocal(local *model.Local) error {
 	return l.PostgresqlDB.Create(local).Error
 }
 
+// Creates multiple locals in a single transaction.
+func (l *Local) BulkCreateLocals(locals []*model.Local) error {
+	if len(locals) == 0 {
+		return nil
+	}
+
+	return l.PostgresqlDB.Create(locals).Error
+}
+
 // Updates a local given its model.
 func (l *Local) UpdateLocal(
 	id uuid.UUID,
@@ -127,6 +136,20 @@ func (l *Local) DeleteLocal(id uuid.UUID) error {
 	}
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
+	}
+
+	return nil
+}
+
+// Bulk deletes locals given their ids.
+func (l *Local) BulkDeleteLocals(localIds []uuid.UUID) error {
+	if len(localIds) == 0 {
+		return nil
+	}
+
+	result := l.PostgresqlDB.Delete(&model.Local{}, "id IN (?)", localIds)
+	if result.Error != nil {
+		return result.Error
 	}
 
 	return nil
