@@ -75,13 +75,6 @@ definitions:
           $ref: '#/definitions/schemas.CreateSessionRequest'
         type: array
     type: object
-  schemas.BulkCreateLocalRequest:
-    properties:
-      locals:
-        items:
-          $ref: '#/definitions/schemas.CreateLocalRequest'
-        type: array
-    type: object
   schemas.BulkCreatePlanRequest:
     properties:
       plans:
@@ -117,9 +110,6 @@ definitions:
           $ref: '#/definitions/schemas.DeleteCommunityServiceRequest'
         type: array
     type: object
-  schemas.BulkDeleteLocalRequest:
-    properties:
-      locals:
   schemas.BulkDeletePlanRequest:
     properties:
       plans:
@@ -903,8 +893,24 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -1995,94 +2001,6 @@ paths:
       security:
       - JWT: []
       summary: Update Local.
-      tags:
-      - Local
-  /local/bulk-create/:
-    post:
-      consumes:
-      - application/json
-      description: Creates multiple locals in a batch.
-      parameters:
-      - description: Bulk Create Local Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.BulkCreateLocalRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/schemas.Local'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Bulk Create Locals.
-      tags:
-      - Local
-  /local/bulk-delete/:
-    delete:
-      consumes:
-      - application/json
-      description: Bulk deletes locals given their ids.
-      parameters:
-      - description: Bulk Delete Local Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.BulkDeleteLocalRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            $ref: '#/definitions/schemas.Local'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Bulk Delete Locals.
       tags:
       - Local
   /login/:
