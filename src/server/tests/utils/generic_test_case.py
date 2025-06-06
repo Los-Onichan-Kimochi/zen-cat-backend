@@ -33,16 +33,11 @@ def create_test_case(test_case, n_parameters, equivalence_classes,
         idx += str(class_type)
         classes.append(equivalence_classes[parameter][class_type])
 
-    print(idx)
-
-
     indexes  = [0] * n_parameters
 
     while True:
         end, sub_test_case = create_sub_test_case(n_parameters, classes,
                                                   indexes, expected)
-        print(sub_test_case)
-        print(expected)
         specific_cases .append(sub_test_case)
 
         if end:

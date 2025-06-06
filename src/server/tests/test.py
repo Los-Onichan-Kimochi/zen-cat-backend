@@ -19,13 +19,13 @@ c_3 = "communityId=76035ca7-1d3b-4d7d-9091-fc55f7410e59"
 p_3 = "planId=eb71f5e0-589d-4f1b-86e7-696c30e92bfe"
 
 
-base = "http://localhost:8098/community-plan/plan//"
+base = "http://localhost:8098/community-plan/"
 
 url = base + "?" + "" #+ "&" + p_1 #+ "&" + c_2 + "&" + p_2
 
-response = requests.get(url)
+response = requests.get(url, params=None)
 data = response.json()
 
 # Pretty print the JSON
-#print(json.dumps(data, indent=4))
-print(json.dumps(test_cases_GET_fetch_3, indent=4))
+print(json.dumps(data, indent=4))
+#print(json.dumps(test_cases_GET_fetch_3, indent=4))
