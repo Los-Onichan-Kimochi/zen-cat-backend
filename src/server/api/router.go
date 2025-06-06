@@ -80,6 +80,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	local.GET("/:localId/", a.GetLocal)
 	local.GET("/", a.FetchLocals)
 	local.POST("/", a.CreateLocal)
+	local.POST("/bulk-create/", a.BulkCreateLocals)
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
 	local.DELETE("/bulk-delete/", a.BulkDeleteLocals)

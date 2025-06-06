@@ -50,6 +50,15 @@ func (l *Local) CreateLocal(local *model.Local) error {
 	return l.PostgresqlDB.Create(local).Error
 }
 
+// Creates multiple locals in a single transaction.
+func (l *Local) BulkCreateLocals(locals []*model.Local) error {
+	if len(locals) == 0 {
+		return nil
+	}
+
+	return l.PostgresqlDB.Create(locals).Error
+}
+
 // Updates a local given its model.
 func (l *Local) UpdateLocal(
 	id uuid.UUID,

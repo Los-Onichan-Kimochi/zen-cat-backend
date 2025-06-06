@@ -90,6 +90,39 @@ func (a *Api) CreateLocal(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
+// @Summary 			Bulk Create Locals.
+// @Description 		Creates multiple locals in a batch.
+// @Tags 				Local
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               request body schemas.BatchCreateLocalRequest true "Bulk Create Locals Request"
+// @Success 			201 {object} schemas.Locals "Created"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/local/bulk-create/ [post]
+func (a *Api) BulkCreateLocals(c echo.Context) error {
+	updatedBy := "ADMIN"
+
+	var request schemas.BatchCreateLocalRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, newErr := a.BllController.Local.BulkCreateLocals(
+		request.Locals,
+		updatedBy,
+	)
+	if newErr != nil {
+		return errors.HandleError(*newErr, c)
+	}
+
+	return c.JSON(http.StatusCreated, response)
+}
+
 // @Summary 			Update Local.
 // @Description 		Update the local information.
 // @Tags 				Local

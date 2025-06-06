@@ -54,6 +54,13 @@ definitions:
           $ref: '#/definitions/schemas.CreateCommunityServiceRequest'
         type: array
     type: object
+  schemas.BatchCreateLocalRequest:
+    properties:
+      locals:
+        items:
+          $ref: '#/definitions/schemas.CreateLocalRequest'
+        type: array
+    type: object
   schemas.BatchCreateServiceLocalRequest:
     properties:
       service_locals:
@@ -110,6 +117,13 @@ definitions:
           $ref: '#/definitions/schemas.DeleteCommunityServiceRequest'
         type: array
     type: object
+  schemas.BulkDeleteLocalRequest:
+    properties:
+      locals:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.BulkDeletePlanRequest:
     properties:
       plans:
@@ -120,6 +134,13 @@ definitions:
   schemas.BulkDeleteProfessionalRequest:
     properties:
       professionals:
+        items:
+          type: string
+        type: array
+    type: object
+  schemas.BulkDeleteReservationRequest:
+    properties:
+      reservations:
         items:
           type: string
         type: array
@@ -138,9 +159,23 @@ definitions:
           $ref: '#/definitions/schemas.DeleteServiceProfessionalRequest'
         type: array
     type: object
+  schemas.BulkDeleteServiceRequest:
+    properties:
+      services:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.BulkDeleteSessionRequest:
     properties:
       sessions:
+        items:
+          type: string
+        type: array
+    type: object
+  schemas.BulkDeleteUserRequest:
+    properties:
+      users:
         items:
           type: string
         type: array
@@ -302,6 +337,19 @@ definitions:
       specialty:
         type: string
       type:
+        type: string
+    type: object
+  schemas.CreateReservationRequest:
+    properties:
+      name:
+        type: string
+      reservation_time:
+        type: string
+      session_id:
+        type: string
+      state:
+        type: string
+      user_id:
         type: string
     type: object
   schemas.CreateServiceLocalRequest:
@@ -769,6 +817,19 @@ definitions:
       specialty:
         type: string
       type:
+        type: string
+    type: object
+  schemas.UpdateReservationRequest:
+    properties:
+      name:
+        type: string
+      reservation_time:
+        type: string
+      session_id:
+        type: string
+      state:
+        type: string
+      user_id:
         type: string
     type: object
   schemas.UpdateServiceRequest:
@@ -2002,6 +2063,88 @@ paths:
       summary: Update Local.
       tags:
       - Local
+  /local/bulk-create/:
+    post:
+      consumes:
+      - application/json
+      description: Creates multiple locals in a batch.
+      parameters:
+      - description: Bulk Create Locals Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BatchCreateLocalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Locals'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Create Locals.
+      tags:
+      - Local
+  /local/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk delete locals given their ids.
+      parameters:
+      - description: Bulk Delete Local Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteLocalRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Locals.
+      tags:
+      - Local
   /login/:
     post:
       consumes:
@@ -2768,7 +2911,82 @@ paths:
       summary: Fetch Reservations.
       tags:
       - Reservation
+    post:
+      consumes:
+      - application/json
+      description: Create a new reservation.
+      parameters:
+      - description: Create Reservation Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Reservation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Reservation.
+      tags:
+      - Reservation
   /reservation/{reservationId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a reservation given its id.
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: reservationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Reservation.
+      tags:
+      - Reservation
     get:
       consumes:
       - application/json
@@ -2809,6 +3027,92 @@ paths:
       security:
       - JWT: []
       summary: Get Reservation.
+      tags:
+      - Reservation
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing reservation.
+      parameters:
+      - description: Reservation ID
+        in: path
+        name: reservationId
+        required: true
+        type: string
+      - description: Update Reservation Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Reservation'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Reservation.
+      tags:
+      - Reservation
+  /reservation/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk delete reservations given their ids.
+      parameters:
+      - description: Bulk Delete Reservation Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteReservationRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Reservations.
       tags:
       - Reservation
   /service-local/:
@@ -3560,6 +3864,44 @@ paths:
       summary: Update Service.
       tags:
       - Service
+  /service/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk delete services given their ids.
+      parameters:
+      - description: Bulk Delete Service Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteServiceRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Services.
+      tags:
+      - Service
   /session/:
     get:
       consumes:
@@ -4071,10 +4413,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -4172,6 +4510,44 @@ paths:
       security:
       - JWT: []
       summary: Update User.
+      tags:
+      - User
+  /user/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk delete users given their ids.
+      parameters:
+      - description: Bulk Delete User Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete Users.
       tags:
       - User
 swagger: "2.0"

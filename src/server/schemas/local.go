@@ -43,6 +43,10 @@ type UpdateLocalRequest struct {
 	ImageUrl       *string `json:"image_url"`
 }
 
+type BatchCreateLocalRequest struct {
+	Locals []*CreateLocalRequest `json:"locals"`
+}
+
 type BulkDeleteLocalRequest struct {
 	Locals []string `json:"locals"`
 }
