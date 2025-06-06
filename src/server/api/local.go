@@ -153,6 +153,7 @@ func (a *Api) DeleteLocal(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+
 // @Summary 			Bulk Create Locals.
 // @Description 		Creates multiple locals in a batch.
 // @Tags 				Local
