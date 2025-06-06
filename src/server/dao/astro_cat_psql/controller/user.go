@@ -26,6 +26,7 @@ func (u *User) GetUser(userId uuid.UUID) (*model.User, error) {
 		Preload("Memberships").
 		Preload("Memberships.Community").
 		Preload("Memberships.Plan").
+		Preload("Onboarding").
 		First(&user, "id = ?", userId)
 	if result.Error != nil {
 		return nil, result.Error
@@ -40,6 +41,7 @@ func (u *User) GetUserByEmail(email string) (*model.User, error) {
 		Preload("Memberships").
 		Preload("Memberships.Community").
 		Preload("Memberships.Plan").
+		Preload("Onboarding").
 		First(&user, "email = ?", email)
 	if result.Error != nil {
 		return nil, result.Error
@@ -54,6 +56,7 @@ func (u *User) FetchUsers() ([]*model.User, error) {
 		Preload("Memberships").
 		Preload("Memberships.Community").
 		Preload("Memberships.Plan").
+		Preload("Onboarding").
 		Find(&users)
 	if result.Error != nil {
 		return nil, result.Error

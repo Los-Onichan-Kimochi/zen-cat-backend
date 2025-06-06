@@ -56,8 +56,9 @@ func (u *User) CreateUser(
 		createUserRequest.Email,
 		createUserRequest.Rol,
 		createUserRequest.ImageUrl,
-
 		updatedBy,
+		createUserRequest.Memberships,
+		createUserRequest.Onboarding,
 	)
 }
 
@@ -75,7 +76,8 @@ func (u *User) UpdateUser(
 		updateUserRequest.Email,
 		updateUserRequest.Rol,
 		updateUserRequest.ImageUrl,
-
+		updateUserRequest.Memberships,
+		updateUserRequest.Onboarding,
 		updatedBy,
 	)
 }
