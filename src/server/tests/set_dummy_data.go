@@ -4,7 +4,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	daoPostgresql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
-	testsSetup "onichankimochi.com/astro_cat_backend/src/server/tests/db"
+	testsSetup "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func main() {

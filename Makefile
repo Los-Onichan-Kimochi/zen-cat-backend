@@ -13,7 +13,7 @@ set-up-db:
 setup-test:
 	cd src/server/tests && \
 	python3 -m venv libs && \
-	source libs/bin/activate && \
+	. libs/bin/activate && \
 	pip install -r requirements.txt && \
 	deactivate
 
@@ -23,14 +23,12 @@ run:
 
 # Test commands
 test:
-	make set-up-db && \
-	make run && \
-	make use-python && \
-
-# Switch to python enviroment for development
-use-python:
+	cd src/server/ && \
+	go run tests/set_dummy_data.go && \
+	cd .. && cd .. && \
 	cd src/server/tests && \
-	source libs/bin/activate
+	. libs/bin/activate && \
+	python3 -m pytest
 
 # Swagger documentation
 swag-docs:

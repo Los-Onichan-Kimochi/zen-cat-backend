@@ -1,36 +1,10 @@
-import requests
-import uuid
-import json
+from utils.generic_test_case import generate_test_cases
+from utils.equivalence_classes import EquivalenceClasses as eq
 
-# Base URL of your API
-BASE_URL = "http://localhost:8098"
+XD = generate_test_cases(2,
+                    eq.id(),
+                    eq.email()
+                    )
 
-# Endpoint path
-ENDPOINT = "/community-plan/"
-
-# JWT Token (replace with your actual token)
-JWT_TOKEN = "XD"
-
-# Sample request data
-request_data = {
-    "communityId": str(uuid.uuid4()),  # Replace with actual UUID
-    "planId": "MYCASO DE PRUEBA",       # Replace with actual UUID
-    # Add other required fields as per your schema
-}
-
-# Headers
-headers = {
-    "Authorization": f"Bearer {JWT_TOKEN}",
-    "Content-Type": "application/json"
-}
-
-# Make the POST request
-response = requests.post(
-    f"{BASE_URL}{ENDPOINT}",
-    headers=headers,
-    data=json.dumps(request_data)
-)
-
-# Print the response
-print(f"Status Code: {response.status_code}")
-print(f"Response: {response.json()}")
+for i in XD:
+    print(i)
