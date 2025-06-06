@@ -60,8 +60,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
 	community.DELETE("/:communityId/", a.DeleteCommunity)
-	community.POST("/bulk-create/", a.BulkCreateCommunities)
-	community.DELETE("/bulk-delete/", a.BulkDeleteCommunities)
+	community.POST("/bulk/", a.BulkCreateCommunities)
 
 	// Professional endpoints (all protected)
 	professional := a.Echo.Group("/professional")
@@ -82,8 +81,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
-	local.POST("/bulk-create/", a.BulkCreateLocals)
-	local.DELETE("/bulk-delete/", a.BulkDeleteLocals)
 
 	// Plan endpoints (all protected)
 	plan := a.Echo.Group("/plan")
@@ -93,8 +90,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	plan.POST("/", a.CreatePlan)
 	plan.PATCH("/:planId/", a.UpdatePlan)
 	plan.DELETE("/:planId/", a.DeletePlan)
-	plan.POST("/bulk-create/", a.BulkCreatePlans)
-	plan.DELETE("/bulk-delete/", a.BulkDeletePlans)
 
 	// User endpoints (all protected)
 	user := a.Echo.Group("/user")
@@ -123,8 +118,6 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	session.DELETE("/:sessionId/", a.DeleteSession)
 	session.POST("/bulk/", a.BulkCreateSessions)
 	session.DELETE("/bulk-delete/", a.BulkDeleteSessions)
-	session.POST("/check-conflicts/", a.CheckSessionConflicts)
-	session.POST("/availability/", a.GetDayAvailability)
 
 	// Reservation endpoints (read-only)
 	reservation := a.Echo.Group("/reservation")
@@ -137,9 +130,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityPlan.POST("/", a.CreateCommunityPlan)
 	communityPlan.GET("/:communityId/:planId/", a.GetCommunityPlan)
 	communityPlan.DELETE("/:communityId/:planId/", a.DeleteCommunityPlan)
-	communityPlan.POST("/bulk-create/", a.BulkCreateCommunityPlans)
+	communityPlan.POST("/bulk/", a.BulkCreateCommunityPlans)
 	communityPlan.GET("/", a.FetchCommunityPlans)
-	communityPlan.DELETE("/bulk-delete/", a.BulkDeleteCommunityPlans)
+	communityPlan.DELETE("/bulk/", a.BulkDeleteCommunityPlans)
 
 	// CommunityService endpoints (all protected)
 	communityService := a.Echo.Group("/community-service")
@@ -147,9 +140,9 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
-	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
+	communityService.POST("/bulk/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
-	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
+	communityService.DELETE("/bulk/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints
 	serviceLocal := a.Echo.Group("/service-local")

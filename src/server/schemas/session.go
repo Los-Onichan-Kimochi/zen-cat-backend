@@ -54,36 +54,3 @@ type BatchCreateSessionRequest struct {
 type BulkDeleteSessionRequest struct {
 	Sessions []uuid.UUID `json:"sessions"`
 }
-
-type CheckConflictRequest struct {
-	Date           time.Time  `json:"date"`
-	StartTime      time.Time  `json:"start_time"`
-	EndTime        time.Time  `json:"end_time"`
-	ProfessionalId uuid.UUID  `json:"professional_id"`
-	LocalId        *uuid.UUID `json:"local_id"`
-	ExcludeId      *uuid.UUID `json:"exclude_id"` // Para excluir sesión en modo edición
-}
-
-type ConflictResult struct {
-	HasConflict           bool       `json:"has_conflict"`
-	ProfessionalConflicts []*Session `json:"professional_conflicts"`
-	LocalConflicts        []*Session `json:"local_conflicts"`
-}
-
-type AvailabilityRequest struct {
-	Date           time.Time  `json:"date"`
-	ProfessionalId *uuid.UUID `json:"professional_id"`
-	LocalId        *uuid.UUID `json:"local_id"`
-}
-
-type TimeSlot struct {
-	Start string `json:"start"`
-	End   string `json:"end"`
-	Title string `json:"title"`
-	Type  string `json:"type"` // "professional" | "local"
-}
-
-type AvailabilityResult struct {
-	IsAvailable bool       `json:"is_available"`
-	BusySlots   []TimeSlot `json:"busy_slots"`
-}

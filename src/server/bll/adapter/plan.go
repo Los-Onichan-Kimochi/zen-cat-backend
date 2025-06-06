@@ -94,44 +94,6 @@ func (p *Plan) CreatePostgresqlPlan(
 	}, nil
 }
 
-// Bulk creates plans into postgresql DB.
-func (p *Plan) BulkCreatePostgresqlPlans(
-	plansData []*schemas.CreatePlanRequest,
-	updatedBy string,
-) ([]*schemas.Plan, *errors.Error) {
-	if updatedBy == "" {
-		return nil, &errors.BadRequestError.InvalidUpdatedByValue
-	}
-
-	plansModel := make([]*model.Plan, len(plansData))
-	for i, planData := range plansData {
-		plansModel[i] = &model.Plan{
-			Id:               uuid.New(),
-			Fee:              planData.Fee,
-			Type:             planData.Type,
-			ReservationLimit: planData.ReservationLimit,
-			AuditFields: model.AuditFields{
-				UpdatedBy: updatedBy,
-			},
-		}
-	}
-	if err := p.DaoPostgresql.Plan.BulkCreatePlans(plansModel); err != nil {
-		return nil, &errors.BadRequestError.PlanNotCreated
-	}
-
-	plans := make([]*schemas.Plan, len(plansModel))
-	for i, planModel := range plansModel {
-		plans[i] = &schemas.Plan{
-			Id:               planModel.Id,
-			Fee:              planModel.Fee,
-			Type:             planModel.Type,
-			ReservationLimit: planModel.ReservationLimit,
-		}
-	}
-
-	return plans, nil
-}
-
 // Updates a plan in postgresql DB and returns it as a Plan schema.
 func (p *Plan) UpdatePostgresqlPlan(
 	planId uuid.UUID,
@@ -167,17 +129,6 @@ func (p *Plan) UpdatePostgresqlPlan(
 func (p *Plan) DeletePostgresqlPlan(planId uuid.UUID) *errors.Error {
 	err := p.DaoPostgresql.Plan.DeletePlan(planId)
 	if err != nil {
-		return &errors.BadRequestError.PlanNotSoftDeleted
-	}
-
-	return nil
-}
-
-// Bulk deletes plans from postgresql DB.
-func (p *Plan) BulkDeletePostgresqlPlans(
-	planIds []uuid.UUID,
-) *errors.Error {
-	if err := p.DaoPostgresql.Plan.BulkDeletePlans(planIds); err != nil {
 		return &errors.BadRequestError.PlanNotSoftDeleted
 	}
 

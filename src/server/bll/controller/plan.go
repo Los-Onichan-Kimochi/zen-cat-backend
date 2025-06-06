@@ -72,17 +72,6 @@ func (p *Plan) CreatePlan(
 	)
 }
 
-// Bulk creates plans.
-func (p *Plan) BulkCreatePlans(
-	createPlansData []*schemas.CreatePlanRequest,
-	updatedBy string,
-) ([]*schemas.Plan, *errors.Error) {
-	return p.Adapter.Plan.BulkCreatePostgresqlPlans(
-		createPlansData,
-		updatedBy,
-	)
-}
-
 // Updates a plan.
 func (p *Plan) UpdatePlan(
 	planId uuid.UUID,
@@ -103,11 +92,4 @@ func (p *Plan) DeletePlan(planId uuid.UUID) *errors.Error {
 	return p.Adapter.Plan.DeletePostgresqlPlan(planId)
 }
 
-// Bulk deletes plans.
-func (p *Plan) BulkDeletePlans(
-	bulkDeletePlanData schemas.BulkDeletePlanRequest,
-) *errors.Error {
-	return p.Adapter.Plan.BulkDeletePostgresqlPlans(
-		bulkDeletePlanData.Plans,
-	)
-}
+// TODO: Add BulkCreatePlans (Batch)

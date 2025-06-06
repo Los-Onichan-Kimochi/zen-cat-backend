@@ -55,11 +55,6 @@ func (p *Plan) CreatePlan(plan *model.Plan) error {
 	return p.PostgresqlDB.Create(plan).Error
 }
 
-// Creates multiple plans in a batch.
-func (p *Plan) BulkCreatePlans(plans []*model.Plan) error {
-	return p.PostgresqlDB.Create(&plans).Error
-}
-
 // Updates a plan given fields to update.
 func (p *Plan) UpdatePlan(
 	id uuid.UUID,
@@ -109,23 +104,6 @@ func (p *Plan) UpdatePlan(
 // Soft deletes a plan given its ID.
 func (p *Plan) DeletePlan(planId uuid.UUID) error {
 	result := p.PostgresqlDB.Delete(&model.Plan{}, "id = ?", planId)
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
-	}
-
-	return nil
-}
-
-// Batch deletes multiple plans given their IDs.
-func (p *Plan) BulkDeletePlans(planIds []uuid.UUID) error {
-	if len(planIds) == 0 {
-		return nil
-	}
-
-	result := p.PostgresqlDB.Where("id IN ?", planIds).Delete(&model.Plan{})
 	if result.Error != nil {
 		return result.Error
 	}
