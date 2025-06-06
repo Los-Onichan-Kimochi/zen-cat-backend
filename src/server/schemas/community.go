@@ -30,3 +30,7 @@ type UpdateCommunityRequest struct {
 type BatchCreateCommunityRequest struct {
 	Communities []*CreateCommunityRequest `json:"communities"`
 }
+
+type BulkDeleteCommunityRequest struct {
+	Communities []uuid.UUID `json:"communities"`
+}

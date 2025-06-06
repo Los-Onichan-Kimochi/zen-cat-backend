@@ -181,6 +181,7 @@ func (l *Local) DeletePostgresqlLocal(localId uuid.UUID) *errors.Error {
 
 	return nil
 }
+
 //NO BORRAR
 // Bulk deletes professionals from postgresql DB.
 func (l *Local) BulkDeletePostgresqlLocals(

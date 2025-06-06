@@ -615,7 +615,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-service/bulk/": {
+        "/community-service/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -688,7 +688,9 @@ const docTemplateserver = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/community-service/bulk-delete/": {
             "delete": {
                 "security": [
                     {
@@ -1010,7 +1012,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community/bulk/": {
+        "/community/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -1044,6 +1046,75 @@ const docTemplateserver = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.Communities"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community/bulk-delete/": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes communities given their ids.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Bulk Delete Communities.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete Community Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeleteCommunityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Community"
                         }
                     },
                     "400": {
@@ -1957,6 +2028,144 @@ const docTemplateserver = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Plan"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/plan/bulk-create/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates multiple plans in a batch.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Plan"
+                ],
+                "summary": "Bulk Create Plans.",
+                "parameters": [
+                    {
+                        "description": "Bulk Create Plan Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkCreatePlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Plans"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/plan/bulk-delete/": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Bulk deletes plans given their ids.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Plan"
+                ],
+                "summary": "Bulk Delete Plans.",
+                "parameters": [
+                    {
+                        "description": "Bulk Delete Plan Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.BulkDeletePlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "$ref": "#/definitions/schemas.Plan"
                         }
@@ -4196,6 +4405,69 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/session/availability/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get availability information for a specific date.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Session"
+                ],
+                "summary": "Get Day Availability.",
+                "parameters": [
+                    {
+                        "description": "Availability Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AvailabilityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AvailabilityResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/session/bulk-delete/": {
             "delete": {
                 "security": [
@@ -4315,6 +4587,69 @@ const docTemplateserver = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/session/check-conflicts/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Check for time conflicts with existing sessions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Session"
+                ],
+                "summary": "Check Session Conflicts.",
+                "parameters": [
+                    {
+                        "description": "Check Conflict Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CheckConflictRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ConflictResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -4892,6 +5227,34 @@ const docTemplateserver = `{
                 "PlanTypeAnual"
             ]
         },
+        "schemas.AvailabilityRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "local_id": {
+                    "type": "string"
+                },
+                "professional_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.AvailabilityResult": {
+            "type": "object",
+            "properties": {
+                "busy_slots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.TimeSlot"
+                    }
+                },
+                "is_available": {
+                    "type": "boolean"
+                }
+            }
+        },
         "schemas.BatchCreateCommunityPlanRequest": {
             "type": "object",
             "properties": {
@@ -4965,6 +5328,13 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CreateLocalRequest"
+        "schemas.BulkCreatePlanRequest": {
+            "type": "object",
+            "properties": {
+                "plans": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreatePlanRequest"
                     }
                 }
             }
@@ -4991,6 +5361,17 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.BulkDeleteCommunityRequest": {
+            "type": "object",
+            "properties": {
+                "communities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "schemas.BulkDeleteCommunityServiceRequest": {
             "type": "object",
             "properties": {
@@ -5006,6 +5387,10 @@ const docTemplateserver = `{
             "type": "object",
             "properties": {
                 "locals": {
+        "schemas.BulkDeletePlanRequest": {
+            "type": "object",
+            "properties": {
+                "plans": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -5054,6 +5439,30 @@ const docTemplateserver = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "schemas.CheckConflictRequest": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "exclude_id": {
+                    "description": "Para excluir sesión en modo edición",
+                    "type": "string"
+                },
+                "local_id": {
+                    "type": "string"
+                },
+                "professional_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
                 }
             }
         },
@@ -5134,6 +5543,26 @@ const docTemplateserver = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schemas.CommunityService"
+                    }
+                }
+            }
+        },
+        "schemas.ConflictResult": {
+            "type": "object",
+            "properties": {
+                "has_conflict": {
+                    "type": "boolean"
+                },
+                "local_conflicts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Session"
+                    }
+                },
+                "professional_conflicts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Session"
                     }
                 }
             }
@@ -5844,6 +6273,24 @@ const docTemplateserver = `{
                     "items": {
                         "$ref": "#/definitions/schemas.Session"
                     }
+                }
+            }
+        },
+        "schemas.TimeSlot": {
+            "type": "object",
+            "properties": {
+                "end": {
+                    "type": "string"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"professional\" | \"local\"",
+                    "type": "string"
                 }
             }
         },
