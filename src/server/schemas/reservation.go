@@ -19,3 +19,23 @@ type Reservation struct {
 type Reservations struct {
 	Reservations []*Reservation `json:"reservations"`
 }
+
+type CreateReservationRequest struct {
+	Name            string    `json:"name"`
+	ReservationTime time.Time `json:"reservation_time"`
+	State           string    `json:"state"`
+	UserId          uuid.UUID `json:"user_id"`
+	SessionId       uuid.UUID `json:"session_id"`
+}
+
+type UpdateReservationRequest struct {
+	Name            *string    `json:"name"`
+	ReservationTime *time.Time `json:"reservation_time"`
+	State           *string    `json:"state"`
+	UserId          *uuid.UUID `json:"user_id"`
+	SessionId       *uuid.UUID `json:"session_id"`
+}
+
+type BulkDeleteReservationRequest struct {
+	Reservations []string `json:"reservations"`
+}

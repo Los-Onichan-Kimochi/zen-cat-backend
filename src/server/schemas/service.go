@@ -3,11 +3,11 @@ package schemas
 import "github.com/google/uuid"
 
 type Service struct {
-	Id          uuid.UUID	`json:"id"`
-	Name        string 		`json:"name"`
-	Description string		`json:"description"`
-	ImageUrl    string		`json:"image_url"`
-	IsVirtual   bool		`json:"is_virtual"`
+	Id          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	ImageUrl    string    `json:"image_url"`
+	IsVirtual   bool      `json:"is_virtual"`
 }
 
 type Services struct {
@@ -16,15 +16,19 @@ type Services struct {
 }
 
 type CreateServiceRequest struct {
-	Name        string 		`json:"name"`
-	Description string		`json:"description"`
-	ImageUrl    string		`json:"image_url"`
-	IsVirtual   bool		`json:"is_virtual"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageUrl    string `json:"image_url"`
+	IsVirtual   bool   `json:"is_virtual"`
 }
 
 type UpdateServiceRequest struct {
-	Name        *string 	`json:"name"`
-	Description *string		`json:"description"`
-	ImageUrl    *string		`json:"image_url"`
-	IsVirtual   *bool		`json:"is_virtual"`
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+	ImageUrl    *string `json:"image_url"`
+	IsVirtual   *bool   `json:"is_virtual"`
+}
+
+type BulkDeleteServiceRequest struct {
+	Services []string `json:"services"`
 }
