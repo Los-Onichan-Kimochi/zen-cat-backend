@@ -9,12 +9,15 @@ set-up-db:
 	docker compose up astro-cat-postgres -d --wait
 	cd src/server/ && go run tests/set_dummy_data.go
 
+update-dummy_data:
+	cd src/server/ && go run tests/set_dummy_data.go
+
 # Set up testing enviroment for python
 setup-test:
 	cd src/server/tests && \
 	python3 -m venv libs && \
 	. libs/bin/activate && \
-	pip install -r requirements.txt && \
+	pip install -r utils/requirements.txt && \
 	deactivate
 
 # Runners

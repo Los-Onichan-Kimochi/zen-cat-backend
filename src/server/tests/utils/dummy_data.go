@@ -137,7 +137,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	reservationLimit := 8
 	plans := []*model.Plan{
 		{
-			Id:               uuid.New(),
+			Id:               uuid.Must(uuid.Parse("d1694efe-9a13-42d7-a9e8-4d629f9f2f35")),
 			Fee:              70.0,
 			Type:             model.PlanTypeMonthly,
 			ReservationLimit: &reservationLimit,
@@ -146,8 +146,17 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			},
 		},
 		{
-			Id:               uuid.New(),
+			Id:               uuid.Must(uuid.Parse("6d222f80-8887-4cc2-b6a1-48d08cd2d742")),
 			Fee:              1000.0,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.Must(uuid.Parse("eb71f5e0-589d-4f1b-86e7-696c30e92bfe")),
+			Fee:              69.0,
 			Type:             model.PlanTypeAnual,
 			ReservationLimit: nil,
 			AuditFields: model.AuditFields{
@@ -165,7 +174,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	// Create dummy communities
 	communities := []*model.Community{
 		{
-			Id:                  uuid.New(),
+			Id:                  uuid.Must(uuid.Parse("e804b95a-a388-4751-b246-96fe97232d35")),
 			Name:                "Yoga Community",
 			Purpose:             "Community for yoga enthusiasts",
 			ImageUrl:            "test-image",
@@ -175,9 +184,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			},
 		},
 		{
-			Id:                  uuid.New(),
+			Id:                  uuid.Must(uuid.Parse("a1570014-f96c-4ba1-9ac6-e2aec2127910")),
 			Name:                "Gym Group",
 			Purpose:             "Community for meditation practitioners",
+			ImageUrl:            "test-image",
+			NumberSubscriptions: 0,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.Must(uuid.Parse("76035ca7-1d3b-4d7d-9091-fc55f7410e59")),
+			Name:                "Gamers Group",
+			Purpose:             "Community for Dota2",
 			ImageUrl:            "test-image",
 			NumberSubscriptions: 0,
 			AuditFields: model.AuditFields{
@@ -422,6 +441,14 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Id:          uuid.New(),
 			CommunityId: communities[1].Id,
 			PlanId:      plans[1].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id,
+			PlanId:      plans[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},

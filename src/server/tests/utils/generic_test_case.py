@@ -1,4 +1,4 @@
-def create_sub_test_case(n_parameters, classes, indexes):
+def create_sub_test_case(n_parameters, classes, indexes, expected):
     sub_test_case = []
 
     for parameter in range(n_parameters):
@@ -15,6 +15,8 @@ def create_sub_test_case(n_parameters, classes, indexes):
             indexes[current_index] = 0
             current_index -= 1
 
+    sub_test_case.append(expected)
+
     if current_index < 0:
         return True, sub_test_case
 
@@ -23,24 +25,29 @@ def create_sub_test_case(n_parameters, classes, indexes):
 def create_test_case(test_case, n_parameters, equivalence_classes,
                      specific_cases):
     classes = []
-    test_case_id = ""
-
+    expected = True
+    idx = ""
     for parameter in range(n_parameters):
         class_type = (test_case >> parameter) & 1
-        test_case_id += str(class_type)
+        expected = expected and not bool(class_type)
+        idx += str(class_type)
         classes.append(equivalence_classes[parameter][class_type])
+
+    print(idx)
+
 
     indexes  = [0] * n_parameters
 
     while True:
         end, sub_test_case = create_sub_test_case(n_parameters, classes,
-                                                  indexes)
+                                                  indexes, expected)
+        print(sub_test_case)
+        print(expected)
         specific_cases .append(sub_test_case)
 
         if end:
-            break
 
-    print(test_case_id + "->" )
+            break
 
 def generate_test_cases(n_parameters, *equivalence_classes):
     if len(equivalence_classes) != n_parameters:
