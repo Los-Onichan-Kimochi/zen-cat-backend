@@ -1461,7 +1461,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			City:           "Lima",
 			PostalCode:     "15001",
 			District:       "Downtown",
-			Address:        "Main St 123, Central, Metropolitan. Ref: Near Central Park",
+			Address:        "Main St 123, Near Central Park",
 			UserId:         users[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1475,7 +1475,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			City:           "Lima",
 			PostalCode:     "15002",
 			District:       "Business",
-			Address:        "Downtown Ave 456, Central, Metropolitan. Ref: Near Business Center",
+			Address:        "Downtown Ave 456, Near Business Center",
 			UserId:         users[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
