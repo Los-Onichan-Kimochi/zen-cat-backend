@@ -13,19 +13,20 @@ import (
 )
 
 type AstroCatPsqlCollection struct {
-	Logger           logging.Logger
-	Community        *Community
-	Professional     *Professional
-	Local            *Local
-	User             *User
-	Service          *Service
-	Plan             *Plan
-	CommunityPlan    *CommunityPlan
-	CommunityService *CommunityService
-	ServiceLocal      *ServiceLocal
+	Logger              logging.Logger
+	Community           *Community
+	Professional        *Professional
+	Local               *Local
+	User                *User
+	Onboarding          *Onboarding
+	Service             *Service
+	Plan                *Plan
+	CommunityPlan       *CommunityPlan
+	CommunityService    *CommunityService
+	ServiceLocal        *ServiceLocal
 	ServiceProfessional *ServiceProfessional
-	Session          *Session
-	Reservation      *Reservation
+	Session             *Session
+	Reservation         *Reservation
 }
 
 // Create dao controller collection
@@ -52,19 +53,20 @@ func NewAstroCatPsqlCollection(
 	createTables(postgresqlDB)
 
 	return &AstroCatPsqlCollection{
-		Logger:           logger,
-		Community:        NewCommunityController(logger, postgresqlDB),
-		Professional:     NewProfessionalController(logger, postgresqlDB),
-		Local:            NewLocalController(logger, postgresqlDB),
-		User:             NewUserController(logger, postgresqlDB),
-		Service:          NewServiceController(logger, postgresqlDB),
-		Plan:             NewPlanController(logger, postgresqlDB),
-		CommunityPlan:    NewCommunityPlanController(logger, postgresqlDB),
-		CommunityService: NewCommunityServiceController(logger, postgresqlDB),
-		ServiceLocal: 	  NewServiceLocalController(logger, postgresqlDB),
+		Logger:              logger,
+		Community:           NewCommunityController(logger, postgresqlDB),
+		Professional:        NewProfessionalController(logger, postgresqlDB),
+		Local:               NewLocalController(logger, postgresqlDB),
+		User:                NewUserController(logger, postgresqlDB),
+		Onboarding:          NewOnboardingController(logger, postgresqlDB),
+		Service:             NewServiceController(logger, postgresqlDB),
+		Plan:                NewPlanController(logger, postgresqlDB),
+		CommunityPlan:       NewCommunityPlanController(logger, postgresqlDB),
+		CommunityService:    NewCommunityServiceController(logger, postgresqlDB),
+		ServiceLocal:        NewServiceLocalController(logger, postgresqlDB),
 		ServiceProfessional: NewServiceProfessionalController(logger, postgresqlDB),
-		Session:          NewSessionController(logger, postgresqlDB),
-		Reservation:      NewReservationController(logger, postgresqlDB),
+		Session:             NewSessionController(logger, postgresqlDB),
+		Reservation:         NewReservationController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 

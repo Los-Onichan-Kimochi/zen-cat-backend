@@ -104,6 +104,20 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	user.POST("/", a.CreateUser)
 	user.PATCH("/:userId/", a.UpdateUser)
 	user.DELETE("/:userId/", a.DeleteUser)
+	user.POST("/bulk-create/", a.BulkCreateUsers)
+	user.DELETE("/bulk-delete/", a.BulkDeleteUsers)
+
+	// Onboarding endpoints (all protected)
+	onboarding := a.Echo.Group("/onboarding")
+	onboarding.Use(a.JWTMiddleware) // Apply JWT middleware to all onboarding routes
+	onboarding.GET("/:onboardingId/", a.GetOnboarding)
+	onboarding.GET("/", a.FetchOnboardings)
+	onboarding.GET("/user/:userId/", a.GetOnboardingByUserId)
+	onboarding.POST("/user/:userId/", a.CreateOnboardingForUser)
+	onboarding.PATCH("/:onboardingId/", a.UpdateOnboarding)
+	onboarding.PATCH("/user/:userId/", a.UpdateOnboardingByUserId)
+	onboarding.DELETE("/:onboardingId/", a.DeleteOnboarding)
+	onboarding.DELETE("/user/:userId/", a.DeleteOnboardingByUserId)
 
 	// Service Endpoints (all protected)
 	service := a.Echo.Group("/service")
@@ -113,6 +127,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
 	service.DELETE("/:serviceId/", a.DeleteService)
+	service.DELETE("/bulk-delete/", a.BulkDeleteServices)
 
 	// Session endpoints
 	session := a.Echo.Group("/session")
@@ -126,10 +141,15 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	session.POST("/check-conflicts/", a.CheckSessionConflicts)
 	session.POST("/availability/", a.GetDayAvailability)
 
-	// Reservation endpoints (read-only)
+	// Reservation endpoints
 	reservation := a.Echo.Group("/reservation")
+	reservation.Use(a.JWTMiddleware) // Apply JWT middleware to all reservation routes
 	reservation.GET("/:reservationId/", a.GetReservation)
 	reservation.GET("/", a.FetchReservations)
+	reservation.POST("/", a.CreateReservation)
+	reservation.PATCH("/:reservationId/", a.UpdateReservation)
+	reservation.DELETE("/:reservationId/", a.DeleteReservation)
+	reservation.DELETE("/bulk-delete/", a.BulkDeleteReservations)
 
 	// CommunityPlan endpoints (all protected)
 	communityPlan := a.Echo.Group("/community-plan")

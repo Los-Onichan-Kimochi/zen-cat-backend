@@ -61,6 +61,19 @@ func (l *Local) CreateLocal(
 	)
 }
 
+// Creates multiple locals.
+func (l *Local) BulkCreateLocals(
+	createLocalsData []*schemas.CreateLocalRequest,
+	updatedBy string,
+) (*schemas.Locals, *errors.Error) {
+	locals, err := l.Adapter.Local.BulkCreatePostgresqlLocals(createLocalsData, updatedBy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Locals{Locals: locals}, nil
+}
+
 // Update a local.
 func (l *Local) UpdateLocal(
 	localId uuid.UUID,
@@ -85,4 +98,13 @@ func (l *Local) UpdateLocal(
 // Deletes a local.
 func (l *Local) DeleteLocal(localId uuid.UUID) *errors.Error {
 	return l.Adapter.Local.DeletePostgresqlLocal(localId)
+}
+
+// Bulk deletes locals.
+func (l *Local) BulkDeleteLocals(
+	bulkDeleteLocalData schemas.BulkDeleteLocalRequest,
+) *errors.Error {
+	return l.Adapter.Local.BulkDeletePostgresqlLocals(
+		bulkDeleteLocalData.Locals,
+	)
 }

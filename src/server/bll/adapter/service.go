@@ -143,3 +143,22 @@ func (l *Service) DeletePostgresqlService(serviceId uuid.UUID) *errors.Error {
 
 	return nil
 }
+
+// Bulk deletes services from postgresql DB
+func (s *Service) BulkDeletePostgresqlServices(serviceIds []string) *errors.Error {
+	// Convert string IDs to UUIDs
+	uuidIds := make([]uuid.UUID, len(serviceIds))
+	for i, id := range serviceIds {
+		parsedId, err := uuid.Parse(id)
+		if err != nil {
+			return &errors.UnprocessableEntityError.InvalidServiceId
+		}
+		uuidIds[i] = parsedId
+	}
+
+	if err := s.DaoPostgresql.Service.BulkDeleteServices(uuidIds); err != nil {
+		return &errors.BadRequestError.ServiceNotSoftDeleted
+	}
+
+	return nil
+}

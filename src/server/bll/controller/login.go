@@ -7,6 +7,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type Login struct {
@@ -39,7 +40,7 @@ func (l *Login) Login(
 		return nil, &errors.AuthenticationError.UnauthorizedUser
 	}
 
-	if user.Password != password {
+	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
 		return nil, &errors.AuthenticationError.UnauthorizedUser
 	}
 
@@ -92,6 +93,8 @@ func (l *Login) Register(
 		string(schemas.UserRolClient),
 		imageUrl,
 		"SYSTEM",
+		nil,
+		nil,
 	)
 	if err != nil {
 		return nil, err
