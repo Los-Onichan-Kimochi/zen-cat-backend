@@ -205,8 +205,8 @@ func (a *Api) BulkDeleteLocals(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	/*if err := a.BllController.Local.BulkDeleteLocals(request); err != nil {
+	if err := a.BllController.Local.BulkDeleteLocals(request); err != nil {
 		return errors.HandleError(*err, c)
 	}
 	return c.NoContent(http.StatusNoContent)
-}*/
+}

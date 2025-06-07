@@ -127,6 +127,10 @@ definitions:
   schemas.BulkDeleteLocalRequest:
     properties:
       locals:
+        items:
+          type: string
+        type: array
+    type: object
   schemas.BulkDeletePlanRequest:
     properties:
       plans:
@@ -1040,20 +1044,6 @@ definitions:
     enum:
     - -9223372036854775808
     - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     - 1
     - 1000
     - 1000000
@@ -2160,19 +2150,19 @@ paths:
       - application/json
       description: Creates multiple locals in a batch.
       parameters:
-      - description: Bulk Create Local Request
+      - description: Bulk Create Locals Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/schemas.BulkCreateLocalRequest'
+          $ref: '#/definitions/schemas.BatchCreateLocalRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/schemas.Local'
+            $ref: '#/definitions/schemas.Locals'
         "400":
           description: Bad Request
           schema:
@@ -2202,7 +2192,7 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Bulk deletes locals given their ids.
+      description: Bulk delete locals given their ids.
       parameters:
       - description: Bulk Delete Local Request
         in: body
@@ -2215,18 +2205,12 @@ paths:
       responses:
         "204":
           description: No Content
-          schema:
-            $ref: '#/definitions/schemas.Local'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/errors.Error'
         "401":
           description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
           schema:
             $ref: '#/definitions/errors.Error'
         "422":
