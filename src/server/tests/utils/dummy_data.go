@@ -1109,12 +1109,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PhoneNumber:    "123456789",
 			DocumentType:   model.DocumentTypeDni,
 			DocumentNumber: "12345678",
-			StreetName:     "Main St",
-			BuildingNumber: "123",
 			District:       "Downtown",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Central Park",
 			UserId:         users[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1125,18 +1120,14 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PhoneNumber:    "987654321",
 			DocumentType:   model.DocumentTypeForeignerCard,
 			DocumentNumber: "87654321",
-			StreetName:     "Downtown Ave",
-			BuildingNumber: "456",
 			District:       "Business",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Business Center",
 			UserId:         users[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 	}
+
 	for _, onboarding := range onboardings {
 		if err := astroCatPsqlDB.Create(onboarding).Error; err != nil {
 			appLogger.Errorf("Error creating dummy onboarding: %v", err)
