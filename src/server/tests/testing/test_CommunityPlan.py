@@ -4,19 +4,26 @@ import json
 from utils.generic_test_case import generate_test_cases
 from utils.equivalence_classes import EquivalenceClasses as eq
 
+eq = eq()
+
 test_cases_FETCH_1 = generate_test_cases(1,
-    eq.communityId()
+    eq.communityId_FETCH()
 )
 
 test_cases_FETCH_2 = generate_test_cases(1,
-    eq.planId()
+    eq.planId_FETCH()
 )
 
 test_cases_FETCH_3 = generate_test_cases(2,
-    eq.communityId(), eq.planId()
+    eq.communityId_FETCH(), eq.planId_FETCH()
 )
+
+test_cases_POST = generate_test_cases(2,
+    eq.communityId_POST(), eq.planId_POST()
+)
+
 test_cases_POST_BULK_2 = generate_test_cases(4,
-    eq.communityId(), eq.planId(), eq.communityId(), eq.planId(),
+    eq.communityId_FETCH(), eq.planId_FETCH(), eq.communityId_FETCH(), eq.planId_FETCH(),
 )
 
 class TestCommunityPlan:
@@ -70,7 +77,7 @@ class TestCommunityPlan:
                 f"Expected failure but got {response.status_code} where data is {json.dumps(response.json(), indent=4)}"
 
     @pytest.mark.parametrize("CommunityId, PlanId, expected",
-                             test_cases_FETCH_3)
+                             test_cases_POST)
     def test_POST(self, CommunityId, PlanId, expected):
         parameters = {"communityId": CommunityId,
                       "planId": PlanId}

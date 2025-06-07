@@ -4,8 +4,8 @@ from utils.equivalence_classes import EquivalenceClasses as eq
 import requests
 import json
 
-test_cases_GET_fetch_3 = generate_test_cases(2,
-    eq.communityId(), eq.planId()
+test_cases_FETCH_2 = generate_test_cases(1,
+    eq.planId()
 )
 
 c_1 ="communityId=e804b95a-a388-4751-b246-96fe97232d35"
@@ -27,5 +27,5 @@ response = requests.get(url, params=None)
 data = response.json()
 
 # Pretty print the JSON
-print(json.dumps(data, indent=4))
-#print(json.dumps(test_cases_GET_fetch_3, indent=4))
+#print(json.dumps(data, indent=4))
+print(json.dumps(test_cases_FETCH_2, indent=4))

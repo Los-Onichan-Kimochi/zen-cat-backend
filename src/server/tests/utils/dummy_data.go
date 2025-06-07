@@ -171,6 +171,15 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:               uuid.Must(uuid.Parse("b038237d-16cd-411f-bfb7-f4077fbc92b5")),
+			Fee:              80001.0,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, plan := range plans {
 		if err := astroCatPsqlDB.Create(plan).Error; err != nil {
@@ -205,6 +214,16 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Id:                  uuid.Must(uuid.Parse("76035ca7-1d3b-4d7d-9091-fc55f7410e59")),
 			Name:                "Gamers Group",
 			Purpose:             "Community for Dota2",
+			ImageUrl:            "test-image",
+			NumberSubscriptions: 0,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.Must(uuid.Parse("769350ca-bde9-4c77-ab95-69d3c9c83ab7")),
+			Name:                "Gamers Group 2",
+			Purpose:             "Community for LOL",
 			ImageUrl:            "test-image",
 			NumberSubscriptions: 0,
 			AuditFields: model.AuditFields{
@@ -586,8 +605,16 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[2].Id,
-			PlanId:      plans[2].Id,
+			CommunityId: communities[0].Id,
+			PlanId:      plans[0].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id,
+			PlanId:      plans[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
