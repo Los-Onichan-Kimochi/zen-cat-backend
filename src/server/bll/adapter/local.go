@@ -182,14 +182,14 @@ func (l *Local) DeletePostgresqlLocal(localId uuid.UUID) *errors.Error {
 	return nil
 }
 
-//NO BORRAR
+// NO BORRAR
 // Bulk deletes professionals from postgresql DB.
 func (l *Local) BulkDeletePostgresqlLocals(
 	localIds []uuid.UUID,
 ) *errors.Error {
-	if err := l.DaoPostgresql.Local.BulkDeleteLocals(localIds); err != nil {
+	/*if err := l.DaoPostgresql.Local.BulkDeleteLocals(localIds); err != nil {
 		return &errors.BadRequestError.LocalNotSoftDeleted
-	}
+	}*/
 
 	return nil
 }
@@ -204,7 +204,7 @@ func (l *Local) BulkCreatePostgresqlLocals(
 	}
 
 	localsModel := make([]*model.Local, len(localsData))
-	for i, localData := range(localsData){
+	for i, localData := range localsData {
 		localsModel[i] = &model.Local{
 			Id:             uuid.New(),
 			LocalName:      localData.LocalName,
@@ -221,9 +221,9 @@ func (l *Local) BulkCreatePostgresqlLocals(
 			},
 		}
 	}
-	if err := l.DaoPostgresql.Local.BulkCreateLocals(localsModel); err != nil {
+	/*if err := l.DaoPostgresql.Local.BulkCreateLocals(localsModel); err != nil {
 		return nil, &errors.BadRequestError.LocalNotCreated
-	}
+	}*/
 	locals := make([]*schemas.Local, len(localsModel))
 	for i, localModel := range localsModel {
 		locals[i] = &schemas.Local{
