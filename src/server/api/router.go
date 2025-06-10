@@ -118,6 +118,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 
 	// Session endpoints
 	session := a.Echo.Group("/session")
+	session.Use(a.JWTMiddleware) // Apply JWT middleware to all session routes
 	session.GET("/:sessionId/", a.GetSession)
 	session.GET("/", a.FetchSessions)
 	session.POST("/", a.CreateSession)
@@ -160,6 +161,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 
 	// ServiceLocal endpoints
 	serviceLocal := a.Echo.Group("/service-local")
+	communityService.Use(a.JWTMiddleware)
 	serviceLocal.POST("/", a.CreateServiceLocal)
 	serviceLocal.GET("/:serviceId/:localId/", a.GetServiceLocal)
 	serviceLocal.DELETE("/:serviceId/:localId/", a.DeleteServiceLocal)
@@ -169,6 +171,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 
 	// ServiceProfessional endpoints
 	serviceProfessional := a.Echo.Group("/service-professional")
+	serviceProfessional.Use(a.JWTMiddleware)
 	serviceProfessional.POST("/", a.CreateServiceProfessional)
 	serviceProfessional.GET("/:serviceId/:professionalId/", a.GetServiceProfessional)
 	serviceProfessional.DELETE("/:serviceId/:professionalId/", a.DeleteServiceProfessional)
