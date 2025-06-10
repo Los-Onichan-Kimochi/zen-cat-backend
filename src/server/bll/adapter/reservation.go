@@ -27,7 +27,9 @@ func NewReservationAdapter(
 }
 
 // Gets a specific reservation and adapts it.
-func (r *Reservation) GetPostgresqlReservation(reservationId uuid.UUID) (*schemas.Reservation, *errors.Error) {
+func (r *Reservation) GetPostgresqlReservation(
+	reservationId uuid.UUID,
+) (*schemas.Reservation, *errors.Error) {
 	reservationModel, err := r.DaoPostgresql.Reservation.GetReservation(reservationId)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.ReservationNotFound
@@ -50,7 +52,11 @@ func (r *Reservation) FetchPostgresqlReservations(
 	sessionIds []uuid.UUID,
 	states []string,
 ) ([]*schemas.Reservation, *errors.Error) {
-	reservationModels, err := r.DaoPostgresql.Reservation.FetchReservations(userIds, sessionIds, states)
+	reservationModels, err := r.DaoPostgresql.Reservation.FetchReservations(
+		userIds,
+		sessionIds,
+		states,
+	)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.ReservationNotFound
 	}

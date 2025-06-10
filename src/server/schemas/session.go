@@ -36,15 +36,16 @@ type CreateSessionRequest struct {
 }
 
 type UpdateSessionRequest struct {
-	Title          *string    `json:"title"`
-	Date           *time.Time `json:"date"`
-	StartTime      *time.Time `json:"start_time"`
-	EndTime        *time.Time `json:"end_time"`
-	State          *string    `json:"state"`
-	Capacity       *int       `json:"capacity"`
-	SessionLink    *string    `json:"session_link"`
-	ProfessionalId *uuid.UUID `json:"professional_id"`
-	LocalId        *uuid.UUID `json:"local_id"`
+	Title           *string    `json:"title"`
+	Date            *time.Time `json:"date"`
+	StartTime       *time.Time `json:"start_time"`
+	EndTime         *time.Time `json:"end_time"`
+	State           *string    `json:"state"`
+	RegisteredCount *int       `json:"registered_count"`
+	Capacity        *int       `json:"capacity"`
+	SessionLink     *string    `json:"session_link"`
+	ProfessionalId  *uuid.UUID `json:"professional_id"`
+	LocalId         *uuid.UUID `json:"local_id"`
 }
 
 type BatchCreateSessionRequest struct {

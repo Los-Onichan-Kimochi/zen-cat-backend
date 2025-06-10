@@ -32,7 +32,9 @@ func (s *Session) CreateSession(session *model.Session) error {
 func (s *Session) GetSession(sessionId uuid.UUID) (*model.Session, error) {
 	session := &model.Session{}
 
-	result := s.PostgresqlDB.Preload("Professional").Preload("Local").First(&session, "id = ?", sessionId)
+	result := s.PostgresqlDB.Preload("Professional").
+		Preload("Local").
+		First(&session, "id = ?", sessionId)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -48,6 +50,7 @@ func (s *Session) UpdateSession(
 	startTime *time.Time,
 	endTime *time.Time,
 	state *string,
+	registeredCount *int,
 	capacity *int,
 	sessionLink *string,
 	professionalId *uuid.UUID,
@@ -71,6 +74,9 @@ func (s *Session) UpdateSession(
 	}
 	if state != nil {
 		updateFields["state"] = *state
+	}
+	if registeredCount != nil {
+		updateFields["registered_count"] = *registeredCount
 	}
 	if capacity != nil {
 		updateFields["capacity"] = *capacity
