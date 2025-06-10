@@ -25,7 +25,10 @@ func NewReservationController(logger logging.Logger, postgresqlDB *gorm.DB) *Res
 // Gets a specific reservation by ID.
 func (r *Reservation) GetReservation(reservationId uuid.UUID) (*model.Reservation, error) {
 	var reservation model.Reservation
-	result := r.PostgresqlDB.Preload("User").Preload("Session").Where("id = ?", reservationId).First(&reservation)
+	result := r.PostgresqlDB.Preload("User").
+		Preload("Session").
+		Where("id = ?", reservationId).
+		First(&reservation)
 	if result.Error != nil {
 		return nil, result.Error
 	}
