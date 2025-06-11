@@ -498,3 +498,10 @@ func (u *User) BulkDeletePostgresqlUsers(userIds []string) *errors.Error {
 
 	return nil
 }
+
+func (u *User) UpdateUserPassword(userId uuid.UUID, hashedPassword string) *errors.Error {
+	if err := u.DaoPostgresql.User.UpdateUserPassword(userId, hashedPassword); err != nil {
+		return &errors.BadRequestError.UserPasswordNotUpdated
+	}
+	return nil
+}

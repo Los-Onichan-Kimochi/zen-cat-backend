@@ -57,3 +57,7 @@ type BulkDeleteUserRequest struct {
 type BulkCreateUserRequest struct {
 	Users []*CreateUserRequest `json:"users"`
 }
+
+type ChangePasswordInput struct {
+	NewPassword string `json:"new_password" validate:"required"`
+}

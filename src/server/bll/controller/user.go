@@ -6,6 +6,7 @@ import (
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
 	errors "onichankimochi.com/astro_cat_backend/src/server/errors"
 	schemas "onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
@@ -102,4 +103,26 @@ func (u *User) BulkDeleteUsers(
 	return u.Adapter.User.BulkDeletePostgresqlUser(
 		bulkDeleteUsersData.Users,
 	)
+}
+
+func (u *User) ChangePassword(
+	userId uuid.UUID,
+	request schemas.ChangePasswordInput,
+) *errors.Error {
+	_, err := u.Adapter.User.GetPostgresqlUser(userId)
+	if err != nil {
+		return &errors.ObjectNotFoundError.UserNotFound
+	}
+
+	hashedPassword, hashErr := utils.HashPassword(request.NewPassword)
+	if hashErr != nil {
+		return &errors.InternalServerError.Default
+	}
+
+	updateErr := u.Adapter.User.UpdateUserPassword(userId, hashedPassword)
+	if updateErr != nil {
+		return &errors.BadRequestError.UserPasswordNotUpdated
+	}
+
+	return nil
 }

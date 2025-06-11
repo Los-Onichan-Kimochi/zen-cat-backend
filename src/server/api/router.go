@@ -42,6 +42,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	// Login endpoints (public)
 	a.Echo.POST("/login/", a.Login)
 	a.Echo.POST("/register/", a.Register)
+	a.Echo.POST("/forgot-password/", a.ForgotPassword)
 
 	// ===== PROTECTED ENDPOINTS (JWT Authentication required) =====
 
@@ -106,6 +107,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	user.DELETE("/:userId/", a.DeleteUser)
 	user.POST("/bulk-create/", a.BulkCreateUsers)
 	user.DELETE("/bulk-delete/", a.BulkDeleteUsers)
+	user.POST("/change-password/", a.ChangePassword)
 
 	// Onboarding endpoints (all protected)
 	onboarding := a.Echo.Group("/onboarding")
