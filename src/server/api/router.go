@@ -104,7 +104,20 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	user.POST("/", a.CreateUser)
 	user.PATCH("/:userId/", a.UpdateUser)
 	user.DELETE("/:userId/", a.DeleteUser)
+	user.POST("/bulk-create/", a.BulkCreateUsers)
 	user.DELETE("/bulk-delete/", a.BulkDeleteUsers)
+
+	// Onboarding endpoints (all protected)
+	onboarding := a.Echo.Group("/onboarding")
+	onboarding.Use(a.JWTMiddleware) // Apply JWT middleware to all onboarding routes
+	onboarding.GET("/:onboardingId/", a.GetOnboarding)
+	onboarding.GET("/", a.FetchOnboardings)
+	onboarding.GET("/user/:userId/", a.GetOnboardingByUserId)
+	onboarding.POST("/user/:userId/", a.CreateOnboardingForUser)
+	onboarding.PATCH("/:onboardingId/", a.UpdateOnboarding)
+	onboarding.PATCH("/user/:userId/", a.UpdateOnboardingByUserId)
+	onboarding.DELETE("/:onboardingId/", a.DeleteOnboarding)
+	onboarding.DELETE("/user/:userId/", a.DeleteOnboardingByUserId)
 
 	// Service Endpoints (all protected)
 	service := a.Echo.Group("/service")
