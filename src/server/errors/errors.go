@@ -205,6 +205,7 @@ var (
 		UserNotCreated                Error
 		UserNotUpdated                Error
 		UserNotSoftDeleted            Error
+		UserPasswordNotUpdated        Error
 		CommunityPlanNotCreated       Error
 		CommunityPlanNotDeleted       Error
 		CommunityServiceNotCreated    Error
