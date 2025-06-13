@@ -192,6 +192,13 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	serviceProfessional.GET("/", a.FetchServiceProfessionals)
 	serviceProfessional.DELETE("/bulk/", a.BulkDeleteServiceProfessionals)
 
+	// S3 endpoints (all protected)
+	s3 := a.Echo.Group("/s3")
+	s3.Use(a.JWTMiddleware)
+	s3.POST("/upload-url/", a.GenerateUploadPresignedURL)     // Admin only (checked inside handler)
+	s3.POST("/download-url/", a.GenerateDownloadPresignedURL) // Admin and User
+	s3.GET("/image-url/", a.GetImageURL)                      // Admin and User
+
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
 	a.Logger.Fatal(a.Echo.Start(fmt.Sprintf(":%s", a.EnvSettings.MainPort)))

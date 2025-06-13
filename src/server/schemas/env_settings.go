@@ -28,6 +28,12 @@ type EnvSettings struct {
 
 	// JWT
 	TokenSignatureKey []byte
+
+	// AWS S3
+	AwsAccessKeyId     string
+	AwsSecretAccessKey string
+	AwsRegion          string
+	S3BucketName       string
 }
 
 // Create a new env settings defined on .env file
@@ -61,6 +67,12 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 
 	tokenSignatureKey := []byte(os.Getenv("TOKEN_SIGNATURE_KEY"))
 
+	// AWS S3 Configuration
+	awsAccessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
+	awsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	awsRegion := os.Getenv("AWS_REGION")
+	s3BucketName := os.Getenv("S3_BUCKET_NAME")
+
 	return &EnvSettings{
 		EnableSqlLogs: enableSqlLogs,
 
@@ -75,5 +87,10 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 		AstroCatPostgresName:     astroCatPostgresName,
 
 		TokenSignatureKey: tokenSignatureKey,
+
+		AwsAccessKeyId:     awsAccessKeyId,
+		AwsSecretAccessKey: awsSecretAccessKey,
+		AwsRegion:          awsRegion,
+		S3BucketName:       s3BucketName,
 	}
 }
