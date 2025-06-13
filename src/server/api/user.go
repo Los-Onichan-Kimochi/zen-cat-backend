@@ -201,40 +201,27 @@ func (a *Api) BulkCreateUsers(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
-// @Summary                Change password
-// @Tags                   User
-// @Security               JWT
-// @Accept                 json
-// @Produce                json
-// @Param                  changePassword body schemas.ChangePasswordInput true "New password"
-// @Success                200 {object} echo.Map
-// @Failure                400,401,422,500 {object} errors.Error
-// @Router                 /change-password/ [post]
+// @Summary      Change password with email
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Param        changePassword body schemas.ChangePasswordInput true "Email and new password"
+// @Success      200 {object} echo.Map
+// @Failure      400,401,422,500 {object} errors.Error
+// @Router       /user/change-password/ [post]
 func (a *Api) ChangePassword(c echo.Context) error {
-	// Obtain token
-	_, credentials, authErr := a.BllController.Auth.AccessTokenValidation(c)
-	if authErr != nil {
-		return errors.HandleError(*authErr, c)
-	}
-
 	// Parse body
 	var request schemas.ChangePasswordInput
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
-	// Validate schema
-	if err := c.Validate(&request); err != nil {
-		return errors.HandleError(errors.BadRequestError.InvalidUpdatedByValue, c)
-	}
-
-	// Call controller
-	err := a.BllController.User.ChangePassword(credentials.UserId, request)
-	if err != nil {
+	// Cambiar la contraseña
+	if err := a.BllController.User.ChangePassword(request.Email, request); err != nil {
 		return errors.HandleError(*err, c)
 	}
 
-	// Return successfully
+	// Respuesta exitosa
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "Password changed successfully",
 	})

@@ -192,9 +192,12 @@ definitions:
     type: object
   schemas.ChangePasswordInput:
     properties:
+      email:
+        type: string
       new_password:
         type: string
     required:
+    - email
     - new_password
     type: object
   schemas.CheckConflictRequest:
@@ -1076,10 +1079,22 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
     - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1117,45 +1132,6 @@ paths:
       summary: Refresh user access token.
       tags:
       - Auth
-  /change-password/:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: New password
-        in: body
-        name: changePassword
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.ChangePasswordInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/echo.Map'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Change password
-      tags:
-      - User
   /community-plan/:
     get:
       consumes:
@@ -5125,6 +5101,43 @@ paths:
       security:
       - JWT: []
       summary: Bulk Delete Users.
+      tags:
+      - User
+  /user/change-password/:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Email and new password
+        in: body
+        name: changePassword
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ChangePasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/echo.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: Change password with email
       tags:
       - User
 swagger: "2.0"

@@ -106,20 +106,23 @@ func (u *User) BulkDeleteUsers(
 }
 
 func (u *User) ChangePassword(
-	userId uuid.UUID,
+	email string,
 	request schemas.ChangePasswordInput,
 ) *errors.Error {
-	_, err := u.Adapter.User.GetPostgresqlUser(userId)
+	// Buscar usuario por email
+	user, err := u.Adapter.User.GetPostgresqlUserByEmail(email)
 	if err != nil {
 		return &errors.ObjectNotFoundError.UserNotFound
 	}
 
+	// Hashear la nueva contraseña
 	hashedPassword, hashErr := utils.HashPassword(request.NewPassword)
 	if hashErr != nil {
 		return &errors.InternalServerError.Default
 	}
 
-	updateErr := u.Adapter.User.UpdateUserPassword(userId, hashedPassword)
+	// Actualizar contraseña usando el ID del usuario encontrado
+	updateErr := u.Adapter.User.UpdateUserPassword(user.Id, hashedPassword)
 	if updateErr != nil {
 		return &errors.BadRequestError.UserPasswordNotUpdated
 	}
