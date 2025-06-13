@@ -1,4 +1,4 @@
-package api
+package middleware
 
 import (
 	"github.com/labstack/echo/v4"
@@ -7,7 +7,7 @@ import (
 )
 
 // JWTMiddleware validates JWT tokens for protected endpoints
-func (a *Api) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (a *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Verificar si está en modo desarrollo
 		if config.GetDevMode() {

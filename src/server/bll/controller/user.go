@@ -103,3 +103,15 @@ func (u *User) BulkDeleteUsers(
 		bulkDeleteUsersData.Users,
 	)
 }
+
+func (u *User) CheckUserExistsByEmail(email string) (*schemas.CheckUserExistsResponse, *errors.Error) {
+	_, err := u.Adapter.User.GetPostgresqlUserByEmail(email)
+
+	// Si no hay error, el usuario existe
+	exists := err == nil
+
+	return &schemas.CheckUserExistsResponse{
+		Email:  email,
+		Exists: exists,
+	}, nil
+}

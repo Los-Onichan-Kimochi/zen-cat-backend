@@ -10,20 +10,29 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
-type AuditMiddleware struct {
-	logger        logging.Logger
-	bllController *controller.ControllerCollection
+type Middleware struct {
+	Logger        logging.Logger
+	BllController *controller.ControllerCollection
+	EnvSettings   *schemas.EnvSettings
+	Echo          *echo.Echo
 }
 
-func NewAuditMiddleware(logger logging.Logger, bllController *controller.ControllerCollection) *AuditMiddleware {
-	return &AuditMiddleware{
-		logger:        logger,
-		bllController: bllController,
+func NewMiddleware(
+	logger logging.Logger,
+	bllController *controller.ControllerCollection,
+	envSettings *schemas.EnvSettings,
+	echo *echo.Echo,
+) *Middleware {
+	return &Middleware{
+		Logger:        logger,
+		BllController: bllController,
+		EnvSettings:   envSettings,
+		Echo:          echo,
 	}
 }
 
 // AuditMiddleware captures API calls and logs them for audit purposes
-func (a *AuditMiddleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (a *Middleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Skip audit logging for certain paths
 		path := c.Request().URL.Path
@@ -39,7 +48,7 @@ func (a *AuditMiddleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFun
 		var hasValidUser bool
 
 		// Try to get user credentials from JWT
-		if _, credentials, err := a.bllController.Auth.AccessTokenValidation(c); err == nil {
+		if _, credentials, err := a.BllController.Auth.AccessTokenValidation(c); err == nil {
 			auditContext = schemas.AuditContext{
 				UserId:    credentials.UserId,
 				UserEmail: credentials.UserEmail,
@@ -74,8 +83,8 @@ func (a *AuditMiddleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFun
 			}
 
 			// Log the audit event (don't fail the request if audit logging fails)
-			if auditErr := a.bllController.AuditLog.LogAuditEvent(auditContext, event); auditErr != nil {
-				a.logger.Error("Failed to log audit event: ", auditErr)
+			if auditErr := a.BllController.AuditLog.LogAuditEvent(auditContext, event); auditErr != nil {
+				a.Logger.Error("Failed to log audit event: ", auditErr)
 			}
 		}
 
