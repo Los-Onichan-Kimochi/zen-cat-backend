@@ -13,7 +13,7 @@ update-dummy_data:
 	cd src/server/ && go run tests/set_dummy_data.go
 
 # Set up testing enviroment for python
-setup-test:
+set-up-test:
 	cd src/server/tests && \
 	python3 -m venv libs && \
 	. libs/bin/activate && \
