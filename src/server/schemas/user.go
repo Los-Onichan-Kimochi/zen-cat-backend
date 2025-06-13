@@ -57,3 +57,8 @@ type BulkDeleteUserRequest struct {
 type BulkCreateUserRequest struct {
 	Users []*CreateUserRequest `json:"users"`
 }
+
+type CheckUserExistsResponse struct {
+	Email  string `json:"email"`
+	Exists bool   `json:"exists"`
+}

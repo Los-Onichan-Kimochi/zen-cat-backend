@@ -27,6 +27,7 @@ type AstroCatPsqlCollection struct {
 	ServiceProfessional *ServiceProfessional
 	Session             *Session
 	Reservation         *Reservation
+	AuditLog            *AuditLog
 }
 
 // Create dao controller collection
@@ -67,6 +68,7 @@ func NewAstroCatPsqlCollection(
 		ServiceProfessional: NewServiceProfessionalController(logger, postgresqlDB),
 		Session:             NewSessionController(logger, postgresqlDB),
 		Reservation:         NewReservationController(logger, postgresqlDB),
+		AuditLog:            NewAuditLogController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 
@@ -116,6 +118,9 @@ func createTables(astroCatPsqlDB *gorm.DB) {
 		panic(err)
 	}
 	if err := astroCatPsqlDB.AutoMigrate(&model.ServiceProfessional{}); err != nil {
+		panic(err)
+	}
+	if err := astroCatPsqlDB.AutoMigrate(&model.AuditLog{}); err != nil {
 		panic(err)
 	}
 }

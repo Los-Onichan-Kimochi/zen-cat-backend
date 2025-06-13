@@ -25,6 +25,7 @@ type ControllerCollection struct {
 	ServiceProfessional *ServiceProfessional
 	Session             *Session
 	Reservation         *Reservation
+	AuditLog            *AuditLog
 }
 
 // Create bll controller collection
@@ -51,6 +52,7 @@ func NewControllerCollection(
 	serviceProfessional := NewServiceProfessionalController(logger, bllAdapter, envSettings)
 	session := NewSessionController(logger, bllAdapter, envSettings)
 	reservation := NewReservationController(logger, bllAdapter, envSettings)
+	auditLog := NewAuditLogController(logger, bllAdapter, envSettings)
 
 	return &ControllerCollection{
 		Logger:              logger,
@@ -70,5 +72,6 @@ func NewControllerCollection(
 		ServiceProfessional: serviceProfessional,
 		Session:             session,
 		Reservation:         reservation,
+		AuditLog:            auditLog,
 	}, astroCatPsqlDB
 }
