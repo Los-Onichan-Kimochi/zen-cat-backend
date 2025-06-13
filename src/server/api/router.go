@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	_ "onichankimochi.com/astro_cat_backend/src/server/api/docs" // Import generated swagger docs
+	auditMiddleware "onichankimochi.com/astro_cat_backend/src/server/api/middleware"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
@@ -30,6 +31,10 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 		AllowCredentials: true,
 	}
 	a.Echo.Use(middleware.CORSWithConfig(corsConfig))
+
+	// Add audit middleware
+	auditMw := auditMiddleware.NewAuditMiddleware(a.Logger, a.BllController)
+	a.Echo.Use(auditMw.AuditMiddleware)
 
 	if envSettings.EnableSwagger {
 		a.Echo.GET("/swagger/*", echoSwagger.EchoWrapHandler(echoSwagger.InstanceName("server")))
@@ -191,6 +196,14 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	serviceProfessional.POST("/bulk/", a.BulkCreateServiceProfessionals)
 	serviceProfessional.GET("/", a.FetchServiceProfessionals)
 	serviceProfessional.DELETE("/bulk/", a.BulkDeleteServiceProfessionals)
+
+	// AuditLog endpoints (all protected)
+	auditLog := a.Echo.Group("/audit-log")
+	auditLog.Use(a.JWTMiddleware) // Apply JWT middleware to all audit-log routes
+	auditLog.GET("/", a.GetAuditLogs)
+	auditLog.GET("/:auditLogId/", a.GetAuditLogById)
+	auditLog.GET("/stats/", a.GetAuditStats)
+	auditLog.DELETE("/cleanup/", a.DeleteOldAuditLogs)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
