@@ -62,3 +62,8 @@ type ChangePasswordInput struct {
 	Email       string `json:"email" validate:"required,email"`
 	NewPassword string `json:"new_password" validate:"required"`
 }
+
+type CheckUserExistsResponse struct {
+	Email  string `json:"email"`
+	Exists bool   `json:"exists"`
+}

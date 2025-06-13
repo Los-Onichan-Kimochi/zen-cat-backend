@@ -29,6 +29,7 @@ var (
 		ServiceLocalNotFound        Error
 		ServiceProfessionalNotFound Error
 		SessionNotFound             Error
+		AuditLogNotFound            Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -81,6 +82,10 @@ var (
 		SessionNotFound: Error{
 			Code:    "SESSION_ERROR_001",
 			Message: "Session not found",
+		},
+		AuditLogNotFound: Error{
+			Code:    "AUDIT_LOG_ERROR_001",
+			Message: "Audit log not found",
 		},
 	}
 
@@ -200,7 +205,6 @@ var (
 		UserNotCreated                Error
 		UserNotUpdated                Error
 		UserNotSoftDeleted            Error
-		UserPasswordNotUpdated        Error
 		CommunityPlanNotCreated       Error
 		CommunityPlanNotDeleted       Error
 		CommunityServiceNotCreated    Error

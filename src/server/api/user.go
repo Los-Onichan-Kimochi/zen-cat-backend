@@ -201,6 +201,33 @@ func (a *Api) BulkCreateUsers(c echo.Context) error {
 	return c.JSON(http.StatusCreated, response)
 }
 
+// @Summary 			Check User Exists by Email.
+// @Description 		Checks if a user exists with the given email address.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               email    query   string  true  "Email address"
+// @Success 			200 {object} schemas.CheckUserExistsResponse "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/check-exists [get]
+func (a *Api) CheckUserExistsByEmail(c echo.Context) error {
+	email := c.QueryParam("email")
+	if email == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, err := a.BllController.User.CheckUserExistsByEmail(email)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 // @Summary      Change password with email
 // @Tags         User
 // @Accept       json
