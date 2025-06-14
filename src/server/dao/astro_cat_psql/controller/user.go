@@ -166,3 +166,17 @@ func (u *User) BulkDeleteUsers(userIds []uuid.UUID) error {
 	}
 	return nil
 }
+
+func (u *User) UpdateUserPassword(userId uuid.UUID, hashedPassword string) error {
+	result := u.PostgresqlDB.
+		Model(&model.User{}).
+		Where("id = ?", userId).
+		Update("password", hashedPassword)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}

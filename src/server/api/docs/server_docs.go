@@ -1349,6 +1349,64 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/forgot-password/": {
+            "post": {
+                "description": "Envía un código de recuperación (PIN) al correo electrónico del usuario",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ForgotPassword"
+                ],
+                "summary": "Recovery Password",
+                "parameters": [
+                    {
+                        "description": "Email del usuario",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ForgotPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Código enviado exitosamente",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ForgotPasswordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Error al enviar el código",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Usuario no encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Formato incorrecto",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/health-check/": {
             "get": {
                 "description": "Verify connection in swagger",
@@ -5971,6 +6029,63 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/user/change-password/": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change password with email",
+                "parameters": [
+                    {
+                        "description": "Email and new password",
+                        "name": "changePassword",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ChangePasswordInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/echo.Map"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{userId}/": {
             "get": {
                 "security": [
@@ -6173,6 +6288,10 @@ const docTemplateserver = `{
         }
     },
     "definitions": {
+        "echo.Map": {
+            "type": "object",
+            "additionalProperties": true
+        },
         "errors.Error": {
             "type": "object",
             "properties": {
@@ -6462,6 +6581,21 @@ const docTemplateserver = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "schemas.ChangePasswordInput": {
+            "type": "object",
+            "required": [
+                "email",
+                "new_password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
                 }
             }
         },
@@ -6961,6 +7095,28 @@ const docTemplateserver = `{
                 "DocumentTypeForeignerCard",
                 "DocumentTypePassport"
             ]
+        },
+        "schemas.ForgotPasswordRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.ForgotPasswordResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            }
         },
         "schemas.Gender": {
             "type": "string",
@@ -7623,6 +7779,9 @@ const docTemplateserver = `{
                 },
                 "professional_id": {
                     "type": "string"
+                },
+                "registered_count": {
+                    "type": "integer"
                 },
                 "session_link": {
                     "type": "string"

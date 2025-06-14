@@ -23,6 +23,7 @@ type AdapterCollection struct {
 	ServiceProfessional *ServiceProfessional
 	Session             *Session
 	Reservation         *Reservation
+	AuditLog            *AuditLog
 }
 
 // Create bll adapter collection
@@ -46,5 +47,6 @@ func NewAdapterCollection(
 		ServiceProfessional: NewServiceProfessionalAdapter(logger, daoAstroCatPsql),
 		Session:             NewSessionAdapter(logger, daoAstroCatPsql),
 		Reservation:         NewReservationAdapter(logger, daoAstroCatPsql),
+		AuditLog:            NewAuditLogAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }
