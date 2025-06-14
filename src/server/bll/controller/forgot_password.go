@@ -54,3 +54,31 @@ func (fp *ForgotPassword) GenerateResetPin(
 		Pin:     pin, // solo para curso/test
 	}, nil
 }
+
+func (fp *ForgotPassword) SendResetPinBySMS(
+	email string,
+) (*schemas.ForgotPasswordResponse, *errors.Error) {
+	// Buscar usuario
+	user, err := fp.Adapter.User.GetPostgresqlUserByEmail(email)
+	if err != nil {
+		return nil, &errors.ForgotPasswordError.InvalidEmail
+	}
+
+	// Verifica que haya completado el onboarding para enviar el SM
+	onboarding, err := fp.Adapter.Onboarding.GetPostgresqlOnboardingByUserId(user.Id)
+	if err != nil {
+		return nil, &errors.ForgotPasswordError.InvalidEmail
+	}
+
+	// Generar PIN de 6 dígitos
+
+	// Enviar por SMS
+	errSMS := sms.SendPINBySMS(onboarding.PhoneNumber, resetPins[user.Email])
+	if errSMS != nil {
+		return nil, &errors.ForgotPasswordError.FailedToSendSMS
+	}
+
+	return &schemas.ForgotPasswordResponse{
+		Message: "Código enviado por SMS",
+	}, nil
+}
