@@ -1079,22 +1079,10 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
     - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1310,48 +1298,7 @@ paths:
       summary: Get CommunityPlan.
       tags:
       - CommunityPlan
-  /community-plan/bulk/:
-    delete:
-      consumes:
-      - application/json
-      description: Bulk deletes community-plan associations.
-      parameters:
-      - description: Bulk Delete CommunityPlan Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/schemas.BulkDeleteCommunityPlanRequest'
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "401":
-          description: Missing or malformed JWT
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "422":
-          description: Unprocessable Entity
-          schema:
-            $ref: '#/definitions/errors.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.Error'
-      security:
-      - JWT: []
-      summary: Bulk Delete CommunityPlans.
-      tags:
-      - CommunityPlan
+  /community-plan/bulk-create/:
     post:
       consumes:
       - application/json
@@ -1397,6 +1344,48 @@ paths:
       security:
       - JWT: []
       summary: Bulk Create CommunityPlans.
+      tags:
+      - CommunityPlan
+  /community-plan/bulk-delete/:
+    delete:
+      consumes:
+      - application/json
+      description: Bulk deletes community-plan associations.
+      parameters:
+      - description: Bulk Delete CommunityPlan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.BulkDeleteCommunityPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Bulk Delete CommunityPlans.
       tags:
       - CommunityPlan
   /community-service/:
