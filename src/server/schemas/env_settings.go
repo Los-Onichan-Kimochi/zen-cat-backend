@@ -28,6 +28,13 @@ type EnvSettings struct {
 
 	// JWT
 	TokenSignatureKey []byte
+
+	// Email
+	EmailHost     string
+	EmailPort     int
+	EmailUser     string
+	EmailPassword string
+	EmailFrom     string
 }
 
 // Create a new env settings defined on .env file
@@ -61,6 +68,19 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 
 	tokenSignatureKey := []byte(os.Getenv("TOKEN_SIGNATURE_KEY"))
 
+	// lo del email :v
+
+	emailHost := os.Getenv("EMAIL_HOST")
+	emailPortStr := os.Getenv("EMAIL_PORT")
+	emailUser := os.Getenv("EMAIL_USER")
+	emailPassword := os.Getenv("EMAIL_PASSWORD")
+	emailFrom := os.Getenv("EMAIL_FROM")
+
+	emailPort, err := strconv.Atoi(emailPortStr)
+	if err != nil {
+		logger.Panicln("Invalid value for EMAIL_PORT, must be integer", err)
+	}
+
 	return &EnvSettings{
 		EnableSqlLogs: enableSqlLogs,
 
@@ -75,5 +95,11 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 		AstroCatPostgresName:     astroCatPostgresName,
 
 		TokenSignatureKey: tokenSignatureKey,
+
+		EmailHost:     emailHost,
+		EmailPort:     emailPort,
+		EmailUser:     emailUser,
+		EmailPassword: emailPassword,
+		EmailFrom:     emailFrom,
 	}
 }

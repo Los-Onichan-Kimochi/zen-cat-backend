@@ -205,6 +205,7 @@ var (
 		UserNotCreated                Error
 		UserNotUpdated                Error
 		UserNotSoftDeleted            Error
+		UserPasswordNotUpdated        Error
 		CommunityPlanNotCreated       Error
 		CommunityPlanNotDeleted       Error
 		CommunityServiceNotCreated    Error
@@ -313,6 +314,10 @@ var (
 			Code:    "USER_ERROR_005",
 			Message: "User not soft deleted",
 		},
+		UserPasswordNotUpdated: Error{
+			Code:    "USER_ERROR_007",
+			Message: "Failed to update user password",
+		},
 		CommunityPlanNotCreated: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_002",
 			Message: "Community-Plan association not created",
@@ -416,6 +421,26 @@ var (
 		Default: Error{
 			Code:    "INTERNAL_SERVER_ERROR_001",
 			Message: "An unexpected error occurred.",
+		},
+	}
+
+	// For forgot password or recovery flows
+	ForgotPasswordError = struct {
+		InvalidEmail        Error
+		FailedToSendEmail   Error
+		InvalidOrExpiredPin Error
+	}{
+		InvalidEmail: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_001",
+			Message: "Email not associated to any account",
+		},
+		FailedToSendEmail: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_002",
+			Message: "Failed to send reset email",
+		},
+		InvalidOrExpiredPin: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_003",
+			Message: "Invalid or expired PIN code",
 		},
 	}
 )

@@ -6,6 +6,7 @@ import (
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
 	errors "onichankimochi.com/astro_cat_backend/src/server/errors"
 	schemas "onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
@@ -114,4 +115,29 @@ func (u *User) CheckUserExistsByEmail(email string) (*schemas.CheckUserExistsRes
 		Email:  email,
 		Exists: exists,
 	}, nil
+}
+
+func (u *User) ChangePassword(
+	email string,
+	request schemas.ChangePasswordInput,
+) *errors.Error {
+	// Buscar usuario por email
+	user, err := u.Adapter.User.GetPostgresqlUserByEmail(email)
+	if err != nil {
+		return &errors.ObjectNotFoundError.UserNotFound
+	}
+
+	// Hashear la nueva contraseña
+	hashedPassword, hashErr := utils.HashPassword(request.NewPassword)
+	if hashErr != nil {
+		return &errors.InternalServerError.Default
+	}
+
+	// Actualizar contraseña usando el ID del usuario encontrado
+	updateErr := u.Adapter.User.UpdateUserPassword(user.Id, hashedPassword)
+	if updateErr != nil {
+		return &errors.BadRequestError.UserPasswordNotUpdated
+	}
+
+	return nil
 }

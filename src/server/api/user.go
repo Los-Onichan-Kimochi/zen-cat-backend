@@ -227,3 +227,29 @@ func (a *Api) CheckUserExistsByEmail(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary      Change password with email
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Param        changePassword body schemas.ChangePasswordInput true "Email and new password"
+// @Success      200 {object} echo.Map
+// @Failure      400,401,422,500 {object} errors.Error
+// @Router       /user/change-password/ [post]
+func (a *Api) ChangePassword(c echo.Context) error {
+	// Parse body
+	var request schemas.ChangePasswordInput
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Cambiar la contraseña
+	if err := a.BllController.User.ChangePassword(request.Email, request); err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	// Respuesta exitosa
+	return c.JSON(http.StatusOK, echo.Map{
+		"message": "Password changed successfully",
+	})
+}
