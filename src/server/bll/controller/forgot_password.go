@@ -73,7 +73,7 @@ func (fp *ForgotPassword) SendResetPinBySMS(
 	// Generar PIN de 6 dígitos
 
 	// Enviar por SMS
-	errSMS := sms.SendPINBySMS(onboarding.PhoneNumber, resetPins[user.Email])
+	errSMS := utils.SendPINBySMS(onboarding.PhoneNumber, resetPins[user.Email])
 	if errSMS != nil {
 		return nil, &errors.ForgotPasswordError.FailedToSendSMS
 	}
