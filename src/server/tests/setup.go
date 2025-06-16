@@ -556,7 +556,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Yearly Gym Membership",
+			Description: "Yearly Maternal Membership",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(1, 0, 0),
 			Status:      model.MembershipStatusActive,
@@ -564,6 +564,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[1].Id,
+			UserId:      users[1].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
 			UserId:      users[1].Id,
 			PlanId:      plans[1].Id,
 		},
