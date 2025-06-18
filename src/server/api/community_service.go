@@ -74,6 +74,34 @@ func (a *Api) GetCommunityService(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get all services associated with a specific community.
+// @Description 		Retrieves all services that are linked to a given community, based on the community ID.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				communityId path string true "Community ID"
+// @Success 			200 {object} schemas.Service "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (No services associated with the given community ID)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/{communityId}/ [get]
+func (a *Api) GetServicesByCommunityId(c echo.Context) error {
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	response, err := a.BllController.CommunityService.GetServicesByCommunityId(communityId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 // @Summary 			Delete CommunityService.
 // @Description 		Deletes a specific community-service association.
 // @Tags 				CommunityService

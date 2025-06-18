@@ -174,6 +174,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.Use(mw.JWTMiddleware) // Apply JWT middleware to all community-service routes
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
+	communityService.GET("/:communityId/", a.GetServicesByCommunityId)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
