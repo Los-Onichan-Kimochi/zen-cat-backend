@@ -3,11 +3,11 @@ package schemas
 type S3Prefix string
 
 var (
-	LandingPrefix      S3Prefix = "landing"
-	ProfessionalPrefix S3Prefix = "professional"
-	LocalPrefix        S3Prefix = "local"
-	UserPrefix         S3Prefix = "user"
-	ServicePrefix      S3Prefix = "service"
-	CommunityPrefix    S3Prefix = "community"
-	TemplatePrefix     S3Prefix = "template"
+	LandingS3Prefix      S3Prefix = "landing"
+	ProfessionalS3Prefix S3Prefix = "professional"
+	LocalS3Prefix        S3Prefix = "local"
+	UserS3Prefix         S3Prefix = "user"
+	ServiceS3Prefix      S3Prefix = "service"
+	CommunityS3Prefix    S3Prefix = "community"
+	TemplateS3Prefix     S3Prefix = "template"
 )

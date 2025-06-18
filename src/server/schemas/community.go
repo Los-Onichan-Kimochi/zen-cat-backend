@@ -16,9 +16,10 @@ type Communities struct {
 }
 
 type CreateCommunityRequest struct {
-	Name     string `json:"name"`
-	Purpose  string `json:"purpose"`
-	ImageUrl string `json:"image_url"`
+	Name       string `json:"name"`
+	Purpose    string `json:"purpose"`
+	ImageUrl   string `json:"image_url"`
+	ImageBytes []byte `json:"image_bytes"`
 }
 
 type UpdateCommunityRequest struct {
@@ -33,4 +34,9 @@ type BatchCreateCommunityRequest struct {
 
 type BulkDeleteCommunityRequest struct {
 	Communities []uuid.UUID `json:"communities"`
+}
+
+type CommunityWithImage struct {
+	Community
+	ImageBytes []byte `json:"image_bytes"`
 }

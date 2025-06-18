@@ -25,17 +25,15 @@ func main() {
 		return
 	}
 
-	// Lista de archivos para probar
-	testFiles := []string{
-		"mitos_embarazo_-t.jpg",
-		"gym_rats.webp",
-	}
-
 	fmt.Println("🚀 Starting S3 test...")
 	fmt.Printf("📁 Download directory: %s\n", downloadDir)
 	fmt.Println("=" + fmt.Sprintf("%40s", "="))
 
 	// Probar subida y descarga para cada archivo
+	testFiles := []string{
+		"mitos_embarazo_-t.jpg",
+		"gym_rats.webp",
+	}
 	for _, filePath := range testFiles {
 		fmt.Printf("\n📄 Testing file: %s\n", filePath)
 
@@ -66,7 +64,7 @@ func main() {
 }
 
 func downloadFile(s3Service *services.S3Service, fileName string, downloadDir string) error {
-	imageBytes, err := s3Service.DownloadFile(schemas.LandingPrefix, fileName)
+	imageBytes, err := s3Service.DownloadFile(schemas.LandingS3Prefix, fileName)
 	if err != nil {
 		return fmt.Errorf("error downloading file: %w", err)
 	}
@@ -95,7 +93,7 @@ func uploadFile(s3Service *services.S3Service, filePath string) error {
 		return fmt.Errorf("error reading file: %w", err)
 	}
 
-	err = s3Service.UploadFile(schemas.LandingPrefix, filePath, imageBytes)
+	err = s3Service.UploadFile(schemas.LandingS3Prefix, filePath, imageBytes)
 	if err != nil {
 		return fmt.Errorf("error uploading file: %w", err)
 	}

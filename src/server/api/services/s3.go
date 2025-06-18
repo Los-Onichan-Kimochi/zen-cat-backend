@@ -3,7 +3,7 @@ package services
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"errors"
 	"io"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -54,7 +54,8 @@ func (s *S3Service) UploadFile(
 	imageBytes []byte,
 ) error {
 	if !s.IsAvailablePrefix(prefix) {
-		return fmt.Errorf("prefix %s is not available", prefix)
+		s.logger.Errorf("Prefix %s is not available", prefix)
+		return errors.New("prefix not available")
 	}
 
 	// Open file
@@ -68,10 +69,9 @@ func (s *S3Service) UploadFile(
 		Body:   src,
 	})
 	if err != nil {
+		s.logger.Errorf("Error uploading file to S3: %v", err)
 		return err
 	}
-
-	s.logger.Infof("File successfully uploaded to S3: %s/%s", prefix, objectName)
 
 	return nil
 }
@@ -79,7 +79,8 @@ func (s *S3Service) UploadFile(
 // Downloads a file from S3. It returns the file content as bytes.
 func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]byte, error) {
 	if !s.IsAvailablePrefix(prefix) {
-		return nil, fmt.Errorf("prefix %s is not available", prefix)
+		s.logger.Errorf("Prefix %s is not available", prefix)
+		return nil, errors.New("prefix not available")
 	}
 
 	// Create a new context
@@ -91,16 +92,16 @@ func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]
 		Key:    aws.String(string(prefix) + "/" + objectName),
 	})
 	if err != nil {
+		s.logger.Errorf("Error downloading file from S3: %v", err)
 		return nil, err
 	}
 
 	// Read the file content
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		s.logger.Errorf("Error reading file content: %v", err)
 		return nil, err
 	}
-
-	s.logger.Infof("File successfully downloaded from S3: %s/%s", prefix, objectName)
 
 	return body, nil
 }
@@ -108,13 +109,13 @@ func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]
 // Checks if a prefix is available in S3.
 func (s *S3Service) IsAvailablePrefix(prefix schemas.S3Prefix) bool {
 	for _, p := range []schemas.S3Prefix{
-		schemas.LandingPrefix,
-		schemas.ProfessionalPrefix,
-		schemas.LocalPrefix,
-		schemas.UserPrefix,
-		schemas.ServicePrefix,
-		schemas.CommunityPrefix,
-		schemas.TemplatePrefix,
+		schemas.LandingS3Prefix,
+		schemas.ProfessionalS3Prefix,
+		schemas.LocalS3Prefix,
+		schemas.UserS3Prefix,
+		schemas.ServiceS3Prefix,
+		schemas.CommunityS3Prefix,
+		schemas.TemplateS3Prefix,
 	} {
 		if p == prefix {
 			return true
