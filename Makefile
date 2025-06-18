@@ -3,6 +3,10 @@ init-vscode:
 	cd src/server && cp .env.sample .env && cd .. && cd .. && \
 	cd .vscode && cp settings.json.sample settings.json
 
+# Set up AWS S3 credentials
+set-aws-credentials:
+	@./scripts/setup-aws-s3.sh
+
 # Set up database
 set-up-db:
 	docker compose down && \
@@ -24,3 +28,7 @@ run:
 # Swagger documentation
 swag-docs:
 	cd src/server/api && swag init -g server.go --instanceName server --parseDependency --parseDepth 1
+
+# S3 test
+s3-test:
+	cd src/server/tests/s3_test && go run s3.go

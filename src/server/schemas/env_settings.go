@@ -35,6 +35,13 @@ type EnvSettings struct {
 	EmailUser     string
 	EmailPassword string
 	EmailFrom     string
+
+	// AWS S3
+	AwsAccessKeyId     string
+	AwsSecretAccessKey string
+	AwsSessionToken    string
+	AwsRegion          string
+	S3BucketName       string
 }
 
 // Create a new env settings defined on .env file
@@ -68,8 +75,7 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 
 	tokenSignatureKey := []byte(os.Getenv("TOKEN_SIGNATURE_KEY"))
 
-	// lo del email :v
-
+	// Email
 	emailHost := os.Getenv("EMAIL_HOST")
 	emailPortStr := os.Getenv("EMAIL_PORT")
 	emailUser := os.Getenv("EMAIL_USER")
@@ -80,6 +86,13 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 	if err != nil {
 		logger.Panicln("Invalid value for EMAIL_PORT, must be integer", err)
 	}
+
+	// AWS S3
+	AwsAccessKeyId := os.Getenv("AWS_ACCESS_KEY_ID")
+	AwsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	AwsSessionToken := os.Getenv("AWS_SESSION_TOKEN")
+	AwsRegion := os.Getenv("AWS_REGION")
+	S3BucketName := os.Getenv("S3_BUCKET_NAME")
 
 	return &EnvSettings{
 		EnableSqlLogs: enableSqlLogs,
@@ -101,5 +114,11 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 		EmailUser:     emailUser,
 		EmailPassword: emailPassword,
 		EmailFrom:     emailFrom,
+
+		AwsAccessKeyId:     AwsAccessKeyId,
+		AwsSecretAccessKey: AwsSecretAccessKey,
+		AwsSessionToken:    AwsSessionToken,
+		AwsRegion:          AwsRegion,
+		S3BucketName:       S3BucketName,
 	}
 }
