@@ -58,6 +58,11 @@ func (s *S3Service) UploadFile(
 		return errors.New("prefix not available")
 	}
 
+	if len(imageBytes) == 0 {
+		s.logger.Infof("No image bytes to upload for %s", objectName)
+		return nil
+	}
+
 	// Open file
 	src := bytes.NewReader(imageBytes)
 

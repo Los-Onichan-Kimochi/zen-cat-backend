@@ -117,9 +117,6 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
-	if request.ImageBytes == nil {
-		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
-	}
 
 	response, newErr := a.BllController.Community.CreateCommunity(request, updatedBy)
 	if newErr != nil {
@@ -127,9 +124,15 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 	}
 
 	// Upload image to S3
-	err := a.S3Service.UploadFile(schemas.CommunityS3Prefix, request.ImageUrl, request.ImageBytes)
-	if err != nil {
-		return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+	if request.ImageUrl != "" {
+		err := a.S3Service.UploadFile(
+			schemas.CommunityS3Prefix,
+			request.ImageUrl,
+			request.ImageBytes,
+		)
+		if err != nil {
+			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+		}
 	}
 
 	return c.JSON(http.StatusCreated, response)
@@ -198,9 +201,6 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
-	if request.ImageBytes == nil {
-		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
-	}
 
 	response, newErr := a.BllController.Community.UpdateCommunity(communityId, request, updatedBy)
 	if newErr != nil {
@@ -209,7 +209,11 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 
 	// Upload image to S3 if it exists
 	if request.ImageUrl != nil {
-		err := a.S3Service.UploadFile(schemas.CommunityS3Prefix, *request.ImageUrl, request.ImageBytes)
+		err := a.S3Service.UploadFile(
+			schemas.CommunityS3Prefix,
+			*request.ImageUrl,
+			request.ImageBytes,
+		)
 		if err != nil {
 			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
 		}
