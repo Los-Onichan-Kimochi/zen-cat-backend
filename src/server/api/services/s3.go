@@ -73,6 +73,8 @@ func (s *S3Service) UploadFile(
 		return err
 	}
 
+	s.logger.Infof("File %s uploaded to S3.", string(prefix)+"/"+objectName)
+
 	return nil
 }
 
@@ -92,7 +94,7 @@ func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]
 		Key:    aws.String(string(prefix) + "/" + objectName),
 	})
 	if err != nil {
-		s.logger.Errorf("Error downloading file from S3: %v", err)
+		s.logger.Errorf("Error downloading file %s from S3: %v", string(prefix)+"/"+objectName, err)
 		return nil, err
 	}
 
@@ -102,6 +104,8 @@ func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]
 		s.logger.Errorf("Error reading file content: %v", err)
 		return nil, err
 	}
+
+	s.logger.Infof("File %s downloaded from S3.", string(prefix)+"/"+objectName)
 
 	return body, nil
 }
