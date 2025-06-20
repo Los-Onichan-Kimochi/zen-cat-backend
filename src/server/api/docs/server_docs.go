@@ -15,6 +15,280 @@ const docTemplateserver = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/audit-log/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve audit logs with optional filtering and pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AuditLog"
+                ],
+                "summary": "Get Audit Logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comma-separated user IDs",
+                        "name": "userIds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated action types",
+                        "name": "actions",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated entity types",
+                        "name": "entityTypes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated user roles",
+                        "name": "userRoles",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "startDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "endDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by success (true/false)",
+                        "name": "success",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page size (default: 50, max: 200)",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditLogs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/audit-log/cleanup/": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Delete audit logs older than the specified number of days",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AuditLog"
+                ],
+                "summary": "Delete Old Audit Logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Number of days to keep (default: 90)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/audit-log/stats/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve audit statistics for the specified time period",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AuditLog"
+                ],
+                "summary": "Get Audit Statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Number of days to include in stats (default: 30)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditStats"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/audit-log/{auditLogId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve a specific audit log by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AuditLog"
+                ],
+                "summary": "Get Audit Log by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Audit Log ID",
+                        "name": "auditLogId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditLog"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/refresh/": {
             "post": {
                 "security": [
@@ -200,7 +474,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/community-plan/bulk/": {
+        "/community-plan/bulk-create/": {
             "post": {
                 "security": [
                     {
@@ -273,7 +547,9 @@ const docTemplateserver = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/community-plan/bulk-delete/": {
             "delete": {
                 "security": [
                     {
@@ -1312,6 +1588,73 @@ const docTemplateserver = `{
                         "description": "Ok",
                         "schema": {
                             "$ref": "#/definitions/schemas.Community"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community/{communityId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a community given its id with its image.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Get Community with Image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityWithImage"
                         }
                     },
                     "400": {
@@ -6084,6 +6427,67 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/user/check-exists": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Checks if a user exists with the given email address.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Check User Exists by Email.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email address",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CheckUserExistsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{userId}/": {
             "get": {
                 "security": [
@@ -6311,6 +6715,194 @@ const docTemplateserver = `{
                 "PlanTypeMonthly",
                 "PlanTypeAnual"
             ]
+        },
+        "schemas.ActionStat": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "schemas.AuditActionType": {
+            "type": "string",
+            "enum": [
+                "CREATE",
+                "UPDATE",
+                "DELETE",
+                "BULK_CREATE",
+                "BULK_DELETE",
+                "LOGIN",
+                "REGISTER",
+                "SUBSCRIBE",
+                "UNSUBSCRIBE",
+                "CREATE_RESERVATION",
+                "CANCEL_RESERVATION",
+                "UPDATE_PROFILE"
+            ],
+            "x-enum-varnames": [
+                "AuditActionCreate",
+                "AuditActionUpdate",
+                "AuditActionDelete",
+                "AuditActionBulkCreate",
+                "AuditActionBulkDelete",
+                "AuditActionLogin",
+                "AuditActionRegister",
+                "AuditActionSubscribe",
+                "AuditActionUnsubscribe",
+                "AuditActionCreateReservation",
+                "AuditActionCancelReservation",
+                "AuditActionUpdateProfile"
+            ]
+        },
+        "schemas.AuditEntityType": {
+            "type": "string",
+            "enum": [
+                "USER",
+                "COMMUNITY",
+                "PROFESSIONAL",
+                "LOCAL",
+                "PLAN",
+                "SERVICE",
+                "SESSION",
+                "RESERVATION",
+                "MEMBERSHIP",
+                "ONBOARDING",
+                "COMMUNITY_PLAN",
+                "COMMUNITY_SERVICE",
+                "SERVICE_LOCAL",
+                "SERVICE_PROFESSIONAL"
+            ],
+            "x-enum-varnames": [
+                "AuditEntityUser",
+                "AuditEntityCommunity",
+                "AuditEntityProfessional",
+                "AuditEntityLocal",
+                "AuditEntityPlan",
+                "AuditEntityService",
+                "AuditEntitySession",
+                "AuditEntityReservation",
+                "AuditEntityMembership",
+                "AuditEntityOnboarding",
+                "AuditEntityCommunityPlan",
+                "AuditEntityCommunityService",
+                "AuditEntityServiceLocal",
+                "AuditEntityServiceProfessional"
+            ]
+        },
+        "schemas.AuditLog": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "$ref": "#/definitions/schemas.AuditActionType"
+                },
+                "additional_info": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "entity_name": {
+                    "type": "string"
+                },
+                "entity_type": {
+                    "$ref": "#/definitions/schemas.AuditEntityType"
+                },
+                "error_message": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ip_address": {
+                    "type": "string"
+                },
+                "new_values": {
+                    "type": "string"
+                },
+                "old_values": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "$ref": "#/definitions/schemas.UserProfile"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_role": {
+                    "$ref": "#/definitions/schemas.UserRol"
+                }
+            }
+        },
+        "schemas.AuditLogs": {
+            "type": "object",
+            "properties": {
+                "audit_logs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.AuditLog"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                }
+            }
+        },
+        "schemas.AuditStats": {
+            "type": "object",
+            "properties": {
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.ActionStat"
+                    }
+                },
+                "entity_types": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.EntityTypeStat"
+                    }
+                },
+                "failure_count": {
+                    "type": "integer"
+                },
+                "success_count": {
+                    "type": "integer"
+                },
+                "total_events": {
+                    "type": "integer"
+                },
+                "user_roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.UserRoleStat"
+                    }
+                }
+            }
         },
         "schemas.AvailabilityRequest": {
             "type": "object",
@@ -6621,6 +7213,17 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CheckUserExistsResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "exists": {
+                    "type": "boolean"
+                }
+            }
+        },
         "schemas.Communities": {
             "type": "object",
             "properties": {
@@ -6702,6 +7305,32 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CommunityWithImage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number_subscriptions": {
+                    "type": "integer"
+                },
+                "purpose": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.ConflictResult": {
             "type": "object",
             "properties": {
@@ -6740,6 +7369,12 @@ const docTemplateserver = `{
         "schemas.CreateCommunityRequest": {
             "type": "object",
             "properties": {
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -7093,6 +7728,17 @@ const docTemplateserver = `{
                 "DocumentTypeForeignerCard",
                 "DocumentTypePassport"
             ]
+        },
+        "schemas.EntityTypeStat": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "entity_type": {
+                    "type": "string"
+                }
+            }
         },
         "schemas.ForgotPasswordRequest": {
             "type": "object",
@@ -7597,6 +8243,12 @@ const docTemplateserver = `{
         "schemas.UpdateCommunityRequest": {
             "type": "object",
             "properties": {
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -7905,6 +8557,17 @@ const docTemplateserver = `{
                 "UserRolClient"
             ]
         },
+        "schemas.UserRoleStat": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "user_role": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.Users": {
             "type": "object",
             "properties": {
@@ -7927,6 +8590,8 @@ const docTemplateserver = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -7943,6 +8608,8 @@ const docTemplateserver = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

@@ -37,6 +37,42 @@ func (a *Api) GetCommunity(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get Community with Image.
+// @Description 		Gets a community given its id with its image.
+// @Tags 				Community
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               communityId    path   string  true  "Community ID"
+// @Success 			200 {object} schemas.CommunityWithImage "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community/{communityId}/image/ [get]
+func (a *Api) GetCommunityWithImage(c echo.Context) error {
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	response, err := a.BllController.Community.GetCommunity(communityId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	imageBytes, s3Err := a.S3Service.DownloadFile(schemas.CommunityS3Prefix, response.ImageUrl)
+	if s3Err != nil && s3Err.Error() != "NoSuchKey" {
+		return errors.HandleError(errors.InternalServerError.FailedToDownloadImage, c)
+	}
+
+	return c.JSON(http.StatusOK, schemas.CommunityWithImage{
+		Community:  *response,
+		ImageBytes: imageBytes,
+	})
+}
+
 // @Summary 			Fetch Communities.
 // @Description 		Fetch all communities, filtered by params.
 // @Tags 				Community
@@ -85,6 +121,18 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 	response, newErr := a.BllController.Community.CreateCommunity(request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
+	}
+
+	// Upload image to S3
+	if request.ImageUrl != "" {
+		err := a.S3Service.UploadFile(
+			schemas.CommunityS3Prefix,
+			request.ImageUrl,
+			request.ImageBytes,
+		)
+		if err != nil {
+			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+		}
 	}
 
 	return c.JSON(http.StatusCreated, response)
@@ -157,6 +205,18 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 	response, newErr := a.BllController.Community.UpdateCommunity(communityId, request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
+	}
+
+	// Upload image to S3 if it exists
+	if request.ImageUrl != nil {
+		err := a.S3Service.UploadFile(
+			schemas.CommunityS3Prefix,
+			*request.ImageUrl,
+			request.ImageBytes,
+		)
+		if err != nil {
+			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+		}
 	}
 
 	return c.JSON(http.StatusOK, response)
