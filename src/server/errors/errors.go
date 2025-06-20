@@ -439,6 +439,7 @@ var (
 		InvalidEmail        Error
 		FailedToSendEmail   Error
 		InvalidOrExpiredPin Error
+		FailedToSendSMS     Error
 	}{
 		InvalidEmail: Error{
 			Code:    "FORGOT_PASSWORD_ERROR_001",
@@ -451,6 +452,10 @@ var (
 		InvalidOrExpiredPin: Error{
 			Code:    "FORGOT_PASSWORD_ERROR_003",
 			Message: "Invalid or expired PIN code",
+		},
+		FailedToSendSMS: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_004",
+			Message: "Failed to send SMS with recovery PIN",
 		},
 	}
 )
