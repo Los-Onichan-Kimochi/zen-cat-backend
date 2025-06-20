@@ -200,6 +200,7 @@ var (
 		InvalidPlanType               Error
 		MembershipNotCreated          Error
 		MembershipNotUpdated          Error
+		MembershipNotDeleted          Error
 		OnboardingNotCreated          Error
 		OnboardingNotUpdated          Error
 		UserNotCreated                Error
@@ -265,6 +266,10 @@ var (
 		MembershipNotUpdated: Error{
 			Code:    "MEMBERSHIP_ERROR_003",
 			Message: "Membership not updated",
+		},
+		MembershipNotDeleted: Error{
+			Code:    "MEMBERSHIP_ERROR_005",
+			Message: "Membership not deleted",
 		},
 		OnboardingNotCreated: Error{
 			Code:    "ONBOARDING_ERROR_002",

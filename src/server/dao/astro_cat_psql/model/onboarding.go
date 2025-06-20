@@ -33,10 +33,11 @@ type Onboarding struct {
 	BirthDate *time.Time `gorm:"type:date"`
 	Gender    *Gender    `gorm:"type:varchar(20)"`
 	// Dirección
-	City       string `gorm:"type:varchar(100);not null"`
-	PostalCode string `gorm:"type:varchar(10);not null"`
-	District   string `gorm:"type:varchar(100);not null"`
-	Address    string `gorm:"type:varchar(255);not null"`
+	PostalCode string  `gorm:"type:varchar(10);not null"`
+	Address    string  `gorm:"type:varchar(255);not null"`
+	District   *string `gorm:"type:varchar(100);not null"`
+	Province   *string `gorm:"type:varchar(100);not null"`
+	Region     *string `gorm:"type:varchar(100);not null"`
 	AuditFields
 
 	UserId uuid.UUID `gorm:"type:uuid;unique"`

@@ -41,9 +41,10 @@ func (o *Onboarding) GetPostgresqlOnboarding(
 		PhoneNumber:    onboardingModel.PhoneNumber,
 		BirthDate:      onboardingModel.BirthDate,
 		Gender:         (*schemas.Gender)(onboardingModel.Gender),
-		City:           onboardingModel.City,
 		PostalCode:     onboardingModel.PostalCode,
 		District:       onboardingModel.District,
+		Province:       onboardingModel.Province,
+		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
 	}, nil
 }
@@ -63,9 +64,10 @@ func (o *Onboarding) GetPostgresqlOnboardingByUserId(
 		PhoneNumber:    onboardingModel.PhoneNumber,
 		BirthDate:      onboardingModel.BirthDate,
 		Gender:         (*schemas.Gender)(onboardingModel.Gender),
-		City:           onboardingModel.City,
 		PostalCode:     onboardingModel.PostalCode,
 		District:       onboardingModel.District,
+		Province:       onboardingModel.Province,
+		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
 	}, nil
 }
@@ -85,9 +87,10 @@ func (o *Onboarding) FetchPostgresqlOnboardings() ([]*schemas.Onboarding, *error
 			PhoneNumber:    onboardingModel.PhoneNumber,
 			BirthDate:      onboardingModel.BirthDate,
 			Gender:         (*schemas.Gender)(onboardingModel.Gender),
-			City:           onboardingModel.City,
 			PostalCode:     onboardingModel.PostalCode,
 			District:       onboardingModel.District,
+			Province:       onboardingModel.Province,
+			Region:         onboardingModel.Region,
 			Address:        onboardingModel.Address,
 		}
 	}
@@ -102,9 +105,10 @@ func (o *Onboarding) CreatePostgresqlOnboarding(
 	phoneNumber string,
 	birthDate *string,
 	gender *schemas.Gender,
-	city string,
 	postalCode string,
-	district string,
+	district *string,
+	province *string,
+	region *string,
 	address string,
 	updatedBy string,
 ) (*schemas.Onboarding, *errors.Error) {
@@ -141,9 +145,10 @@ func (o *Onboarding) CreatePostgresqlOnboarding(
 		PhoneNumber:    phoneNumber,
 		BirthDate:      parsedBirthDate,
 		Gender:         (*model.Gender)(gender),
-		City:           city,
 		PostalCode:     postalCode,
 		District:       district,
+		Province:       province,
+		Region:         region,
 		Address:        address,
 		UserId:         userId,
 		AuditFields: model.AuditFields{
@@ -162,9 +167,10 @@ func (o *Onboarding) CreatePostgresqlOnboarding(
 		PhoneNumber:    onboardingModel.PhoneNumber,
 		BirthDate:      onboardingModel.BirthDate,
 		Gender:         (*schemas.Gender)(onboardingModel.Gender),
-		City:           onboardingModel.City,
 		PostalCode:     onboardingModel.PostalCode,
 		District:       onboardingModel.District,
+		Province:       onboardingModel.Province,
+		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
 	}, nil
 }
@@ -176,9 +182,10 @@ func (o *Onboarding) UpdatePostgresqlOnboarding(
 	phoneNumber *string,
 	birthDate *string,
 	gender *schemas.Gender,
-	city *string,
 	postalCode *string,
 	district *string,
+	province *string,
+	region *string,
 	address *string,
 	updatedBy string,
 ) (*schemas.Onboarding, *errors.Error) {
@@ -203,9 +210,10 @@ func (o *Onboarding) UpdatePostgresqlOnboarding(
 		phoneNumber,
 		parsedBirthDate,
 		(*model.Gender)(gender),
-		city,
 		postalCode,
 		district,
+		province,
+		region,
 		address,
 		updatedBy,
 	)
@@ -220,9 +228,10 @@ func (o *Onboarding) UpdatePostgresqlOnboarding(
 		PhoneNumber:    onboardingModel.PhoneNumber,
 		BirthDate:      onboardingModel.BirthDate,
 		Gender:         (*schemas.Gender)(onboardingModel.Gender),
-		City:           onboardingModel.City,
 		PostalCode:     onboardingModel.PostalCode,
 		District:       onboardingModel.District,
+		Province:       onboardingModel.Province,
+		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
 	}, nil
 }
