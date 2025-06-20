@@ -415,6 +415,23 @@ definitions:
           $ref: '#/definitions/schemas.CommunityService'
         type: array
     type: object
+  schemas.CommunityWithImage:
+    properties:
+      id:
+        type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
+      image_url:
+        type: string
+      name:
+        type: string
+      number_subscriptions:
+        type: integer
+      purpose:
+        type: string
+    type: object
   schemas.ConflictResult:
     properties:
       has_conflict:
@@ -440,6 +457,10 @@ definitions:
     type: object
   schemas.CreateCommunityRequest:
     properties:
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       name:
@@ -1063,6 +1084,10 @@ definitions:
     type: object
   schemas.UpdateCommunityRequest:
     properties:
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       name:
@@ -1308,22 +1333,10 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
     - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1895,6 +1908,47 @@ paths:
       security:
       - JWT: []
       summary: Create CommunityService.
+      tags:
+      - CommunityService
+  /community-service/{communityId}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all services that are linked to a given community, based
+        on the community ID.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Service'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (No services associated with the given community
+            ID)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get all services associated with a specific community.
       tags:
       - CommunityService
   /community-service/{communityId}/{serviceId}/:
@@ -2627,8 +2681,6 @@ paths:
       - JWT: []
       summary: Update Local.
       tags:
-      - Local
-  /local/bulk-create/:
     post:
       consumes:
       - application/json

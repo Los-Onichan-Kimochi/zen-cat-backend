@@ -44,6 +44,39 @@ func (cs *CommunityService) GetCommunityService(
 	return &communityService, nil
 }
 
+// Fetch all community-service associations, filtered by
+//
+//   - `communityId` if provided.
+func (cs *CommunityService) GetServicesByCommunityId(
+	communityId uuid.UUID,
+) ([]*model.Service, error) {
+	var communityServices []*model.CommunityService
+
+	// Realizamos la consulta en la base de datos para obtener las asociaciones de comunidad y servicio
+	query := cs.PostgresqlDB.Model(&model.CommunityService{})
+
+	query = query.Where("community_id = ?", communityId)
+
+	// Ejecutamos la consulta y almacenamos las asociaciones
+	if err := query.Find(&communityServices).Error; err != nil {
+		return nil, err
+	}
+
+	// Obtenemos los IDs de los servicios asociados
+	var serviceIds []uuid.UUID
+	for _, communityService := range communityServices {
+		serviceIds = append(serviceIds, communityService.ServiceId)
+	}
+
+	// Ahora realizamos una segunda consulta para obtener los servicios
+	var services []*model.Service
+	if err := cs.PostgresqlDB.Where("id IN (?)", serviceIds).Find(&services).Error; err != nil {
+		return nil, err
+	}
+
+	return services, nil
+}
+
 // Deletes a specific community-service association.
 func (cs *CommunityService) DeleteCommunityService(
 	communityId uuid.UUID,

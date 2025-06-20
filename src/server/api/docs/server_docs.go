@@ -1032,6 +1032,67 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/community-service/{communityId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves all services that are linked to a given community, based on the community ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Get all services associated with a specific community.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Service"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (No services associated with the given community ID)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/community-service/{communityId}/{serviceId}/": {
             "get": {
                 "security": [
@@ -1588,6 +1649,73 @@ const docTemplateserver = `{
                         "description": "Ok",
                         "schema": {
                             "$ref": "#/definitions/schemas.Community"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/community/{communityId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a community given its id with its image.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Community"
+                ],
+                "summary": "Get Community with Image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityWithImage"
                         }
                     },
                     "400": {
@@ -7777,6 +7905,32 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CommunityWithImage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "number_subscriptions": {
+                    "type": "integer"
+                },
+                "purpose": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.ConflictResult": {
             "type": "object",
             "properties": {
@@ -7815,6 +7969,12 @@ const docTemplateserver = `{
         "schemas.CreateCommunityRequest": {
             "type": "object",
             "properties": {
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8759,6 +8919,12 @@ const docTemplateserver = `{
         "schemas.UpdateCommunityRequest": {
             "type": "object",
             "properties": {
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -9129,12 +9295,6 @@ const docTemplateserver = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -9145,12 +9305,7 @@ const docTemplateserver = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
+
             ]
         }
     }

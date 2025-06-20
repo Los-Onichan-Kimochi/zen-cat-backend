@@ -62,6 +62,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community := a.Echo.Group("/community")
 	community.Use(mw.JWTMiddleware) // Apply JWT middleware to all community routes
 	community.GET("/:communityId/", a.GetCommunity)
+	community.GET("/:communityId/image/", a.GetCommunityWithImage)
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
@@ -186,6 +187,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.Use(mw.JWTMiddleware) // Apply JWT middleware to all community-service routes
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
+	communityService.GET("/:communityId/", a.GetServicesByCommunityId)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
