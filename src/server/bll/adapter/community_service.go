@@ -3,7 +3,6 @@ package adapter
 import (
 	"strings"
 
-
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -78,6 +77,32 @@ func (cs *CommunityService) GetPostgresqlCommunityService(
 		CommunityId: communityServiceModel.CommunityId,
 		ServiceId:   communityServiceModel.ServiceId,
 	}, nil
+}
+
+// Todo: add comment
+func (cs *CommunityService) GetPostgresqlServicesByCommunityId(
+	communityId uuid.UUID,
+) ([]*schemas.Service, *errors.Error) {
+	servicesModel, err := cs.DaoPostgresql.CommunityService.GetServicesByCommunityId(
+		communityId,
+	)
+
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.CommunityServiceNotFound
+	}
+
+	services := make([]*schemas.Service, len(servicesModel))
+	for i, serviceModel := range servicesModel {
+		services[i] = &schemas.Service{
+			Id:          serviceModel.Id,
+			Name:        serviceModel.Name,
+			Description: serviceModel.Description,
+			ImageUrl:    serviceModel.ImageUrl,
+			IsVirtual:   serviceModel.IsVirtual,
+		}
+	}
+
+	return services, nil
 }
 
 // Deletes a specific community-service association from postgresql DB.

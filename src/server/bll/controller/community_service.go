@@ -77,6 +77,19 @@ func (cs *CommunityService) GetCommunityService(
 	return cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
 }
 
+// Todo: Add a comment
+func (cs *CommunityService) GetServicesByCommunityId(
+	communityId uuid.UUID,
+) (*schemas.Services, *errors.Error) {
+
+	services, err := cs.Adapter.CommunityService.GetPostgresqlServicesByCommunityId(communityId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Services{Services: services}, nil
+}
+
 // Deletes a specific community-service association.
 func (cs *CommunityService) DeleteCommunityService(
 	communityIdString string,
