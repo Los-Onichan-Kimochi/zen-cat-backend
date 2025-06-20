@@ -13,6 +13,7 @@ type Reservation struct {
 	State            string    `json:"state"`
 	LastModification time.Time `json:"last_modification"`
 	UserId           uuid.UUID `json:"user_id"`
+	MembershipId     uuid.UUID `json:"membership_id"`
 	SessionId        uuid.UUID `json:"session_id"`
 }
 
@@ -25,6 +26,7 @@ type CreateReservationRequest struct {
 	ReservationTime time.Time `json:"reservation_time"`
 	State           string    `json:"state"`
 	UserId          uuid.UUID `json:"user_id"`
+	MembershipId    uuid.UUID `json:"membership_id"`
 	SessionId       uuid.UUID `json:"session_id"`
 }
 
@@ -33,6 +35,7 @@ type UpdateReservationRequest struct {
 	ReservationTime *time.Time `json:"reservation_time"`
 	State           *string    `json:"state"`
 	UserId          *uuid.UUID `json:"user_id"`
+	MembershipId    *uuid.UUID `json:"membership_id"`
 	SessionId       *uuid.UUID `json:"session_id"`
 }
 

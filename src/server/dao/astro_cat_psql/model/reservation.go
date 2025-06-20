@@ -23,10 +23,12 @@ type Reservation struct {
 	LastModification time.Time
 	AuditFields
 
-	UserId    uuid.UUID `gorm:"type:uuid"`
-	User      User      `gorm:"foreignKey:UserId"`
-	SessionId uuid.UUID `gorm:"type:uuid"`
-	Session   Session   `gorm:"foreignKey:SessionId"`
+	UserId       uuid.UUID  `gorm:"type:uuid"`
+	User         User       `gorm:"foreignKey:UserId"`
+	SessionId    uuid.UUID  `gorm:"type:uuid"`
+	Session      Session    `gorm:"foreignKey:SessionId"`
+	MembershipId uuid.UUID  `gorm:"type:uuid"`
+	Membership   Membership `gorm:"foreignKey:MembershipId"`
 }
 
 func (Reservation) TableName() string {

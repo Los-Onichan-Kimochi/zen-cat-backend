@@ -46,6 +46,7 @@ func (a *Api) GetReservation(c echo.Context) error {
 // @Security			JWT
 // @Param 				userIds query []string false "User IDs"
 // @Param 				sessionIds query []string false "Session IDs"
+// @Param 				membershipIds query []string false "Membership IDs"
 // @Param 				states query []string false "Reservation States"
 // @Success 			200 {object} schemas.Reservations "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
@@ -57,6 +58,7 @@ func (a *Api) GetReservation(c echo.Context) error {
 func (a *Api) FetchReservations(c echo.Context) error {
 	userIdsString := c.QueryParam("userIds")
 	sessionIdsString := c.QueryParam("sessionIds")
+	membershipIdsString := c.QueryParam("membershipIds")
 	statesString := c.QueryParam("states")
 
 	userIds := []string{}
@@ -69,12 +71,17 @@ func (a *Api) FetchReservations(c echo.Context) error {
 		sessionIds = strings.Split(sessionIdsString, ",")
 	}
 
+	membershipIds := []string{}
+	if membershipIdsString != "" {
+		membershipIds = strings.Split(membershipIdsString, ",")
+	}
+
 	states := []string{}
 	if statesString != "" {
 		states = strings.Split(statesString, ",")
 	}
 
-	response, err := a.BllController.Reservation.FetchReservations(userIds, sessionIds, states)
+	response, err := a.BllController.Reservation.FetchReservations(userIds, sessionIds, membershipIds, states)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

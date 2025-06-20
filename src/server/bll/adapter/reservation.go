@@ -43,6 +43,7 @@ func (r *Reservation) GetPostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
+		MembershipId:     reservationModel.MembershipId,
 	}, nil
 }
 
@@ -50,11 +51,13 @@ func (r *Reservation) GetPostgresqlReservation(
 func (r *Reservation) FetchPostgresqlReservations(
 	userIds []uuid.UUID,
 	sessionIds []uuid.UUID,
+	membershipIds []uuid.UUID,
 	states []string,
 ) ([]*schemas.Reservation, *errors.Error) {
 	reservationModels, err := r.DaoPostgresql.Reservation.FetchReservations(
 		userIds,
 		sessionIds,
+		membershipIds,
 		states,
 	)
 	if err != nil {
@@ -71,6 +74,7 @@ func (r *Reservation) FetchPostgresqlReservations(
 			LastModification: reservationModel.LastModification,
 			UserId:           reservationModel.UserId,
 			SessionId:        reservationModel.SessionId,
+			MembershipId:     reservationModel.MembershipId,
 		}
 	}
 
@@ -83,6 +87,7 @@ func (r *Reservation) CreatePostgresqlReservation(
 	reservationTime time.Time,
 	state string,
 	userId uuid.UUID,
+	membershipId uuid.UUID,
 	sessionId uuid.UUID,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
@@ -91,6 +96,7 @@ func (r *Reservation) CreatePostgresqlReservation(
 		reservationTime,
 		state,
 		userId,
+		membershipId,
 		sessionId,
 		updatedBy,
 	)
@@ -106,6 +112,7 @@ func (r *Reservation) CreatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
+		MembershipId:     reservationModel.MembershipId,
 	}, nil
 }
 
@@ -116,6 +123,7 @@ func (r *Reservation) UpdatePostgresqlReservation(
 	reservationTime *time.Time,
 	state *string,
 	userId *uuid.UUID,
+	membershipId *uuid.UUID,
 	sessionId *uuid.UUID,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
@@ -125,6 +133,7 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		reservationTime,
 		state,
 		userId,
+		membershipId,
 		sessionId,
 		updatedBy,
 	)
@@ -139,6 +148,7 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		State:            string(reservationModel.State),
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
+		MembershipId:     reservationModel.MembershipId,
 		SessionId:        reservationModel.SessionId,
 	}, nil
 }

@@ -38,6 +38,7 @@ func (r *Reservation) GetReservation(
 func (r *Reservation) FetchReservations(
 	userIds []string,
 	sessionIds []string,
+	membershipIds []string,
 	states []string,
 ) (*schemas.Reservations, *errors.Error) {
 	// Validate and convert userIds to UUIDs if provided.
@@ -78,6 +79,25 @@ func (r *Reservation) FetchReservations(
 		}
 	}
 
+	// Validate and convert membershipIds to UUIDs if provided.
+	parsedMembershipIds := []uuid.UUID{}
+	if len(membershipIds) > 0 {
+		for _, id := range membershipIds {
+			parsedId, err := uuid.Parse(id)
+			if err != nil {
+				return nil, &errors.UnprocessableEntityError.InvalidMembershipId
+			}
+
+			// Validate that the membership exists
+			_, newErr := r.Adapter.Membership.GetPostgresqlMembership(parsedId)
+			if newErr != nil {
+				return nil, newErr
+			}
+
+			parsedMembershipIds = append(parsedMembershipIds, parsedId)
+		}
+	}
+
 	reservations, err := r.Adapter.Reservation.FetchPostgresqlReservations(
 		parsedUserIds,
 		parsedSessionIds,
@@ -107,6 +127,12 @@ func (r *Reservation) CreateReservation(
 		return nil, sessionErr
 	}
 
+	// Validate that the membership exists
+	membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(createReservationData.MembershipId)
+	if membershipErr != nil {
+		return nil, membershipErr
+	}
+
 	// Modify `registered_count` field of the session
 	session.RegisteredCount++
 	_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
@@ -130,6 +156,7 @@ func (r *Reservation) CreateReservation(
 		createReservationData.State,
 		createReservationData.UserId,
 		createReservationData.SessionId,
+		createReservationData.MembershipId,
 		updatedBy,
 	)
 }
@@ -156,12 +183,21 @@ func (r *Reservation) UpdateReservation(
 		}
 	}
 
+	// Validate that the membership exists if provided
+	if updateReservationData.MembershipId != nil {
+		_, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*updateReservationData.MembershipId)
+		if membershipErr != nil {
+			return nil, membershipErr
+		}
+	}
+
 	return r.Adapter.Reservation.UpdatePostgresqlReservation(
 		reservationId,
 		updateReservationData.Name,
 		updateReservationData.ReservationTime,
 		updateReservationData.State,
 		updateReservationData.UserId,
+		updateReservationData.MembershipId,
 		updateReservationData.SessionId,
 		updatedBy,
 	)

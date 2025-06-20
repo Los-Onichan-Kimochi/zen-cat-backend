@@ -27,6 +27,7 @@ func (r *Reservation) GetReservation(reservationId uuid.UUID) (*model.Reservatio
 	var reservation model.Reservation
 	result := r.PostgresqlDB.Preload("User").
 		Preload("Session").
+		Preload("Membership").
 		Where("id = ?", reservationId).
 		First(&reservation)
 	if result.Error != nil {
@@ -40,6 +41,7 @@ func (r *Reservation) GetReservation(reservationId uuid.UUID) (*model.Reservatio
 func (r *Reservation) FetchReservations(
 	userIds []uuid.UUID,
 	sessionIds []uuid.UUID,
+	membershipIds []uuid.UUID,
 	states []string,
 ) ([]*model.Reservation, error) {
 	reservations := []*model.Reservation{}
@@ -51,6 +53,9 @@ func (r *Reservation) FetchReservations(
 	}
 	if len(sessionIds) > 0 {
 		query = query.Where("session_id IN (?)", sessionIds)
+	}
+	if len(membershipIds) > 0 {
+		query = query.Where("membership_id IN (?)", membershipIds)
 	}
 	if len(states) > 0 {
 		query = query.Where("state IN (?)", states)
@@ -70,6 +75,7 @@ func (r *Reservation) CreateReservation(
 	state string,
 	userId uuid.UUID,
 	sessionId uuid.UUID,
+	membershipId uuid.UUID,
 	updatedBy string,
 ) (*model.Reservation, error) {
 	reservation := model.Reservation{
@@ -80,6 +86,7 @@ func (r *Reservation) CreateReservation(
 		LastModification: time.Now(),
 		UserId:           userId,
 		SessionId:        sessionId,
+		MembershipId:     membershipId,
 	}
 
 	if err := r.PostgresqlDB.Create(&reservation).Error; err != nil {
@@ -87,7 +94,10 @@ func (r *Reservation) CreateReservation(
 	}
 
 	// Reload with preloaded relationships
-	if err := r.PostgresqlDB.Preload("User").Preload("Session").First(&reservation, reservation.Id).Error; err != nil {
+	if err := r.PostgresqlDB.Preload("User").
+		Preload("Session").
+		Preload("Membership").
+		First(&reservation, reservation.Id).Error; err != nil {
 		return nil, err
 	}
 
@@ -101,6 +111,7 @@ func (r *Reservation) UpdateReservation(
 	reservationTime *time.Time,
 	state *string,
 	userId *uuid.UUID,
+	membershipId *uuid.UUID,
 	sessionId *uuid.UUID,
 	updatedBy string,
 ) (*model.Reservation, error) {
@@ -122,6 +133,9 @@ func (r *Reservation) UpdateReservation(
 	if userId != nil {
 		reservation.UserId = *userId
 	}
+	if membershipId != nil {
+		reservation.MembershipId = *membershipId
+	}
 	if sessionId != nil {
 		reservation.SessionId = *sessionId
 	}
@@ -132,7 +146,10 @@ func (r *Reservation) UpdateReservation(
 	}
 
 	// Reload with preloaded relationships
-	if err := r.PostgresqlDB.Preload("User").Preload("Session").First(&reservation, reservation.Id).Error; err != nil {
+	if err := r.PostgresqlDB.Preload("User").
+		Preload("Session").
+		Preload("Membership").
+		First(&reservation, reservation.Id).Error; err != nil {
 		return nil, err
 	}
 

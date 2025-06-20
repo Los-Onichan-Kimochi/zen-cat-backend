@@ -22,6 +22,7 @@ type Membership struct {
 	Status      MembershipStatus `json:"status"`
 	Community   Community        `json:"community"`
 	Plan        Plan             `json:"plan"`
+	User        User             `json:"user"`
 }
 
 type Memberships struct {

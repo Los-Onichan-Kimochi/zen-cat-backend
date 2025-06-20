@@ -543,19 +543,6 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	memberships := []*model.Membership{
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Yoga Membership",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-			CommunityId: communities[0].Id,
-			UserId:      users[0].Id,
-			PlanId:      plans[0].Id,
-		},
-		{
-			Id:          uuid.New(),
 			Description: "Yearly Maternal Membership",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(1, 0, 0),
@@ -569,6 +556,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
+			Description: "Monthly Yoga Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[1].Id,
+			PlanId:      plans[0].Id,
+		},
+		{
+			Id:          uuid.New(),
 			Description: "Yearly Wellness Membership",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(1, 0, 0),
@@ -577,7 +577,59 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[1].Id,
+			UserId:      users[2].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[3].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[4].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[5].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[6].Id,
 			PlanId:      plans[1].Id,
 		},
 	}
@@ -1118,7 +1170,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour), // Same as session start time
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1130,7 +1183,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
+			MembershipId:     memberships[3].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1142,7 +1196,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateAnulled,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
+			MembershipId:     memberships[4].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1154,7 +1209,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
+			MembershipId:     memberships[5].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1166,7 +1222,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
+			MembershipId:     memberships[6].Id,
 			SessionId:        sessions[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1180,7 +1237,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1192,7 +1250,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
+			MembershipId:     memberships[3].Id,
 			SessionId:        sessions[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1204,7 +1263,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateCancelled,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
+			MembershipId:     memberships[4].Id,
 			SessionId:        sessions[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1218,7 +1278,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1230,7 +1291,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
+			MembershipId:     memberships[3].Id,
 			SessionId:        sessions[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1242,7 +1304,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
+			MembershipId:     memberships[5].Id,
 			SessionId:        sessions[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1254,7 +1317,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateDone,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
+			MembershipId:     memberships[6].Id,
 			SessionId:        sessions[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1268,7 +1332,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 16*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
+			MembershipId:     memberships[4].Id,
 			SessionId:        sessions[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1282,7 +1347,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
+			MembershipId:     memberships[5].Id,
 			SessionId:        sessions[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1294,7 +1360,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
+			MembershipId:     memberships[6].Id,
 			SessionId:        sessions[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1308,19 +1375,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
-			SessionId:        sessions[5].Id,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:               uuid.New(),
-			Name:             "Weekend Yoga Flow - Admin",
-			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
-			State:            model.ReservationStateConfirmed,
-			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1332,7 +1388,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
+			MembershipId:     memberships[3].Id,
 			SessionId:        sessions[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1344,7 +1401,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
+			MembershipId:     memberships[4].Id,
 			SessionId:        sessions[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1356,7 +1414,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
+			MembershipId:     memberships[5].Id,
 			SessionId:        sessions[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1370,7 +1429,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[6].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1382,7 +1442,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
+			MembershipId:     memberships[3].Id,
 			SessionId:        sessions[6].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1394,7 +1455,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
+			MembershipId:     memberships[4].Id,
 			SessionId:        sessions[6].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1406,7 +1468,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
+			MembershipId:     memberships[5].Id,
 			SessionId:        sessions[6].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1418,7 +1481,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateDone,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
+			MembershipId:     memberships[6].Id,
 			SessionId:        sessions[6].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1432,7 +1496,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(120*time.Hour + 11*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Test-1
+			MembershipId:     memberships[1].Id,
 			SessionId:        sessions[7].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
