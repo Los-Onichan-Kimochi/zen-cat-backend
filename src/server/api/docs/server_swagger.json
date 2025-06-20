@@ -7893,11 +7893,13 @@
             "type": "string",
             "enum": [
                 "ADMINISTRATOR",
-                "CLIENT"
+                "CLIENT",
+                "GUEST"
             ],
             "x-enum-varnames": [
                 "UserRolAdmin",
-                "UserRolClient"
+                "UserRolClient",
+                "UserRolGuest"
             ]
         },
         "schemas.Users": {

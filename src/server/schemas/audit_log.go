@@ -18,6 +18,7 @@ const (
 
 	// User actions
 	AuditActionLogin             AuditActionType = "LOGIN"
+	AuditActionLogout            AuditActionType = "LOGOUT"
 	AuditActionRegister          AuditActionType = "REGISTER"
 	AuditActionSubscribe         AuditActionType = "SUBSCRIBE"
 	AuditActionUnsubscribe       AuditActionType = "UNSUBSCRIBE"
@@ -92,6 +93,7 @@ type AuditStats struct {
 	EntityTypes  []EntityTypeStat `json:"entity_types"`
 	SuccessCount int64            `json:"success_count"`
 	FailureCount int64            `json:"failure_count"`
+	ActiveUsers  int64            `json:"active_users"`
 }
 
 type ActionStat struct {

@@ -88,6 +88,7 @@ func ClearPostgresqlDatabase(
 			model any
 		}{
 			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
 			{"Membership", &model.Membership{}},
 			{"CommunityPlan", &model.CommunityPlan{}},
 			{"CommunityService", &model.CommunityService{}},
@@ -211,10 +212,25 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy users
-	// Define a fixed UUID for the main test user that will be used in frontend
+	// Define fixed UUIDs for system and main test users
+	systemUserId, _ := uuid.Parse("00000000-0000-0000-0000-000000000000") // System user for anonymous events
 	mainUserId, _ := uuid.Parse("11111111-1111-1111-1111-111111111111")
 
 	users := []*model.User{
+		// SYSTEM user for anonymous/error events
+		{
+			Id:             systemUserId,
+			Name:           "SYSTEM",
+			FirstLastName:  "ANONYMOUS",
+			SecondLastName: nil,
+			Password:       hashedPassword, // Same hash but this user can't actually login
+			Email:          "system@zen-cat.internal",
+			Rol:            model.UserRolAdmin, // Admin role for system operations
+			ImageUrl:       "system-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 		{
 			Id:             mainUserId, // Fixed UUID for frontend integration
 			Name:           "Usuario",

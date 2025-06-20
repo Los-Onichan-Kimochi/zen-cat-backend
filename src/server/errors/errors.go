@@ -475,6 +475,9 @@ func HandleError(err Error, c echo.Context) error {
 	case isInErrorGroup(err, InternalServerError):
 		statusCode = http.StatusInternalServerError
 
+	case isInErrorGroup(err, AuthenticationError):
+		statusCode = http.StatusUnauthorized
+
 	default:
 		statusCode = http.StatusInternalServerError // Default case for other errors
 	}

@@ -57,6 +57,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	auth := a.Echo.Group("/auth")
 	auth.Use(mw.JWTMiddleware) // Apply JWT middleware to all auth routes
 	auth.POST("/refresh/", a.RefreshToken)
+	auth.POST("/logout/", a.Logout)
 
 	// Community endpoints (all protected)
 	community := a.Echo.Group("/community")
@@ -206,6 +207,13 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	auditLog.GET("/:auditLogId/", a.GetAuditLogById)
 	auditLog.GET("/stats/", a.GetAuditStats)
 	auditLog.DELETE("/cleanup/", a.DeleteOldAuditLogs)
+
+	// ErrorLog endpoints (all protected)
+	errorLog := a.Echo.Group("/error-log")
+	errorLog.Use(mw.JWTMiddleware) // Apply JWT middleware to all error-log routes
+	errorLog.GET("/", a.GetErrorLogs)
+	errorLog.GET("/:auditLogId/", a.GetErrorLogById)
+	errorLog.GET("/stats/", a.GetErrorStats)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))
