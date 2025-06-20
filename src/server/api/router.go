@@ -127,6 +127,18 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	onboarding.DELETE("/:onboardingId/", a.DeleteOnboarding)
 	onboarding.DELETE("/user/:userId/", a.DeleteOnboardingByUserId)
 
+	// Membership endpoints (all protected)
+	membership := a.Echo.Group("/membership")
+	membership.Use(mw.JWTMiddleware) // Apply JWT middleware to all membership routes
+	membership.GET("/:membershipId/", a.GetMembership)
+	membership.GET("/", a.FetchMemberships)
+	membership.GET("/user/:userId/", a.GetMembershipsByUserId)
+	membership.GET("/community/:communityId/", a.GetMembershipsByCommunityId)
+	membership.POST("/", a.CreateMembership)
+	membership.POST("/user/:userId/", a.CreateMembershipForUser)
+	membership.PATCH("/:membershipId/", a.UpdateMembership)
+	membership.DELETE("/:membershipId/", a.DeleteMembership)
+
 	// Service Endpoints (all protected)
 	service := a.Echo.Group("/service")
 	service.Use(mw.JWTMiddleware) // Apply JWT middleware to all service routes
