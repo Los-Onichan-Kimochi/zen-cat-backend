@@ -66,9 +66,10 @@ func (u *User) GetPostgresqlUser(
 			PhoneNumber:    userModel.Onboarding.PhoneNumber,
 			BirthDate:      userModel.Onboarding.BirthDate,
 			Gender:         (*schemas.Gender)(userModel.Onboarding.Gender),
-			City:           userModel.Onboarding.City,
 			PostalCode:     userModel.Onboarding.PostalCode,
 			District:       userModel.Onboarding.District,
+			Province:       userModel.Onboarding.Province,
+			Region:         userModel.Onboarding.Region,
 			Address:        userModel.Onboarding.Address,
 		}
 	}
@@ -129,9 +130,10 @@ func (u *User) GetPostgresqlUserByEmail(
 			PhoneNumber:    userModel.Onboarding.PhoneNumber,
 			BirthDate:      userModel.Onboarding.BirthDate,
 			Gender:         (*schemas.Gender)(userModel.Onboarding.Gender),
-			City:           userModel.Onboarding.City,
 			PostalCode:     userModel.Onboarding.PostalCode,
 			District:       userModel.Onboarding.District,
+			Province:       userModel.Onboarding.Province,
+			Region:         userModel.Onboarding.Region,
 			Address:        userModel.Onboarding.Address,
 		}
 	}
@@ -191,9 +193,10 @@ func (u *User) FetchPostgresqlUsers() ([]*schemas.User, *errors.Error) {
 				PhoneNumber:    userModel.Onboarding.PhoneNumber,
 				BirthDate:      userModel.Onboarding.BirthDate,
 				Gender:         (*schemas.Gender)(userModel.Onboarding.Gender),
-				City:           userModel.Onboarding.City,
 				PostalCode:     userModel.Onboarding.PostalCode,
 				District:       userModel.Onboarding.District,
+				Province:       userModel.Onboarding.Province,
+				Region:         userModel.Onboarding.Region,
 				Address:        userModel.Onboarding.Address,
 			}
 		}
@@ -264,7 +267,6 @@ func (u *User) CreatePostgresqlUser(
 			PhoneNumber:    onboarding.PhoneNumber,
 			BirthDate:      onboarding.BirthDate,
 			Gender:         (*model.Gender)(onboarding.Gender),
-			City:           onboarding.City,
 			PostalCode:     onboarding.PostalCode,
 			District:       onboarding.District,
 			Address:        onboarding.Address,
@@ -440,9 +442,10 @@ func (u *User) BulkCreatePostgresqlUser(
 				PhoneNumber:    userModel.Onboarding.PhoneNumber,
 				BirthDate:      userModel.Onboarding.BirthDate,
 				Gender:         (*schemas.Gender)(userModel.Onboarding.Gender),
-				City:           userModel.Onboarding.City,
 				PostalCode:     userModel.Onboarding.PostalCode,
 				District:       userModel.Onboarding.District,
+				Province:       userModel.Onboarding.Province,
+				Region:         userModel.Onboarding.Region,
 				Address:        userModel.Onboarding.Address,
 			}
 		}

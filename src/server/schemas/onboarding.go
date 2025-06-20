@@ -39,10 +39,11 @@ type Onboarding struct {
 	BirthDate *time.Time `json:"birth_date"`
 	Gender    *Gender    `json:"gender"`
 	// Dirección
-	City       string `json:"city"`
-	PostalCode string `json:"postal_code"`
-	District   string `json:"district"`
-	Address    string `json:"address"`
+	PostalCode string  `json:"postal_code"`
+	Address    string  `json:"address"`
+	District   *string `json:"district"`
+	Province   *string `json:"province"`
+	Region     *string `json:"region"`
 }
 
 type Onboardings struct {
@@ -60,10 +61,11 @@ type CreateOnboardingRequest struct {
 	BirthDate *time.Time `json:"birth_date"`
 	Gender    *Gender    `json:"gender"`
 	// Dirección
-	City       string `json:"city" binding:"required"`
-	PostalCode string `json:"postal_code" binding:"required"`
-	District   string `json:"district" binding:"required"`
-	Address    string `json:"address" binding:"required"`
+	PostalCode string  `json:"postal_code" binding:"required"`
+	Address    string  `json:"address" binding:"required"`
+	District   *string `json:"district"`
+	Province   *string `json:"province"`
+	Region     *string `json:"region"`
 }
 
 type UpdateOnboardingRequest struct {
@@ -76,8 +78,9 @@ type UpdateOnboardingRequest struct {
 	BirthDate *time.Time `json:"birth_date"`
 	Gender    *Gender    `json:"gender"`
 	// Dirección
-	City       *string `json:"city"`
 	PostalCode *string `json:"postal_code"`
-	District   *string `json:"district"`
 	Address    *string `json:"address"`
+	District   *string `json:"district"`
+	Province   *string `json:"province"`
+	Region     *string `json:"region"`
 }

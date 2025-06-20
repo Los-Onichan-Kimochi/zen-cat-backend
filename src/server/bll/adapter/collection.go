@@ -15,6 +15,7 @@ type AdapterCollection struct {
 	Local               *Local
 	User                *User
 	Onboarding          *Onboarding
+	Membership          *Membership
 	Service             *Service
 	Plan                *Plan
 	CommunityPlan       *CommunityPlan
@@ -39,6 +40,7 @@ func NewAdapterCollection(
 		Local:               NewLocalAdapter(logger, daoAstroCatPsql),
 		User:                NewUserAdapter(logger, daoAstroCatPsql),
 		Onboarding:          NewOnboardingAdapter(logger, daoAstroCatPsql),
+		Membership:          NewMembershipAdapter(logger, daoAstroCatPsql),
 		Service:             NewServiceAdapter(logger, daoAstroCatPsql),
 		Plan:                NewPlanAdapter(logger, daoAstroCatPsql),
 		CommunityPlan:       NewCommunityPlanAdapter(logger, daoAstroCatPsql),
