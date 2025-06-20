@@ -200,6 +200,7 @@ var (
 		InvalidPlanType               Error
 		MembershipNotCreated          Error
 		MembershipNotUpdated          Error
+		MembershipNotDeleted          Error
 		OnboardingNotCreated          Error
 		OnboardingNotUpdated          Error
 		UserNotCreated                Error
@@ -265,6 +266,10 @@ var (
 		MembershipNotUpdated: Error{
 			Code:    "MEMBERSHIP_ERROR_003",
 			Message: "Membership not updated",
+		},
+		MembershipNotDeleted: Error{
+			Code:    "MEMBERSHIP_ERROR_005",
+			Message: "Membership not deleted",
 		},
 		OnboardingNotCreated: Error{
 			Code:    "ONBOARDING_ERROR_002",
@@ -416,11 +421,21 @@ var (
 
 	// For 500 Internal Server errors
 	InternalServerError = struct {
-		Default Error
+		Default               Error
+		FailedToUploadImage   Error
+		FailedToDownloadImage Error
 	}{
 		Default: Error{
 			Code:    "INTERNAL_SERVER_ERROR_001",
 			Message: "An unexpected error occurred.",
+		},
+		FailedToUploadImage: Error{
+			Code:    "INTERNAL_SERVER_ERROR_002",
+			Message: "Failed to upload image to S3",
+		},
+		FailedToDownloadImage: Error{
+			Code:    "INTERNAL_SERVER_ERROR_003",
+			Message: "Failed to download image from S3",
 		},
 	}
 

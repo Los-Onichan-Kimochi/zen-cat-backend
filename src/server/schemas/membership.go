@@ -20,7 +20,11 @@ type Membership struct {
 	StartDate   time.Time        `json:"start_date"`
 	EndDate     time.Time        `json:"end_date"`
 	Status      MembershipStatus `json:"status"`
+	CommunityId uuid.UUID        `json:"community_id"`
 	Community   Community        `json:"community"`
+	UserId      uuid.UUID        `json:"user_id"`
+	User        User             `json:"user"`
+	PlanId      uuid.UUID        `json:"plan_id"`
 	Plan        Plan             `json:"plan"`
 }
 
@@ -33,6 +37,18 @@ type CreateMembershipRequest struct {
 	StartDate   time.Time        `json:"start_date"`
 	EndDate     time.Time        `json:"end_date"`
 	Status      MembershipStatus `json:"status"`
+	CommunityId uuid.UUID        `json:"community_id"`
+	UserId      uuid.UUID        `json:"user_id"`
+	PlanId      uuid.UUID        `json:"plan_id"`
+}
+
+type CreateMembershipForUserRequest struct {
+	Description string           `json:"description"`
+	StartDate   time.Time        `json:"start_date"`
+	EndDate     time.Time        `json:"end_date"`
+	Status      MembershipStatus `json:"status"`
+	CommunityId uuid.UUID        `json:"community_id"`
+	PlanId      uuid.UUID        `json:"plan_id"`
 }
 
 type UpdateMembershipRequest struct {
@@ -40,4 +56,7 @@ type UpdateMembershipRequest struct {
 	StartDate   *time.Time        `json:"start_date"`
 	EndDate     *time.Time        `json:"end_date"`
 	Status      *MembershipStatus `json:"status"`
+	CommunityId *uuid.UUID        `json:"community_id"`
+	UserId      *uuid.UUID        `json:"user_id"`
+	PlanId      *uuid.UUID        `json:"plan_id"`
 }

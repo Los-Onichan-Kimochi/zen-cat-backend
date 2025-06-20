@@ -17,6 +17,7 @@ type ControllerCollection struct {
 	Local               *Local
 	User                *User
 	Onboarding          *Onboarding
+	Membership          *Membership
 	Service             *Service
 	Plan                *Plan
 	CommunityPlan       *CommunityPlan
@@ -45,6 +46,7 @@ func NewControllerCollection(
 	local := NewLocalController(logger, bllAdapter, envSettings)
 	user := NewUserController(logger, bllAdapter, envSettings)
 	onboarding := NewOnboardingController(logger, bllAdapter, envSettings)
+	membership := NewMembershipController(logger, bllAdapter, envSettings)
 	service := NewServiceController(logger, bllAdapter, envSettings)
 	plan := NewPlanController(logger, bllAdapter, envSettings)
 	communityPlan := NewCommunityPlanController(logger, bllAdapter, envSettings)
@@ -66,6 +68,7 @@ func NewControllerCollection(
 		Local:               local,
 		User:                user,
 		Onboarding:          onboarding,
+		Membership:          membership,
 		Service:             service,
 		Plan:                plan,
 		CommunityPlan:       communityPlan,

@@ -63,6 +63,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	community := a.Echo.Group("/community")
 	community.Use(mw.JWTMiddleware) // Apply JWT middleware to all community routes
 	community.GET("/:communityId/", a.GetCommunity)
+	community.GET("/:communityId/image/", a.GetCommunityWithImage)
 	community.GET("/", a.FetchCommunities)
 	community.POST("/", a.CreateCommunity)
 	community.PATCH("/:communityId/", a.UpdateCommunity)
@@ -127,6 +128,18 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	onboarding.DELETE("/:onboardingId/", a.DeleteOnboarding)
 	onboarding.DELETE("/user/:userId/", a.DeleteOnboardingByUserId)
 
+	// Membership endpoints (all protected)
+	membership := a.Echo.Group("/membership")
+	membership.Use(mw.JWTMiddleware) // Apply JWT middleware to all membership routes
+	membership.GET("/:membershipId/", a.GetMembership)
+	membership.GET("/", a.FetchMemberships)
+	membership.GET("/user/:userId/", a.GetMembershipsByUserId)
+	membership.GET("/community/:communityId/", a.GetMembershipsByCommunityId)
+	membership.POST("/", a.CreateMembership)
+	membership.POST("/user/:userId/", a.CreateMembershipForUser)
+	membership.PATCH("/:membershipId/", a.UpdateMembership)
+	membership.DELETE("/:membershipId/", a.DeleteMembership)
+
 	// Service Endpoints (all protected)
 	service := a.Echo.Group("/service")
 	service.Use(mw.JWTMiddleware) // Apply JWT middleware to all service routes
@@ -175,6 +188,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	communityService.Use(mw.JWTMiddleware) // Apply JWT middleware to all community-service routes
 	communityService.POST("/", a.CreateCommunityService)
 	communityService.GET("/:communityId/:serviceId/", a.GetCommunityService)
+	communityService.GET("/:communityId/", a.GetServicesByCommunityId)
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
