@@ -415,6 +415,23 @@ definitions:
           $ref: '#/definitions/schemas.CommunityService'
         type: array
     type: object
+  schemas.CommunityWithImage:
+    properties:
+      id:
+        type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
+      image_url:
+        type: string
+      name:
+        type: string
+      number_subscriptions:
+        type: integer
+      purpose:
+        type: string
+    type: object
   schemas.ConflictResult:
     properties:
       has_conflict:
@@ -440,6 +457,10 @@ definitions:
     type: object
   schemas.CreateCommunityRequest:
     properties:
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       name:
@@ -1014,6 +1035,10 @@ definitions:
     type: object
   schemas.UpdateCommunityRequest:
     properties:
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       name:
@@ -1240,8 +1265,24 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -2238,6 +2279,49 @@ paths:
       security:
       - JWT: []
       summary: Update Community.
+      tags:
+      - Community
+  /community/{communityId}/image/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a community given its id with its image.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityWithImage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Community with Image.
       tags:
       - Community
   /community/bulk-create/:
