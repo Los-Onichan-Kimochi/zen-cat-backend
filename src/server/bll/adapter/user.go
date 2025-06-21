@@ -508,3 +508,62 @@ func (u *User) UpdateUserPassword(userId uuid.UUID, hashedPassword string) *erro
 	}
 	return nil
 }
+
+func (u *User) GetUserStats() (*schemas.UserStats, *errors.Error) {
+	// Get all users to calculate statistics
+	users, err := u.FetchPostgresqlUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	// Initialize counters
+	var adminCount, clientCount, guestCount int64
+	roleDistribution := make(map[schemas.UserRol]int64)
+	var recentConnections []schemas.UserConnection
+
+	// Count users by role
+	for _, user := range users {
+		switch user.Rol {
+		case schemas.UserRolAdmin:
+			adminCount++
+		case schemas.UserRolClient:
+			clientCount++
+		case schemas.UserRolGuest:
+			guestCount++
+		}
+		roleDistribution[user.Rol]++
+
+		// Add to recent connections (you can modify this logic as needed)
+		recentConnections = append(recentConnections, schemas.UserConnection{
+			UserId:       user.Id,
+			UserEmail:    user.Email,
+			UserName:     user.Name,
+			Role:         user.Rol,
+			LastLogin:    nil, // This would need to be implemented with audit logs
+			ConnectionIP: nil, // This would need to be implemented with audit logs
+		})
+	}
+
+	// Build role distribution array
+	var roleDistArray []schemas.UserRoleDistribution
+	for role, count := range roleDistribution {
+		roleDistArray = append(roleDistArray, schemas.UserRoleDistribution{
+			Role:  role,
+			Count: count,
+		})
+	}
+
+	// Limit recent connections to last 10
+	if len(recentConnections) > 10 {
+		recentConnections = recentConnections[:10]
+	}
+
+	return &schemas.UserStats{
+		TotalUsers:        int64(len(users)),
+		AdminCount:        adminCount,
+		ClientCount:       clientCount,
+		GuestCount:        guestCount,
+		RoleDistribution:  roleDistArray,
+		RecentConnections: recentConnections,
+	}, nil
+}

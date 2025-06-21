@@ -389,6 +389,16 @@ var (
 		},
 	}
 
+	// For 403 Forbidden errors
+	ForbiddenError = struct {
+		InsufficientPrivileges Error
+	}{
+		InsufficientPrivileges: Error{
+			Code:    "FORBIDDEN_ERROR_001",
+			Message: "Insufficient privileges to access this resource",
+		},
+	}
+
 	// For 409 Conflict errors
 	ConflictError = struct {
 		CommunityPlanAlreadyExists       Error
@@ -492,6 +502,9 @@ func HandleError(err Error, c echo.Context) error {
 
 	case isInErrorGroup(err, AuthenticationError):
 		statusCode = http.StatusUnauthorized
+
+	case isInErrorGroup(err, ForbiddenError):
+		statusCode = http.StatusForbidden
 
 	default:
 		statusCode = http.StatusInternalServerError // Default case for other errors

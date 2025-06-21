@@ -213,11 +213,11 @@ func (a *Api) BulkCreateUsers(c echo.Context) error {
 // @Failure 			401 {object} errors.Error "Missing or malformed JWT"
 // @Failure 			422 {object} errors.Error "Unprocessable Entity"
 // @Failure 			500 {object} errors.Error "Internal Server Error"
-// @Router 				/user/check-exists [get]
-func (a *Api) CheckUserExistsByEmail(c echo.Context) error {
+// @Router 				/user/check-email/ [get]
+func (a *Api) CheckUserExists(c echo.Context) error {
 	email := c.QueryParam("email")
 	if email == "" {
-		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserEmail, c)
 	}
 
 	response, err := a.BllController.User.CheckUserExistsByEmail(email)
@@ -252,4 +252,68 @@ func (a *Api) ChangePassword(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"message": "Password changed successfully",
 	})
+}
+
+// @Summary 			Change User Role.
+// @Description 		Changes the role of a user given its id.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               userId    path   string  true  "User ID"
+// @Param               changeRoleRequest    body   schemas.ChangeUserRoleRequest  true  "Change Role Request"
+// @Success 			200 {object} schemas.User "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			403 {object} errors.Error "Forbidden - Admin role required"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/{userId}/role/ [patch]
+func (a *Api) ChangeUserRole(c echo.Context) error {
+	updateBy := "ADMIN"
+
+	userId, parseErr := uuid.Parse(c.Param("userId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
+	}
+
+	var request schemas.ChangeUserRoleRequest
+	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Convert to UpdateUserRequest
+	rolStr := string(request.Rol)
+	updateRequest := schemas.UpdateUserRequest{
+		Rol: &rolStr,
+	}
+
+	response, err := a.BllController.User.UpdateUser(userId, updateRequest, updateBy)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// @Summary 			Get User Statistics.
+// @Description 		Get user statistics including role distribution and recent connections.
+// @Tags 				User
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Success 			200 {object} schemas.UserStats "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			403 {object} errors.Error "Forbidden - Admin role required"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/user/stats/ [get]
+func (a *Api) GetUserStats(c echo.Context) error {
+	response, err := a.BllController.User.GetUserStats()
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
