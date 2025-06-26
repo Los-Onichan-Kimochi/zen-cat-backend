@@ -46,6 +46,7 @@ func (o *Onboarding) GetPostgresqlOnboarding(
 		Province:       onboardingModel.Province,
 		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
+		UserId:         onboardingModel.UserId,
 	}, nil
 }
 
@@ -69,6 +70,7 @@ func (o *Onboarding) GetPostgresqlOnboardingByUserId(
 		Province:       onboardingModel.Province,
 		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
+		UserId:         onboardingModel.UserId,
 	}, nil
 }
 
@@ -92,6 +94,7 @@ func (o *Onboarding) FetchPostgresqlOnboardings() ([]*schemas.Onboarding, *error
 			Province:       onboardingModel.Province,
 			Region:         onboardingModel.Region,
 			Address:        onboardingModel.Address,
+			UserId:         onboardingModel.UserId,
 		}
 	}
 
@@ -172,6 +175,7 @@ func (o *Onboarding) CreatePostgresqlOnboarding(
 		Province:       onboardingModel.Province,
 		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
+		UserId:         onboardingModel.UserId,
 	}, nil
 }
 
@@ -233,6 +237,7 @@ func (o *Onboarding) UpdatePostgresqlOnboarding(
 		Province:       onboardingModel.Province,
 		Region:         onboardingModel.Region,
 		Address:        onboardingModel.Address,
+		UserId:         onboardingModel.UserId,
 	}, nil
 }
 

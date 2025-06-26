@@ -94,11 +94,16 @@ func (p *Professional) DeleteProfessional(professionalId uuid.UUID) *errors.Erro
 func (p *Professional) BulkCreateProfessionals(
 	createProfessionalsData []*schemas.CreateProfessionalRequest,
 	updatedBy string,
-) ([]*schemas.Professional, *errors.Error) {
-	return p.Adapter.Professional.BulkCreatePostgresqlProfessionals(
+) (*schemas.Professionals, *errors.Error) {
+	professionals, err := p.Adapter.Professional.BulkCreatePostgresqlProfessionals(
 		createProfessionalsData,
 		updatedBy,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Professionals{Professionals: professionals}, nil
 }
 
 // Bulk deletes professionals.

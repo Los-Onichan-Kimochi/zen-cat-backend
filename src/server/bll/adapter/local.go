@@ -7,6 +7,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -26,14 +27,16 @@ func NewLocalAdapter(
 	}
 }
 
-// Gets a Local from postgresql DB.
-func (l *Local) GetPostgresqlLocal(
-	localId uuid.UUID,
-) (*schemas.Local, *errors.Error) {
-	localModel, err := l.DaoPostgresql.Local.GetLocal(localId)
+// Gets a local from a Postgresql DB given its ID and adapts it to a local schema.
+func (l *Local) GetPostgresqlLocal(id uuid.UUID) (*schemas.Local, *errors.Error) {
+	localModel, err := l.DaoPostgresql.Local.GetLocal(id)
 	if err != nil {
-		return nil, &errors.ObjectNotFoundError.LocalNotFound
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.LocalNotFound
+		}
+		return nil, &errors.BadRequestError.LocalNotCreated
 	}
+
 	return &schemas.Local{
 		Id:             localModel.Id,
 		LocalName:      localModel.LocalName,
@@ -175,7 +178,7 @@ func (l *Local) BulkCreatePostgresqlLocals(
 	return locals, nil
 }
 
-// Updates a local given fields in postgresql DB and returns it.
+// Updates a local from a Postgresql DB given its ID and adapts it to a local schema.
 func (l *Local) UpdatePostgresqlLocal(
 	id uuid.UUID,
 	localName *string,
@@ -207,6 +210,9 @@ func (l *Local) UpdatePostgresqlLocal(
 		updatedBy,
 	)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.LocalNotFound
+		}
 		return nil, &errors.BadRequestError.LocalNotUpdated
 	}
 
@@ -224,9 +230,12 @@ func (l *Local) UpdatePostgresqlLocal(
 	}, nil
 }
 
-// Delets a plan from postgresql BD
+// Deletes a local from postgresql BD
 func (l *Local) DeletePostgresqlLocal(localId uuid.UUID) *errors.Error {
 	if err := l.DaoPostgresql.Local.DeleteLocal(localId); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.LocalNotFound
+		}
 		return &errors.BadRequestError.LocalNotSoftDeleted
 	}
 

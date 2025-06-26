@@ -11,7 +11,7 @@ import (
 func (a *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Verificar si está en modo desarrollo
-		if config.GetDevMode() {
+		if config.GetDevMode() || a.EnvSettings.DisableAuthForTests {
 			// En modo desarrollo, omitir la validación JWT
 			a.Logger.Debugln("🔓 Modo desarrollo: Omitiendo validación JWT")
 			return next(c)
@@ -32,7 +32,7 @@ func (a *Middleware) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 func (a *Middleware) AdminOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Verificar si está en modo desarrollo
-		if config.GetDevMode() {
+		if config.GetDevMode() || a.EnvSettings.DisableAuthForTests {
 			// En modo desarrollo, omitir la validación de roles
 			a.Logger.Debugln("🔓 Modo desarrollo: Omitiendo validación de rol admin")
 			return next(c)
@@ -66,7 +66,7 @@ func (a *Middleware) AdminOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 func (a *Middleware) ClientOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Verificar si está en modo desarrollo
-		if config.GetDevMode() {
+		if config.GetDevMode() || a.EnvSettings.DisableAuthForTests {
 			// En modo desarrollo, omitir la validación de roles
 			a.Logger.Debugln("🔓 Modo desarrollo: Omitiendo validación de rol cliente")
 			return next(c)

@@ -47,6 +47,92 @@ func (l *CustomLogger) Trace(
 	// Ignore trace logs
 }
 
+func ClearPostgresqlDatabaseTesting(
+	appLogger logging.Logger,
+	astroCatPsqlDB *gorm.DB,
+	envSetting *schemas.EnvSettings,
+	t *testing.T,
+) {
+	if envSetting.AstroCatPostgresHost != "localhost" {
+		msg := "Not allow clear Levels Postgres DB into instance different to localhost"
+		if t == nil {
+			appLogger.Panicf(
+				"%s. This function should only be used for tests in local environment",
+				msg,
+			)
+		} else {
+			t.Fatalf("%s. This function should only be used for tests in local environment", msg)
+		}
+		return
+	}
+
+	if astroCatPsqlDB != nil {
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+
+		originalLogger := astroCatPsqlDB.Logger
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
+		}
+
+		// Start a transaction
+		tx := astroCatPsqlDB.Begin()
+
+		// Disable foreign key constraints temporarily
+		tx.Exec("SET CONSTRAINTS ALL DEFERRED")
+
+		// First delete tables that have references to other tables
+		tablesToClear := []struct {
+			name  string
+			model any
+		}{
+			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
+			{"Membership", &model.Membership{}},
+			{"CommunityPlan", &model.CommunityPlan{}},
+			{"CommunityService", &model.CommunityService{}},
+			{"ServiceProfessional", &model.ServiceProfessional{}},
+			{"ServiceLocal", &model.ServiceLocal{}},
+			{"Reservation", &model.Reservation{}},
+			{"Session", &model.Session{}},
+			{"Onboarding", &model.Onboarding{}},
+			{"Template", &model.Template{}},
+
+			// Then delete independent tables
+			{"Professional", &model.Professional{}},
+			{"Local", &model.Local{}},
+			{"User", &model.User{}},
+			{"Plan", &model.Plan{}},
+			{"Service", &model.Service{}},
+			{"Community", &model.Community{}},
+		}
+
+		for _, table := range tablesToClear {
+			appLogger.Infof("Attempting to hard delete all records from %s table...", table.name)
+			if err := tx.Unscoped().Where("true").Delete(table.model).Error; err != nil {
+				tx.Rollback()
+				appLogger.Errorf("Error clearing %s table: %v", table.name, err)
+				return
+			}
+		}
+
+		// Reactivate foreign key constraints
+		tx.Exec("SET CONSTRAINTS ALL IMMEDIATE")
+
+		// Confirm the transaction
+		if err := tx.Commit().Error; err != nil {
+			appLogger.Errorf("Error committing transaction: %v", err)
+			return
+		}
+
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger
+		}
+
+	} else {
+		appLogger.Warn("astroCatPsqlDB is nil, skipping database clearing.")
+	}
+}
+
 // Remove all data from AstroCatPsql db.
 //   - Note: Only use for tests
 func ClearPostgresqlDatabase(
@@ -69,11 +155,11 @@ func ClearPostgresqlDatabase(
 	}
 
 	if astroCatPsqlDB != nil {
-		fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
 
 		originalLogger := astroCatPsqlDB.Logger
 		if !envSetting.EnableSqlLogs {
-			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Info)
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
 		}
 
 		// Start a transaction

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	daoPostgresql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
@@ -186,6 +187,9 @@ func (m *Membership) UpdatePostgresqlMembership(
 
 func (m *Membership) DeletePostgresqlMembership(membershipId uuid.UUID) *errors.Error {
 	if err := m.DaoPostgresql.Membership.DeleteMembership(membershipId); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.MembershipNotFound
+		}
 		return &errors.BadRequestError.MembershipNotDeleted
 	}
 	return nil

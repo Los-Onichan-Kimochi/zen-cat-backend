@@ -9,6 +9,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -86,7 +87,6 @@ func (cs *CommunityService) GetPostgresqlServicesByCommunityId(
 	servicesModel, err := cs.DaoPostgresql.CommunityService.GetServicesByCommunityId(
 		communityId,
 	)
-
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.CommunityServiceNotFound
 	}
@@ -112,6 +112,9 @@ func (cs *CommunityService) DeletePostgresqlCommunityService(
 ) *errors.Error {
 	err := cs.DaoPostgresql.CommunityService.DeleteCommunityService(communityId, serviceId)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.CommunityServiceNotFound
+		}
 		return &errors.BadRequestError.CommunityServiceNotDeleted
 	}
 

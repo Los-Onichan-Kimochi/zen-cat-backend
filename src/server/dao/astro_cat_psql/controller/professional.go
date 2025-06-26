@@ -127,6 +127,9 @@ func (p *Professional) DeleteProfessional(professionalId uuid.UUID) error {
 
 // Creates multiple professionals in a batch.
 func (p *Professional) BulkCreateProfessionals(professionals []*model.Professional) error {
+	if len(professionals) == 0 {
+		return nil
+	}
 	return p.PostgresqlDB.Create(&professionals).Error
 }
 
