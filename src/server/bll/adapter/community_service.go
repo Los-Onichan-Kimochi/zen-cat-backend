@@ -3,13 +3,13 @@ package adapter
 import (
 	"strings"
 
-
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -80,6 +80,31 @@ func (cs *CommunityService) GetPostgresqlCommunityService(
 	}, nil
 }
 
+// Todo: add comment
+func (cs *CommunityService) GetPostgresqlServicesByCommunityId(
+	communityId uuid.UUID,
+) ([]*schemas.Service, *errors.Error) {
+	servicesModel, err := cs.DaoPostgresql.CommunityService.GetServicesByCommunityId(
+		communityId,
+	)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.CommunityServiceNotFound
+	}
+
+	services := make([]*schemas.Service, len(servicesModel))
+	for i, serviceModel := range servicesModel {
+		services[i] = &schemas.Service{
+			Id:          serviceModel.Id,
+			Name:        serviceModel.Name,
+			Description: serviceModel.Description,
+			ImageUrl:    serviceModel.ImageUrl,
+			IsVirtual:   serviceModel.IsVirtual,
+		}
+	}
+
+	return services, nil
+}
+
 // Deletes a specific community-service association from postgresql DB.
 func (cs *CommunityService) DeletePostgresqlCommunityService(
 	communityId uuid.UUID,
@@ -87,6 +112,9 @@ func (cs *CommunityService) DeletePostgresqlCommunityService(
 ) *errors.Error {
 	err := cs.DaoPostgresql.CommunityService.DeleteCommunityService(communityId, serviceId)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.CommunityServiceNotFound
+		}
 		return &errors.BadRequestError.CommunityServiceNotDeleted
 	}
 

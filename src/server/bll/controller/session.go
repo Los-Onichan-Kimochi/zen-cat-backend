@@ -34,6 +34,11 @@ func (s *Session) CreateSession(
 	req schemas.CreateSessionRequest,
 	updatedBy string,
 ) (*schemas.Session, *errors.Error) {
+	// Validate session times
+	if !req.EndTime.After(req.StartTime) {
+		return nil, &errors.BadRequestError.SessionNotCreated
+	}
+
 	// Validate that the professional exists
 	_, err := s.Adapter.Professional.GetPostgresqlProfessional(req.ProfessionalId)
 	if err != nil {
@@ -95,6 +100,7 @@ func (s *Session) UpdateSession(
 		req.StartTime,
 		req.EndTime,
 		req.State,
+		req.RegisteredCount,
 		req.Capacity,
 		req.SessionLink,
 		req.ProfessionalId,
@@ -161,7 +167,11 @@ func (s *Session) FetchSessions(
 		}
 	}
 
-	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(parsedProfessionalIds, parsedLocalIds, states)
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		parsedProfessionalIds,
+		parsedLocalIds,
+		states,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +183,7 @@ func (s *Session) FetchSessions(
 func (s *Session) BulkCreateSessions(
 	createSessionsData []*schemas.CreateSessionRequest,
 	updatedBy string,
-) ([]*schemas.Session, *errors.Error) {
+) (*schemas.Sessions, *errors.Error) {
 	// Validate all professionals and locals exist
 	for _, sessionData := range createSessionsData {
 		// Validate that the professional exists
@@ -191,13 +201,24 @@ func (s *Session) BulkCreateSessions(
 		}
 	}
 
-	return s.Adapter.Session.BulkCreatePostgresqlSessions(createSessionsData, updatedBy)
+	sessions, err := s.Adapter.Session.BulkCreatePostgresqlSessions(createSessionsData, updatedBy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Sessions{Sessions: sessions}, nil
 }
 
 // Checks for session conflicts
-func (s *Session) CheckConflicts(req schemas.CheckConflictRequest) (*schemas.ConflictResult, *errors.Error) {
+func (s *Session) CheckConflicts(
+	req schemas.CheckConflictRequest,
+) (*schemas.ConflictResult, *errors.Error) {
 	// Get all sessions for the specific date
-	sessions, err := s.Adapter.Session.FetchPostgresqlSessions([]uuid.UUID{}, []uuid.UUID{}, []string{})
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{},
+		[]uuid.UUID{},
+		[]string{},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -245,9 +266,15 @@ func (s *Session) CheckConflicts(req schemas.CheckConflictRequest) (*schemas.Con
 }
 
 // Gets availability information for a specific date
-func (s *Session) GetAvailability(req schemas.AvailabilityRequest) (*schemas.AvailabilityResult, *errors.Error) {
+func (s *Session) GetAvailability(
+	req schemas.AvailabilityRequest,
+) (*schemas.AvailabilityResult, *errors.Error) {
 	// Get all sessions for the specific date
-	sessions, err := s.Adapter.Session.FetchPostgresqlSessions([]uuid.UUID{}, []uuid.UUID{}, []string{})
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{},
+		[]uuid.UUID{},
+		[]string{},
+	)
 	if err != nil {
 		return nil, err
 	}

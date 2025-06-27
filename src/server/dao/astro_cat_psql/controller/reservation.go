@@ -25,7 +25,10 @@ func NewReservationController(logger logging.Logger, postgresqlDB *gorm.DB) *Res
 // Gets a specific reservation by ID.
 func (r *Reservation) GetReservation(reservationId uuid.UUID) (*model.Reservation, error) {
 	var reservation model.Reservation
-	result := r.PostgresqlDB.Preload("User").Preload("Session").Where("id = ?", reservationId).First(&reservation)
+	result := r.PostgresqlDB.Preload("User").
+		Preload("Session").
+		Where("id = ?", reservationId).
+		First(&reservation)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -138,10 +141,12 @@ func (r *Reservation) UpdateReservation(
 
 // Deletes a reservation.
 func (r *Reservation) DeleteReservation(reservationId uuid.UUID) error {
-	result := r.PostgresqlDB.Delete(&model.Reservation{}, reservationId)
+	result := r.PostgresqlDB.Where("id = ?", reservationId).Delete(&model.Reservation{})
 	if result.Error != nil {
 		return result.Error
 	}
+
+	// Check if any rows were affected
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}

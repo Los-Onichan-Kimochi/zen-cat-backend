@@ -12,6 +12,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type CustomLogger struct{}
@@ -46,6 +47,92 @@ func (l *CustomLogger) Trace(
 	// Ignore trace logs
 }
 
+func ClearPostgresqlDatabaseTesting(
+	appLogger logging.Logger,
+	astroCatPsqlDB *gorm.DB,
+	envSetting *schemas.EnvSettings,
+	t *testing.T,
+) {
+	if envSetting.AstroCatPostgresHost != "localhost" {
+		msg := "Not allow clear Levels Postgres DB into instance different to localhost"
+		if t == nil {
+			appLogger.Panicf(
+				"%s. This function should only be used for tests in local environment",
+				msg,
+			)
+		} else {
+			t.Fatalf("%s. This function should only be used for tests in local environment", msg)
+		}
+		return
+	}
+
+	if astroCatPsqlDB != nil {
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+
+		originalLogger := astroCatPsqlDB.Logger
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
+		}
+
+		// Start a transaction
+		tx := astroCatPsqlDB.Begin()
+
+		// Disable foreign key constraints temporarily
+		tx.Exec("SET CONSTRAINTS ALL DEFERRED")
+
+		// First delete tables that have references to other tables
+		tablesToClear := []struct {
+			name  string
+			model any
+		}{
+			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
+			{"Membership", &model.Membership{}},
+			{"CommunityPlan", &model.CommunityPlan{}},
+			{"CommunityService", &model.CommunityService{}},
+			{"ServiceProfessional", &model.ServiceProfessional{}},
+			{"ServiceLocal", &model.ServiceLocal{}},
+			{"Reservation", &model.Reservation{}},
+			{"Session", &model.Session{}},
+			{"Onboarding", &model.Onboarding{}},
+			{"Template", &model.Template{}},
+
+			// Then delete independent tables
+			{"Professional", &model.Professional{}},
+			{"Local", &model.Local{}},
+			{"User", &model.User{}},
+			{"Plan", &model.Plan{}},
+			{"Service", &model.Service{}},
+			{"Community", &model.Community{}},
+		}
+
+		for _, table := range tablesToClear {
+			appLogger.Infof("Attempting to hard delete all records from %s table...", table.name)
+			if err := tx.Unscoped().Where("true").Delete(table.model).Error; err != nil {
+				tx.Rollback()
+				appLogger.Errorf("Error clearing %s table: %v", table.name, err)
+				return
+			}
+		}
+
+		// Reactivate foreign key constraints
+		tx.Exec("SET CONSTRAINTS ALL IMMEDIATE")
+
+		// Confirm the transaction
+		if err := tx.Commit().Error; err != nil {
+			appLogger.Errorf("Error committing transaction: %v", err)
+			return
+		}
+
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger
+		}
+
+	} else {
+		appLogger.Warn("astroCatPsqlDB is nil, skipping database clearing.")
+	}
+}
+
 // Remove all data from AstroCatPsql db.
 //   - Note: Only use for tests
 func ClearPostgresqlDatabase(
@@ -68,11 +155,11 @@ func ClearPostgresqlDatabase(
 	}
 
 	if astroCatPsqlDB != nil {
-		fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
 
 		originalLogger := astroCatPsqlDB.Logger
 		if !envSetting.EnableSqlLogs {
-			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Info)
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
 		}
 
 		// Start a transaction
@@ -87,6 +174,7 @@ func ClearPostgresqlDatabase(
 			model any
 		}{
 			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
 			{"Membership", &model.Membership{}},
 			{"CommunityPlan", &model.CommunityPlan{}},
 			{"CommunityService", &model.CommunityService{}},
@@ -142,6 +230,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy plans
 	reservationLimit := 8
+	reservationLimitBasic := 5
+	reservationLimitPremium := 15
 	plans := []*model.Plan{
 		{
 			Id:               uuid.New(),
@@ -161,6 +251,43 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		// Planes para runners
+		{
+			Id:               uuid.New(),
+			Fee:              49.90,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitBasic,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              89.90,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitPremium,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              499.00,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              899.00,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, plan := range plans {
 		if err := astroCatPsqlDB.Create(plan).Error; err != nil {
@@ -170,23 +297,26 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy communities
+	// Define a fixed UUID for the main test community that will be used in frontend
+	mainCommunityId, _ := uuid.Parse("ade8c5e1-ab82-47e0-b48b-3f8f2324c450")
+
 	communities := []*model.Community{
 		{
-			Id:                  uuid.New(),
-			Name:                "Yoga Community",
-			Purpose:             "Community for yoga enthusiasts",
-			ImageUrl:            "test-image",
-			NumberSubscriptions: 0,
+			Id:                  mainCommunityId, // Fixed UUID for frontend integration
+			Name:                "Runners",
+			Purpose:             "Comunidad principal de bienestar que ofrece servicios de yoga, atención médica y fitness para mejorar tu calidad de vida",
+			ImageUrl:            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 150,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:                  uuid.New(),
-			Name:                "Gym Group",
-			Purpose:             "Community for meditation practitioners",
-			ImageUrl:            "test-image",
-			NumberSubscriptions: 0,
+			Name:                "Maternal Care Community",
+			Purpose:             "Comunidad especializada en cuidado maternal y servicios de lactario",
+			ImageUrl:            "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 75,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -198,15 +328,53 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			return
 		}
 	}
+	// contrasenha test123
+	// lo hasheo
+	hashedPassword, err := utils.HashPassword("test123")
+	if err != nil {
+		appLogger.Errorf("Error hashing password: %v", err)
+		return
+	}
 
 	// Create dummy users
+	// Define fixed UUIDs for system and main test users
+	systemUserId, _ := uuid.Parse("00000000-0000-0000-0000-000000000000") // System user for anonymous events
+	mainUserId, _ := uuid.Parse("11111111-1111-1111-1111-111111111111")
+
 	users := []*model.User{
+		// SYSTEM user for anonymous/error events
+		{
+			Id:             systemUserId,
+			Name:           "SYSTEM",
+			FirstLastName:  "ANONYMOUS",
+			SecondLastName: nil,
+			Password:       hashedPassword, // Same hash but this user can't actually login
+			Email:          "system@zen-cat.internal",
+			Rol:            model.UserRolAdmin, // Admin role for system operations
+			ImageUrl:       "system-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             mainUserId, // Fixed UUID for frontend integration
+			Name:           "Usuario",
+			FirstLastName:  "Demo",
+			SecondLastName: nil,
+			Password:       hashedPassword,
+			Email:          "demo@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 		{
 			Id:             uuid.New(),
 			Name:           "Test-1",
 			FirstLastName:  "User",
 			SecondLastName: nil,
-			Password:       "test123",
+			Password:       hashedPassword,
 			Email:          "test-1@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -216,11 +384,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:             uuid.New(),
-			Name:           "Test-2",
+			Name:           "TestAdmin",
 			FirstLastName:  "User",
 			SecondLastName: nil,
-			Password:       "test123",
-			Email:          "test-2@zen-cat.com",
+			Password:       hashedPassword,
+			Email:          "testAdmin@zen-cat.com",
 			Rol:            model.UserRolAdmin,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
@@ -232,7 +400,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Name:           "María",
 			FirstLastName:  "González",
 			SecondLastName: strPtr("López"),
-			Password:       "maria123",
+			Password:       hashedPassword,
 			Email:          "maria.gonzalez@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -245,7 +413,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Name:           "Carlos",
 			FirstLastName:  "Mendoza",
 			SecondLastName: strPtr("Ruiz"),
-			Password:       "carlos123",
+			Password:       hashedPassword,
 			Email:          "carlos.mendoza@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -258,7 +426,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Name:           "Ana",
 			FirstLastName:  "Martínez",
 			SecondLastName: nil,
-			Password:       "ana123",
+			Password:       hashedPassword,
 			Email:          "ana.martinez@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -271,7 +439,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Name:           "Luis",
 			FirstLastName:  "Rodríguez",
 			SecondLastName: strPtr("Flores"),
-			Password:       "luis123",
+			Password:       hashedPassword,
 			Email:          "luis.rodriguez@zen-cat.com",
 			Rol:            model.UserRolClient,
 			ImageUrl:       "test-image",
@@ -292,8 +460,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		{
 			Id:          uuid.New(),
 			Name:        "Yoga",
-			Description: "Servicio de yoga",
-			ImageUrl:    "test-image",
+			Description: "Clases para practicar posturas, respiración y meditación. Mejora tu flexibilidad, reduce el estrés y encuentra equilibrio interior.",
+			ImageUrl:    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
 			IsVirtual:   false,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -301,20 +469,40 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			Name:        "GYM",
-			Description: "Servicio de gimnasio",
-			ImageUrl:    "test-image",
-			IsVirtual:   false,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			Name:        "Citas Médicas",
-			Description: "Servicio online de citas médicas",
-			ImageUrl:    "test-image",
+			Name:        "Cita médica",
+			Description: "Atención personalizada con profesionales de la salud para consultas, diagnósticos y tratamientos. Agenda tu cita fácilmente.",
+			ImageUrl:    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
 			IsVirtual:   true,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Lactario",
+			Description: "Área privada y cómoda para que las mamás puedan amamantar o extraer leche materna en un entorno seguro y tranquilo.",
+			ImageUrl:    "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Gimnasio",
+			Description: "Espacio equipado con máquinas y pesas para entrenamiento físico. Mejora tu condición física con rutinas personalizadas.",
+			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Entrenamiento Funcional",
+			Description: "Ejercicios que imitan movimientos de la vida diaria para mejorar fuerza, coordinación y resistencia de manera integral.",
+			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -411,13 +599,13 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	locals := []*model.Local{
 		{
 			Id:             uuid.New(),
-			LocalName:      "Local Gym",
-			StreetName:     "Main St",
-			BuildingNumber: "123",
-			District:       "Downtown",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Central Park",
+			LocalName:      "Pabellón A",
+			StreetName:     "Av. Almirante Cornejo",
+			BuildingNumber: "1504",
+			District:       "San Miguel",
+			Province:       "Lima",
+			Region:         "Lima",
+			Reference:      "Cerca al parque central",
 			Capacity:       20,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
@@ -426,13 +614,13 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:             uuid.New(),
-			LocalName:      "Local Yoga",
-			StreetName:     "Downtown Ave",
-			BuildingNumber: "456",
-			District:       "Business",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Business Center",
+			LocalName:      "Pabellón A",
+			StreetName:     "Av. Constructores",
+			BuildingNumber: "12345",
+			District:       "San Juan de Lurigancho",
+			Province:       "Lima",
+			Region:         "Lima",
+			Reference:      "Frente al centro comercial",
 			Capacity:       15,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
@@ -441,13 +629,13 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:             uuid.New(),
-			LocalName:      "Studio Zen",
-			StreetName:     "Wellness Blvd",
-			BuildingNumber: "789",
-			District:       "Wellness",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Top floor wellness center",
+			LocalName:      "Pabellón A",
+			StreetName:     "Prolong. Santa María del Carmen",
+			BuildingNumber: "1234",
+			District:       "San Miguel",
+			Province:       "Lima",
+			Region:         "Lima",
+			Reference:      "Al lado del hospital",
 			Capacity:       12,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
@@ -456,14 +644,29 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:             uuid.New(),
-			LocalName:      "Fitness Plus",
-			StreetName:     "Sports Ave",
-			BuildingNumber: "321",
-			District:       "Sports",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Next to Sports Complex",
+			LocalName:      "Pabellón B",
+			StreetName:     "Av. Universitaria",
+			BuildingNumber: "100",
+			District:       "San Miguel",
+			Province:       "Lima",
+			Region:         "Lima",
+			Reference:      "Campus universitario",
 			Capacity:       25,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			LocalName:      "Studio Zen",
+			StreetName:     "Av. La Marina",
+			BuildingNumber: "2000",
+			District:       "San Miguel",
+			Province:       "Lima",
+			Region:         "Lima",
+			Reference:      "Centro comercial Plaza San Miguel",
+			Capacity:       18,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -494,7 +697,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Yearly Gym Membership",
+			Description: "Yearly Maternal Membership",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(1, 0, 0),
 			Status:      model.MembershipStatusActive,
@@ -502,6 +705,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[1].Id,
+			UserId:      users[1].Id,
+			PlanId:      plans[1].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Yearly Wellness Membership",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
 			UserId:      users[1].Id,
 			PlanId:      plans[1].Id,
 		},
@@ -515,18 +731,44 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy community services
 	communityServices := []*model.CommunityService{
+		// Main ZenCat Wellness Community services
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id,
-			ServiceId:   services[0].Id,
+			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			ServiceId:   services[0].Id,    // Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[1].Id,
-			ServiceId:   services[1].Id,
+			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			ServiceId:   services[1].Id,    // Cita médica
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			ServiceId:   services[3].Id,    // Gimnasio
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Maternal Care Community services
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			ServiceId:   services[2].Id,    // Lactario
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			ServiceId:   services[4].Id,    // Entrenamiento Funcional
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -541,18 +783,61 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy community plans
 	communityPlans := []*model.CommunityPlan{
+		// Runners Community plans (4 total - 2 monthly tiers + 2 annual tiers)
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id,
-			PlanId:      plans[0].Id,
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[2].Id,       // Monthly Basic Plan ($49.90)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[1].Id,
-			PlanId:      plans[1].Id,
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[3].Id,       // Monthly Premium Plan ($89.90)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[4].Id,       // Annual Basic Plan ($499.00)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[5].Id,       // Annual Premium Plan ($899.00)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Keep original plans for backward compatibility
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[0].Id,       // Original Monthly Plan ($70.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[1].Id,       // Original Annual Plan ($1000.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Maternal Care Community plan
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			PlanId:      plans[0].Id,       // Monthly Plan
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -561,6 +846,162 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	for _, cp := range communityPlans {
 		if err := astroCatPsqlDB.Create(cp).Error; err != nil {
 			appLogger.Errorf("Error creating dummy community plan: %v", err)
+			return
+		}
+	}
+
+	// Create dummy service-professional relationships
+	serviceProfessionals := []*model.ServiceProfessional{
+		// Yoga service with yoga trainers
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[0].Id,      // Yoga
+			ProfessionalId: professionals[0].Id, // John - Yoga Trainer
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[0].Id,      // Yoga
+			ProfessionalId: professionals[3].Id, // Laura - Advanced Yoga Trainer
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Medical service with doctors
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[1].Id,      // Cita médica
+			ProfessionalId: professionals[1].Id, // Jane - Medic
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[1].Id,      // Cita médica
+			ProfessionalId: professionals[4].Id, // Roberto - General Medicine
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Gym service with gym trainers
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[3].Id,      // Gimnasio
+			ProfessionalId: professionals[2].Id, // Pedro - Gym Trainer
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Functional training with gym trainer
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[4].Id,      // Entrenamiento Funcional
+			ProfessionalId: professionals[2].Id, // Pedro - Gym Trainer
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+	}
+	for _, sp := range serviceProfessionals {
+		if err := astroCatPsqlDB.Create(sp).Error; err != nil {
+			appLogger.Errorf("Error creating dummy service professional: %v", err)
+			return
+		}
+	}
+
+	// Create dummy service-local relationships
+	serviceLocals := []*model.ServiceLocal{
+		// Yoga service available in multiple locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[0].Id, // Yoga
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[0].Id, // Yoga
+			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[0].Id, // Yoga
+			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[0].Id, // Yoga
+			LocalId:   locals[4].Id,   // Studio Zen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Lactario service in specific locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[2].Id, // Lactario
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[2].Id, // Lactario
+			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Gym service in specific locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[3].Id, // Gimnasio
+			LocalId:   locals[3].Id,   // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[3].Id, // Gimnasio
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Functional training in multiple locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[4].Id, // Entrenamiento Funcional
+			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[4].Id, // Entrenamiento Funcional
+			LocalId:   locals[3].Id,   // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+	}
+	for _, sl := range serviceLocals {
+		if err := astroCatPsqlDB.Create(sl).Error; err != nil {
+			appLogger.Errorf("Error creating dummy service local: %v", err)
 			return
 		}
 	}
@@ -700,6 +1141,136 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			SessionLink:     strPtr("https://meet.example.com/health-checkup"),
 			ProfessionalId:  professionals[4].Id, // Roberto - General Medicine
 			LocalId:         nil,                 // Virtual session
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Más sesiones para hoy con diferentes horarios
+		{
+			Id:              uuid.New(),
+			Title:           "Morning Yoga Session",
+			Date:            baseDate,
+			StartTime:       baseDate.Add(6 * time.Hour), // 6:00 AM
+			EndTime:         baseDate.Add(7 * time.Hour), // 7:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 2,
+			Capacity:        15,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
+			LocalId:         &locals[0].Id,       // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Functional Training",
+			Date:            baseDate,
+			StartTime:       baseDate.Add(7 * time.Hour), // 7:00 AM
+			EndTime:         baseDate.Add(8 * time.Hour), // 8:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 3,
+			Capacity:        20,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[1].Id,       // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Gym Session",
+			Date:            baseDate,
+			StartTime:       baseDate.Add(8 * time.Hour), // 8:00 AM
+			EndTime:         baseDate.Add(9 * time.Hour), // 9:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 5,
+			Capacity:        25,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[3].Id,       // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Zen Yoga",
+			Date:            baseDate,
+			StartTime:       baseDate.Add(9 * time.Hour),  // 9:00 AM
+			EndTime:         baseDate.Add(10 * time.Hour), // 10:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 1,
+			Capacity:        18,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
+			LocalId:         &locals[4].Id,       // Studio Zen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Sesiones para mañana con más horarios
+		{
+			Id:              uuid.New(),
+			Title:           "Early Morning Yoga",
+			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:       baseDate.Add(24*time.Hour + 5*time.Hour), // 5:00 AM
+			EndTime:         baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 0,
+			Capacity:        15,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
+			LocalId:         &locals[0].Id,       // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Morning Gym",
+			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:       baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
+			EndTime:         baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 1,
+			Capacity:        20,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[1].Id,       // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Yoga Flow",
+			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:       baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
+			EndTime:         baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 2,
+			Capacity:        12,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
+			LocalId:         &locals[2].Id,       // Pabellón A - Santa María del Carmen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:              uuid.New(),
+			Title:           "Power Training",
+			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:       baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
+			EndTime:         baseDate.Add(24*time.Hour + 9*time.Hour), // 9:00 AM
+			State:           model.SessionStateScheduled,
+			RegisteredCount: 3,
+			Capacity:        25,
+			SessionLink:     nil,
+			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
+			LocalId:         &locals[3].Id,       // Pabellón B
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1068,18 +1639,20 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy onboarding
+	district := "Lince"
+	province := "Lima"
+	region := "Lima"
 	onboardings := []*model.Onboarding{
 		{
 			Id:             uuid.New(),
 			PhoneNumber:    "123456789",
 			DocumentType:   model.DocumentTypeDni,
 			DocumentNumber: "12345678",
-			StreetName:     "Main St",
-			BuildingNumber: "123",
-			District:       "Downtown",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Central Park",
+			PostalCode:     "15001",
+			District:       &district,
+			Province:       &province,
+			Region:         &region,
+			Address:        "Main St 123, Near Central Park",
 			UserId:         users[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -1090,12 +1663,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PhoneNumber:    "987654321",
 			DocumentType:   model.DocumentTypeForeignerCard,
 			DocumentNumber: "87654321",
-			StreetName:     "Downtown Ave",
-			BuildingNumber: "456",
-			District:       "Business",
-			Province:       "Central",
-			Region:         "Metropolitan",
-			Reference:      "Near Business Center",
+			PostalCode:     "15002",
+			District:       &district,
+			Province:       &province,
+			Region:         &region,
+			Address:        "Downtown Ave 456, Near Business Center",
 			UserId:         users[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",

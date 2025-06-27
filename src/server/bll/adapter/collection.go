@@ -9,19 +9,22 @@ import (
 )
 
 type AdapterCollection struct {
-	Logger           logging.Logger
-	Community        *Community
-	Professional     *Professional
-	Local            *Local
-	User             *User
-	Service          *Service
-	Plan             *Plan
-	CommunityPlan    *CommunityPlan
-	CommunityService *CommunityService
-	ServiceLocal      *ServiceLocal
+	Logger              logging.Logger
+	Community           *Community
+	Professional        *Professional
+	Local               *Local
+	User                *User
+	Onboarding          *Onboarding
+	Membership          *Membership
+	Service             *Service
+	Plan                *Plan
+	CommunityPlan       *CommunityPlan
+	CommunityService    *CommunityService
+	ServiceLocal        *ServiceLocal
 	ServiceProfessional *ServiceProfessional
-	Session          *Session
-	Reservation      *Reservation
+	Session             *Session
+	Reservation         *Reservation
+	AuditLog            *AuditLog
 }
 
 // Create bll adapter collection
@@ -32,17 +35,20 @@ func NewAdapterCollection(
 	daoAstroCatPsql, astroCatPsqlDB := daoPostgresql.NewAstroCatPsqlCollection(logger, envSettings)
 
 	return &AdapterCollection{
-		Community:        NewCommunityAdapter(logger, daoAstroCatPsql),
-		Professional:     NewProfessionalAdapter(logger, daoAstroCatPsql),
-		Local:            NewLocalAdapter(logger, daoAstroCatPsql),
-		User:             NewUserAdapter(logger, daoAstroCatPsql),
-		Service:          NewServiceAdapter(logger, daoAstroCatPsql),
-		Plan:             NewPlanAdapter(logger, daoAstroCatPsql),
-		CommunityPlan:    NewCommunityPlanAdapter(logger, daoAstroCatPsql),
-		CommunityService: NewCommunityServiceAdapter(logger, daoAstroCatPsql),
-		ServiceLocal:     NewServiceLocalAdapter(logger, daoAstroCatPsql),
+		Community:           NewCommunityAdapter(logger, daoAstroCatPsql),
+		Professional:        NewProfessionalAdapter(logger, daoAstroCatPsql),
+		Local:               NewLocalAdapter(logger, daoAstroCatPsql),
+		User:                NewUserAdapter(logger, daoAstroCatPsql),
+		Onboarding:          NewOnboardingAdapter(logger, daoAstroCatPsql),
+		Membership:          NewMembershipAdapter(logger, daoAstroCatPsql),
+		Service:             NewServiceAdapter(logger, daoAstroCatPsql),
+		Plan:                NewPlanAdapter(logger, daoAstroCatPsql),
+		CommunityPlan:       NewCommunityPlanAdapter(logger, daoAstroCatPsql),
+		CommunityService:    NewCommunityServiceAdapter(logger, daoAstroCatPsql),
+		ServiceLocal:        NewServiceLocalAdapter(logger, daoAstroCatPsql),
 		ServiceProfessional: NewServiceProfessionalAdapter(logger, daoAstroCatPsql),
-		Session:          NewSessionAdapter(logger, daoAstroCatPsql),
-		Reservation:      NewReservationAdapter(logger, daoAstroCatPsql),
+		Session:             NewSessionAdapter(logger, daoAstroCatPsql),
+		Reservation:         NewReservationAdapter(logger, daoAstroCatPsql),
+		AuditLog:            NewAuditLogAdapter(logger, daoAstroCatPsql),
 	}, astroCatPsqlDB
 }

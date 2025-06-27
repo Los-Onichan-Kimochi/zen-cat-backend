@@ -8,22 +8,26 @@ import (
 )
 
 type ControllerCollection struct {
-	Logger           logging.Logger
-	EnvSettings      *schemas.EnvSettings
-	Auth             *Auth
-	Login            *Login
-	Community        *Community
-	Professional     *Professional
-	Local            *Local
-	User             *User
-	Service          *Service
-	Plan             *Plan
-	CommunityPlan    *CommunityPlan
-	CommunityService *CommunityService
-	ServiceLocal     *ServiceLocal
+	Logger              logging.Logger
+	EnvSettings         *schemas.EnvSettings
+	Auth                *Auth
+	Login               *Login
+	Community           *Community
+	Professional        *Professional
+	Local               *Local
+	User                *User
+	Onboarding          *Onboarding
+	Membership          *Membership
+	Service             *Service
+	Plan                *Plan
+	CommunityPlan       *CommunityPlan
+	CommunityService    *CommunityService
+	ServiceLocal        *ServiceLocal
 	ServiceProfessional *ServiceProfessional
-	Session          *Session
-	Reservation      *Reservation
+	Session             *Session
+	Reservation         *Reservation
+	ForgotPassword      *ForgotPassword
+	AuditLog            *AuditLog
 }
 
 // Create bll controller collection
@@ -41,6 +45,8 @@ func NewControllerCollection(
 	professional := NewProfessionalController(logger, bllAdapter, envSettings)
 	local := NewLocalController(logger, bllAdapter, envSettings)
 	user := NewUserController(logger, bllAdapter, envSettings)
+	onboarding := NewOnboardingController(logger, bllAdapter, envSettings)
+	membership := NewMembershipController(logger, bllAdapter, envSettings)
 	service := NewServiceController(logger, bllAdapter, envSettings)
 	plan := NewPlanController(logger, bllAdapter, envSettings)
 	communityPlan := NewCommunityPlanController(logger, bllAdapter, envSettings)
@@ -49,23 +55,29 @@ func NewControllerCollection(
 	serviceProfessional := NewServiceProfessionalController(logger, bllAdapter, envSettings)
 	session := NewSessionController(logger, bllAdapter, envSettings)
 	reservation := NewReservationController(logger, bllAdapter, envSettings)
+	forgotPassword := NewForgotPasswordController(logger, bllAdapter, envSettings)
+	auditLog := NewAuditLogController(logger, bllAdapter, envSettings)
 
 	return &ControllerCollection{
-		Logger:           logger,
-		EnvSettings:      envSettings,
-		Auth:             auth,
-		Login:            login,
-		Community:        community,
-		Professional:     professional,
-		Local:            local,
-		User:             user,
-		Service:          service,
-		Plan:             plan,
-		CommunityPlan:    communityPlan,
-		CommunityService: communityService,
-		ServiceLocal:     serviceLocal,
+		Logger:              logger,
+		EnvSettings:         envSettings,
+		Auth:                auth,
+		Login:               login,
+		Community:           community,
+		Professional:        professional,
+		Local:               local,
+		User:                user,
+		Onboarding:          onboarding,
+		Membership:          membership,
+		Service:             service,
+		Plan:                plan,
+		CommunityPlan:       communityPlan,
+		CommunityService:    communityService,
+		ServiceLocal:        serviceLocal,
 		ServiceProfessional: serviceProfessional,
-		Session:          session,
-		Reservation:      reservation,
+		Session:             session,
+		Reservation:         reservation,
+		ForgotPassword:      forgotPassword,
+		AuditLog:            auditLog,
 	}, astroCatPsqlDB
 }

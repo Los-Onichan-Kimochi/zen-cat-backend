@@ -28,7 +28,9 @@ func NewReservationController(
 }
 
 // Gets a specific reservation.
-func (r *Reservation) GetReservation(reservationId uuid.UUID) (*schemas.Reservation, *errors.Error) {
+func (r *Reservation) GetReservation(
+	reservationId uuid.UUID,
+) (*schemas.Reservation, *errors.Error) {
 	return r.Adapter.Reservation.GetPostgresqlReservation(reservationId)
 }
 
@@ -76,7 +78,11 @@ func (r *Reservation) FetchReservations(
 		}
 	}
 
-	reservations, err := r.Adapter.Reservation.FetchPostgresqlReservations(parsedUserIds, parsedSessionIds, states)
+	reservations, err := r.Adapter.Reservation.FetchPostgresqlReservations(
+		parsedUserIds,
+		parsedSessionIds,
+		states,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -89,6 +95,16 @@ func (r *Reservation) CreateReservation(
 	createReservationData schemas.CreateReservationRequest,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
+	// Validate updatedBy is not empty
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	// Validate required fields
+	if createReservationData.Name == "" {
+		return nil, &errors.BadRequestError.UserNotCreated // Use existing error for validation
+	}
+
 	// Validate that the user exists
 	_, userErr := r.Adapter.User.GetPostgresqlUser(createReservationData.UserId)
 	if userErr != nil {
@@ -96,10 +112,27 @@ func (r *Reservation) CreateReservation(
 	}
 
 	// Validate that the session exists
-	_, sessionErr := r.Adapter.Session.GetPostgresqlSession(createReservationData.SessionId)
+	session, sessionErr := r.Adapter.Session.GetPostgresqlSession(createReservationData.SessionId)
 	if sessionErr != nil {
 		return nil, sessionErr
 	}
+
+	// Modify `registered_count` field of the session
+	session.RegisteredCount++
+	_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
+		createReservationData.SessionId,
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		&session.RegisteredCount,
+		nil,
+		nil,
+		nil,
+		nil,
+		updatedBy,
+	)
 
 	return r.Adapter.Reservation.CreatePostgresqlReservation(
 		createReservationData.Name,

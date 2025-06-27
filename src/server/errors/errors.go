@@ -15,20 +15,21 @@ type Error struct {
 var (
 	// For 404 Not Found errors
 	ObjectNotFoundError = struct {
-		CommunityNotFound        Error
-		ReservationNotFound      Error
-		ProfessionalNotFound     Error
-		LocalNotFound            Error
-		UserNotFound             Error
-		ServiceNotFound          Error
-		PlanNotFound             Error
-		MembershipNotFound       Error
-		OnboardingNotFound       Error
-		CommunityPlanNotFound    Error
-		CommunityServiceNotFound Error
+		CommunityNotFound           Error
+		ReservationNotFound         Error
+		ProfessionalNotFound        Error
+		LocalNotFound               Error
+		UserNotFound                Error
+		ServiceNotFound             Error
+		PlanNotFound                Error
+		MembershipNotFound          Error
+		OnboardingNotFound          Error
+		CommunityPlanNotFound       Error
+		CommunityServiceNotFound    Error
 		ServiceLocalNotFound        Error
 		ServiceProfessionalNotFound Error
-		SessionNotFound          Error
+		SessionNotFound             Error
+		AuditLogNotFound            Error
 	}{
 		CommunityNotFound: Error{
 			Code:    "COMMUNITY_ERROR_001",
@@ -82,27 +83,31 @@ var (
 			Code:    "SESSION_ERROR_001",
 			Message: "Session not found",
 		},
+		AuditLogNotFound: Error{
+			Code:    "AUDIT_LOG_ERROR_001",
+			Message: "Audit log not found",
+		},
 	}
 
 	// For 422 Unprocessable Entity errors
 	UnprocessableEntityError = struct {
-		InvalidCommunityId        Error
-		InvalidRequestBody        Error
-		InvalidProfessionalId     Error
-		InvalidLocalId            Error
-		InvalidServiceId          Error
-		InvalidPlanId             Error
-		InvalidMembershipId       Error
-		InvalidOnboardingId       Error
-		InvalidUserEmail          Error
-		InvalidUserId             Error
-		InvalidCommunityPlanId    Error
-		InvalidCommunityServiceId Error
-		InvalidParsingInteger     Error
+		InvalidCommunityId           Error
+		InvalidRequestBody           Error
+		InvalidProfessionalId        Error
+		InvalidLocalId               Error
+		InvalidServiceId             Error
+		InvalidPlanId                Error
+		InvalidMembershipId          Error
+		InvalidOnboardingId          Error
+		InvalidUserEmail             Error
+		InvalidUserId                Error
+		InvalidCommunityPlanId       Error
+		InvalidCommunityServiceId    Error
+		InvalidParsingInteger        Error
 		InvalidServiceLocalId        Error
 		InvalidServiceProfessionalId Error
-		InvalidSessionId          Error
-		InvalidReservationId      Error
+		InvalidSessionId             Error
+		InvalidReservationId         Error
 	}{
 		InvalidRequestBody: Error{
 			Code:    "REQUEST_ERROR_001",
@@ -176,45 +181,67 @@ var (
 
 	// For 400 Bad Request errors
 	BadRequestError = struct {
-		InvalidUpdatedByValue      Error
-		CommunityNotCreated        Error
-		CommunityNotUpdated        Error
-		CommunityNotSoftDeleted    Error
-		LocalNotCreated            Error
-		LocalNotUpdated            Error
-		LocalNotSoftDeleted        Error
-		ProfessionalNotCreated     Error
-		ProfessionalNotUpdated     Error
-		ProfessionalNotSoftDeleted Error
-		ServiceNotCreated          Error
-		ServiceNotUpdated          Error
-		ServiceNotSoftDeleted      Error
-		PlanNotCreated             Error
-		PlanNotUpdated             Error
-		PlanNotSoftDeleted         Error
-		InvalidPlanType            Error
-		MembershipNotCreated       Error
-		MembershipNotUpdated       Error
-		OnboardingNotCreated       Error
-		OnboardingNotUpdated       Error
-		UserNotCreated             Error
-		UserNotUpdated             Error
-		UserNotSoftDeleted         Error
-		CommunityPlanNotCreated    Error
-		CommunityPlanNotDeleted    Error
-		CommunityServiceNotCreated Error
-		CommunityServiceNotDeleted Error
-		ServiceLocalNotCreated        	 Error
-		ServiceLocalNotDeleted           Error
-		ServiceProfessionalNotCreated    Error
-		ServiceProfessionalNotDeleted    Error
-		SessionNotCreated          Error
-		SessionNotUpdated          Error
-		SessionNotSoftDeleted      Error
+		InvalidUpdatedByValue         Error
+		InvalidCommunityName          Error
+		InvalidServiceName            Error
+		DuplicateCommunityName        Error
+		DuplicateUserEmail            Error
+		CommunityNotCreated           Error
+		CommunityNotUpdated           Error
+		CommunityNotSoftDeleted       Error
+		LocalNotCreated               Error
+		LocalNotUpdated               Error
+		LocalNotSoftDeleted           Error
+		ProfessionalNotCreated        Error
+		ProfessionalNotUpdated        Error
+		ProfessionalNotSoftDeleted    Error
+		ServiceNotCreated             Error
+		ServiceNotUpdated             Error
+		ServiceNotSoftDeleted         Error
+		PlanNotCreated                Error
+		PlanNotUpdated                Error
+		PlanNotSoftDeleted            Error
+		InvalidPlanType               Error
+		MembershipNotCreated          Error
+		MembershipNotUpdated          Error
+		MembershipNotDeleted          Error
+		OnboardingNotCreated          Error
+		OnboardingNotUpdated          Error
+		UserNotCreated                Error
+		UserNotUpdated                Error
+		UserNotSoftDeleted            Error
+		UserPasswordNotUpdated        Error
+		CommunityPlanNotCreated       Error
+		CommunityPlanNotDeleted       Error
+		CommunityServiceNotCreated    Error
+		CommunityServiceNotDeleted    Error
+		ServiceLocalNotCreated        Error
+		ServiceLocalNotDeleted        Error
+		ServiceProfessionalNotCreated Error
+		ServiceProfessionalNotDeleted Error
+		SessionNotCreated             Error
+		SessionNotUpdated             Error
+		SessionNotSoftDeleted         Error
 	}{
 		InvalidUpdatedByValue: Error{
-			Code:    "REQUEST_ERROR_002",
-			Message: "Invalid updated by value error",
+			Code:    "BAD_REQUEST_ERROR_001",
+			Message: "Invalid updated by value",
+		},
+		InvalidCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_004",
+			Message: "Community name cannot be empty",
+		},
+		InvalidServiceName: Error{
+			Code:    "BAD_REQUEST_ERROR_005",
+			Message: "Service name cannot be empty",
+		},
+		DuplicateCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_002",
+			Message: "Community name already exists",
+		},
+		DuplicateUserEmail: Error{
+			Code:    "BAD_REQUEST_ERROR_003",
+			Message: "User email already exists",
 		},
 		CommunityNotCreated: Error{
 			Code:    "COMMUNITY_ERROR_002",
@@ -259,6 +286,10 @@ var (
 		MembershipNotUpdated: Error{
 			Code:    "MEMBERSHIP_ERROR_003",
 			Message: "Membership not updated",
+		},
+		MembershipNotDeleted: Error{
+			Code:    "MEMBERSHIP_ERROR_005",
+			Message: "Membership not deleted",
 		},
 		OnboardingNotCreated: Error{
 			Code:    "ONBOARDING_ERROR_002",
@@ -308,6 +339,10 @@ var (
 			Code:    "USER_ERROR_005",
 			Message: "User not soft deleted",
 		},
+		UserPasswordNotUpdated: Error{
+			Code:    "USER_ERROR_007",
+			Message: "Failed to update user password",
+		},
 		CommunityPlanNotCreated: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_002",
 			Message: "Community-Plan association not created",
@@ -354,7 +389,6 @@ var (
 		},
 	}
 
-
 	// For 401 Unauthorized errors
 	AuthenticationError = struct {
 		UnauthorizedUser    Error
@@ -375,13 +409,23 @@ var (
 		},
 	}
 
+	// For 403 Forbidden errors
+	ForbiddenError = struct {
+		InsufficientPrivileges Error
+	}{
+		InsufficientPrivileges: Error{
+			Code:    "FORBIDDEN_ERROR_001",
+			Message: "Insufficient privileges to access this resource",
+		},
+	}
+
 	// For 409 Conflict errors
 	ConflictError = struct {
 		CommunityPlanAlreadyExists       Error
 		CommunityServiceAlreadyExists    Error
 		ServiceProfessionalAlreadyExists Error
 		ServiceLocalAlreadyExists        Error
-		UserAlreadyExists             Error
+		UserAlreadyExists                Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -407,11 +451,41 @@ var (
 
 	// For 500 Internal Server errors
 	InternalServerError = struct {
-		Default Error
+		Default               Error
+		FailedToUploadImage   Error
+		FailedToDownloadImage Error
 	}{
 		Default: Error{
 			Code:    "INTERNAL_SERVER_ERROR_001",
 			Message: "An unexpected error occurred.",
+		},
+		FailedToUploadImage: Error{
+			Code:    "INTERNAL_SERVER_ERROR_002",
+			Message: "Failed to upload image to S3",
+		},
+		FailedToDownloadImage: Error{
+			Code:    "INTERNAL_SERVER_ERROR_003",
+			Message: "Failed to download image from S3",
+		},
+	}
+
+	// For forgot password or recovery flows
+	ForgotPasswordError = struct {
+		InvalidEmail        Error
+		FailedToSendEmail   Error
+		InvalidOrExpiredPin Error
+	}{
+		InvalidEmail: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_001",
+			Message: "Email not associated to any account",
+		},
+		FailedToSendEmail: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_002",
+			Message: "Failed to send reset email",
+		},
+		InvalidOrExpiredPin: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_003",
+			Message: "Invalid or expired PIN code",
 		},
 	}
 )
@@ -445,6 +519,12 @@ func HandleError(err Error, c echo.Context) error {
 
 	case isInErrorGroup(err, InternalServerError):
 		statusCode = http.StatusInternalServerError
+
+	case isInErrorGroup(err, AuthenticationError):
+		statusCode = http.StatusUnauthorized
+
+	case isInErrorGroup(err, ForbiddenError):
+		statusCode = http.StatusForbidden
 
 	default:
 		statusCode = http.StatusInternalServerError // Default case for other errors

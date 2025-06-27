@@ -6,6 +6,7 @@ import (
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
 	errors "onichankimochi.com/astro_cat_backend/src/server/errors"
 	schemas "onichankimochi.com/astro_cat_backend/src/server/schemas"
+	"onichankimochi.com/astro_cat_backend/src/server/utils"
 )
 
 type User struct {
@@ -56,8 +57,9 @@ func (u *User) CreateUser(
 		createUserRequest.Email,
 		createUserRequest.Rol,
 		createUserRequest.ImageUrl,
-
 		updatedBy,
+		createUserRequest.Memberships,
+		createUserRequest.Onboarding,
 	)
 }
 
@@ -75,7 +77,8 @@ func (u *User) UpdateUser(
 		updateUserRequest.Email,
 		updateUserRequest.Rol,
 		updateUserRequest.ImageUrl,
-
+		updateUserRequest.Memberships,
+		updateUserRequest.Onboarding,
 		updatedBy,
 	)
 }
@@ -84,13 +87,61 @@ func (u *User) DeleteUser(userId uuid.UUID) *errors.Error {
 	return u.Adapter.User.DeletePostgresqlUser(userId)
 }
 
-// Bulk deletes users.
-func (u *User) BulkDeleteUsers(
-	bulkDeleteUserData schemas.BulkDeleteUserRequest,
-) *errors.Error {
-	return u.Adapter.User.BulkDeletePostgresqlUsers(
-		bulkDeleteUserData.Users,
+func (u *User) BulkCreateUsers(
+	createUsersData []*schemas.CreateUserRequest,
+	updatedBy string,
+) ([]*schemas.User, *errors.Error) {
+	return u.Adapter.User.BulkCreatePostgresqlUser(
+		createUsersData,
+		updatedBy,
 	)
 }
 
-// todo : bulk-create-users
+func (u *User) BulkDeleteUsers(
+	bulkDeleteUsersData schemas.BulkDeleteUserRequest,
+) *errors.Error {
+	return u.Adapter.User.BulkDeletePostgresqlUser(
+		bulkDeleteUsersData.Users,
+	)
+}
+
+func (u *User) CheckUserExistsByEmail(email string) (*schemas.CheckUserExistsResponse, *errors.Error) {
+	_, err := u.Adapter.User.GetPostgresqlUserByEmail(email)
+
+	// Si no hay error, el usuario existe
+	exists := err == nil
+
+	return &schemas.CheckUserExistsResponse{
+		Email:  email,
+		Exists: exists,
+	}, nil
+}
+
+func (u *User) ChangePassword(
+	email string,
+	request schemas.ChangePasswordInput,
+) *errors.Error {
+	// Buscar usuario por email
+	user, err := u.Adapter.User.GetPostgresqlUserByEmail(email)
+	if err != nil {
+		return &errors.ObjectNotFoundError.UserNotFound
+	}
+
+	// Hashear la nueva contraseña
+	hashedPassword, hashErr := utils.HashPassword(request.NewPassword)
+	if hashErr != nil {
+		return &errors.InternalServerError.Default
+	}
+
+	// Actualizar contraseña usando el ID del usuario encontrado
+	updateErr := u.Adapter.User.UpdateUserPassword(user.Id, hashedPassword)
+	if updateErr != nil {
+		return &errors.BadRequestError.UserPasswordNotUpdated
+	}
+
+	return nil
+}
+
+func (u *User) GetUserStats() (*schemas.UserStats, *errors.Error) {
+	return u.Adapter.User.GetUserStats()
+}
