@@ -64,12 +64,12 @@ func (cp *CommunityPlan) GetCommunityPlan(
 ) (*schemas.CommunityPlan, *errors.Error) {
 	communityId, err := uuid.Parse(communityIdString)
 	if err != nil {
-		return nil, &errors.UnprocessableEntityError.InvalidCommunityId
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	planId, err := uuid.Parse(planIdString)
 	if err != nil {
-		return nil, &errors.UnprocessableEntityError.InvalidPlanId
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	return cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)
@@ -82,12 +82,12 @@ func (cp *CommunityPlan) DeleteCommunityPlan(
 ) *errors.Error {
 	communityId, parseErr := uuid.Parse(communityIdString)
 	if parseErr != nil {
-		return &errors.UnprocessableEntityError.InvalidCommunityId
+		return &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	planId, parseErr := uuid.Parse(planIdString)
 	if parseErr != nil {
-		return &errors.UnprocessableEntityError.InvalidPlanId
+		return &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	_, err := cp.Adapter.CommunityPlan.GetPostgresqlCommunityPlan(communityId, planId)

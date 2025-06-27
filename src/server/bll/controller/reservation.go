@@ -95,6 +95,16 @@ func (r *Reservation) CreateReservation(
 	createReservationData schemas.CreateReservationRequest,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
+	// Validate updatedBy is not empty
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	// Validate required fields
+	if createReservationData.Name == "" {
+		return nil, &errors.BadRequestError.UserNotCreated // Use existing error for validation
+	}
+
 	// Validate that the user exists
 	_, userErr := r.Adapter.User.GetPostgresqlUser(createReservationData.UserId)
 	if userErr != nil {

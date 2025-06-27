@@ -44,6 +44,8 @@ type Onboarding struct {
 	District   *string `json:"district"`
 	Province   *string `json:"province"`
 	Region     *string `json:"region"`
+
+	UserId uuid.UUID `json:"user_id"`
 }
 
 type Onboardings struct {

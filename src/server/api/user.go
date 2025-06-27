@@ -243,6 +243,14 @@ func (a *Api) ChangePassword(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	// Validate required fields
+	if request.Email == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserEmail, c)
+	}
+	if request.NewPassword == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
 	// Cambiar la contraseña
 	if err := a.BllController.User.ChangePassword(request.Email, request); err != nil {
 		return errors.HandleError(*err, c)

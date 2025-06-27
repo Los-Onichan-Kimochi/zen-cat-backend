@@ -37,6 +37,9 @@ func NewMiddleware(
 // AuditMiddleware captures API calls and logs them for audit purposes
 func (a *Middleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		if a.EnvSettings.DisableAuthForTests {
+			return next(c)
+		}
 
 		// Obtengo path y method
 		path := c.Request().URL.Path

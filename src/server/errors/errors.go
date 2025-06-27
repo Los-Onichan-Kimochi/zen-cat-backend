@@ -182,6 +182,10 @@ var (
 	// For 400 Bad Request errors
 	BadRequestError = struct {
 		InvalidUpdatedByValue         Error
+		InvalidCommunityName          Error
+		InvalidServiceName            Error
+		DuplicateCommunityName        Error
+		DuplicateUserEmail            Error
 		CommunityNotCreated           Error
 		CommunityNotUpdated           Error
 		CommunityNotSoftDeleted       Error
@@ -220,8 +224,24 @@ var (
 		SessionNotSoftDeleted         Error
 	}{
 		InvalidUpdatedByValue: Error{
-			Code:    "REQUEST_ERROR_002",
-			Message: "Invalid updated by value error",
+			Code:    "BAD_REQUEST_ERROR_001",
+			Message: "Invalid updated by value",
+		},
+		InvalidCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_004",
+			Message: "Community name cannot be empty",
+		},
+		InvalidServiceName: Error{
+			Code:    "BAD_REQUEST_ERROR_005",
+			Message: "Service name cannot be empty",
+		},
+		DuplicateCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_002",
+			Message: "Community name already exists",
+		},
+		DuplicateUserEmail: Error{
+			Code:    "BAD_REQUEST_ERROR_003",
+			Message: "User email already exists",
 		},
 		CommunityNotCreated: Error{
 			Code:    "COMMUNITY_ERROR_002",

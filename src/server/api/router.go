@@ -24,7 +24,7 @@ func (a *Api) HealthCheck(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Works well !!")
 }
 
-func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
+func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	// CORS
 	corsConfig := middleware.CORSConfig{
 		AllowOrigins:     []string{"*"}, // TODO: allow only FrontOffice and UserFront origins
@@ -32,9 +32,11 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	}
 	a.Echo.Use(middleware.CORSWithConfig(corsConfig))
 
-	// Add audit middleware
+	// Add audit middleware (disabled for tests)
 	mw := auditMiddleware.NewMiddleware(a.Logger, a.BllController, a.EnvSettings, a.Echo)
-	a.Echo.Use(mw.AuditMiddleware)
+	if !a.EnvSettings.DisableAuthForTests {
+		a.Echo.Use(mw.AuditMiddleware)
+	}
 
 	if envSettings.EnableSwagger {
 		a.Echo.GET("/swagger/*", echoSwagger.EchoWrapHandler(echoSwagger.InstanceName("server")))
@@ -92,6 +94,8 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
 	local.DELETE("/:localId/", a.DeleteLocal)
+	local.POST("/bulk-create/", a.BulkCreateLocals)
+	local.DELETE("/bulk-delete/", a.BulkDeleteLocals)
 
 	// Plan endpoints (admin only)
 	plan := a.Echo.Group("/plan")
@@ -109,6 +113,7 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	user.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	user.GET("/:userId/", a.GetUser)
 	user.GET("/", a.FetchUsers)
+	user.GET("/exists", a.CheckUserExists)
 	user.POST("/", a.CreateUser)
 	user.PATCH("/:userId/", a.UpdateUser)
 	user.DELETE("/:userId/", a.DeleteUser)
@@ -232,6 +237,10 @@ func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
 	reservation.PATCH("/:reservationId/", a.UpdateReservation)
 	reservation.DELETE("/:reservationId/", a.DeleteReservation)
 	reservation.DELETE("/bulk-delete/", a.BulkDeleteReservations)
+}
+
+func (a *Api) RunApi(envSettings *schemas.EnvSettings) {
+	a.RegisterRoutes(envSettings)
 
 	// Start the server
 	a.Logger.Infoln(fmt.Sprintf("AstroCat server running on port %s", a.EnvSettings.MainPort))

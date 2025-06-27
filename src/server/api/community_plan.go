@@ -127,6 +127,11 @@ func (a *Api) BulkCreateCommunityPlans(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	// Check for missing CommunityPlans field which means invalid JSON binding
+	if request.CommunityPlans == nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
 	response, err := a.BllController.CommunityPlan.BulkCreateCommunityPlans(
 		request.CommunityPlans,
 		updatedBy,
@@ -182,6 +187,11 @@ func (a *Api) FetchCommunityPlans(c echo.Context) error {
 func (a *Api) BulkDeleteCommunityPlans(c echo.Context) error {
 	var request schemas.BulkDeleteCommunityPlanRequest
 	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Check for missing CommunityPlans field which means invalid JSON binding
+	if request.CommunityPlans == nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 

@@ -94,5 +94,10 @@ func (m *Membership) DeleteMembership(membershipId uuid.UUID) error {
 		return result.Error
 	}
 
+	// Check if any rows were affected
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
 	return nil
 }
