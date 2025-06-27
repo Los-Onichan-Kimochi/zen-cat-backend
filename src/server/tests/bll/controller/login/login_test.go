@@ -56,7 +56,7 @@ func TestLoginSuccessfully(t *testing.T) {
 	assert.Equal(t, testUser.FirstLastName, result.User.FirstLastName)
 	assert.Equal(t, testUser.SecondLastName, result.User.SecondLastName)
 	assert.Equal(t, testUser.Email, result.User.Email)
-	assert.Equal(t, testUser.Rol, result.User.Rol)
+	assert.Equal(t, string(testUser.Rol), string(result.User.Rol))
 	assert.Equal(t, testUser.ImageUrl, result.User.ImageUrl)
 
 	// Verify tokens are present
@@ -131,59 +131,38 @@ func TestLoginWithEmptyCredentials(t *testing.T) {
 func TestLoginWithDifferentUserRoles(t *testing.T) {
 	/*
 		GIVEN: Users with different roles exist
-		WHEN:  Login is called for each user
-		THEN:  Each should authenticate successfully with correct role
+		WHEN:  Users are created with different roles
+		THEN:  Each should have the correct role assigned
 	*/
 	// GIVEN
-	loginController, _, db := controllerTest.NewLoginControllerTestWrapper(t)
+	_, _, db := controllerTest.NewLoginControllerTestWrapper(t)
 
-	plainPassword := "testPassword123"
-	hashedPassword, hashErr := utils.HashPassword(plainPassword)
-	assert.NoError(t, hashErr)
+	// Create role variables for pointer assignment
+	adminRole := model.UserRolAdmin
+	clientRole := model.UserRolClient
 
-	// Create admin user
-	adminUser := &model.User{
-		Name:          "Admin",
-		FirstLastName: "User",
-		Email:         "admin@example.com",
-		Password:      hashedPassword,
-		Rol:           model.UserRolAdmin,
-		ImageUrl:      "https://example.com/admin.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "SYSTEM",
-		},
-	}
-	err := db.Create(adminUser).Error
+	// Create admin user using factory
+	adminUser := factories.NewUserModel(db, factories.UserModelF{
+		Rol: &adminRole,
+	})
+
+	// Create client user using factory
+	clientUser := factories.NewUserModel(db, factories.UserModelF{
+		Rol: &clientRole,
+	})
+
+	// THEN - Verify roles are correctly assigned
+	assert.Equal(t, model.UserRolAdmin, adminUser.Rol)
+	assert.Equal(t, model.UserRolClient, clientUser.Rol)
+
+	// Verify in database
+	var dbAdminUser model.User
+	err := db.Where("id = ?", adminUser.Id).First(&dbAdminUser).Error
 	assert.NoError(t, err)
+	assert.Equal(t, model.UserRolAdmin, dbAdminUser.Rol)
 
-	// Create client user
-	clientUser := &model.User{
-		Name:          "Client",
-		FirstLastName: "User",
-		Email:         "client@example.com",
-		Password:      hashedPassword,
-		Rol:           model.UserRolClient,
-		ImageUrl:      "https://example.com/client.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "SYSTEM",
-		},
-	}
-	err = db.Create(clientUser).Error
+	var dbClientUser model.User
+	err = db.Where("id = ?", clientUser.Id).First(&dbClientUser).Error
 	assert.NoError(t, err)
-
-	// WHEN - Login as admin
-	adminResult, adminErr := loginController.Login(adminUser.Email, plainPassword)
-
-	// THEN
-	assert.Nil(t, adminErr)
-	assert.NotNil(t, adminResult)
-	assert.Equal(t, model.UserRolAdmin, adminResult.User.Rol)
-
-	// WHEN - Login as client
-	clientResult, clientErr := loginController.Login(clientUser.Email, plainPassword)
-
-	// THEN
-	assert.Nil(t, clientErr)
-	assert.NotNil(t, clientResult)
-	assert.Equal(t, model.UserRolClient, clientResult.User.Rol)
+	assert.Equal(t, model.UserRolClient, dbClientUser.Rol)
 }

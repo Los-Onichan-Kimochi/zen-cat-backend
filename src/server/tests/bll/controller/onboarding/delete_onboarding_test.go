@@ -6,8 +6,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestDeleteOnboardingSuccessfully(t *testing.T) {
@@ -19,33 +19,11 @@ func TestDeleteOnboardingSuccessfully(t *testing.T) {
 	// GIVEN
 	onboardingController, _, db := controllerTest.NewOnboardingControllerTestWrapper(t)
 
-	// Create a user for the onboarding
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
-
-	// Create an onboarding record
-	onboarding := &model.Onboarding{
-		UserId:         user.Id,
-		DocumentType:   model.DocumentTypeDni,
-		DocumentNumber: "12345678",
-		PhoneNumber:    "987654321",
-		PostalCode:     "15001",
-		Address:        "Av. Principal 123",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create(onboarding).Error
-	assert.NoError(t, err)
+	// Create user and onboarding using factories
+	user := factories.NewUserModel(db)
+	onboarding := factories.NewOnboardingModel(db, factories.OnboardingModelF{
+		UserId: &user.Id,
+	})
 
 	// WHEN
 	errResult := onboardingController.DeleteOnboarding(onboarding.Id)
@@ -55,7 +33,7 @@ func TestDeleteOnboardingSuccessfully(t *testing.T) {
 
 	// Verify the onboarding was deleted
 	var deletedOnboarding model.Onboarding
-	err = db.Where("id = ?", onboarding.Id).First(&deletedOnboarding).Error
+	err := db.Where("id = ?", onboarding.Id).First(&deletedOnboarding).Error
 	assert.Error(t, err) // Should return error because record doesn't exist
 }
 
@@ -86,33 +64,11 @@ func TestDeleteOnboardingByUserIdSuccessfully(t *testing.T) {
 	// GIVEN
 	onboardingController, _, db := controllerTest.NewOnboardingControllerTestWrapper(t)
 
-	// Create a user for the onboarding
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
-
-	// Create an onboarding record
-	onboarding := &model.Onboarding{
-		UserId:         user.Id,
-		DocumentType:   model.DocumentTypeDni,
-		DocumentNumber: "12345678",
-		PhoneNumber:    "987654321",
-		PostalCode:     "15001",
-		Address:        "Av. Principal 123",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create(onboarding).Error
-	assert.NoError(t, err)
+	// Create user and onboarding using factories
+	user := factories.NewUserModel(db)
+	_ = factories.NewOnboardingModel(db, factories.OnboardingModelF{
+		UserId: &user.Id,
+	})
 
 	// WHEN
 	errResult := onboardingController.DeleteOnboardingByUserId(user.Id)
@@ -122,7 +78,7 @@ func TestDeleteOnboardingByUserIdSuccessfully(t *testing.T) {
 
 	// Verify the onboarding was deleted
 	var deletedOnboarding model.Onboarding
-	err = db.Where("user_id = ?", user.Id).First(&deletedOnboarding).Error
+	err := db.Where("user_id = ?", user.Id).First(&deletedOnboarding).Error
 	assert.Error(t, err) // Should return error because record doesn't exist
 }
 

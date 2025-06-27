@@ -3,6 +3,7 @@ package local_test
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
@@ -20,6 +21,7 @@ func TestFetchLocalsSuccessfully(t *testing.T) {
 	// Create local records
 	locals := []*model.Local{
 		{
+			Id:             uuid.New(),
 			LocalName:      "Test Gym 1",
 			StreetName:     "Main Street",
 			BuildingNumber: "123",
@@ -34,6 +36,7 @@ func TestFetchLocalsSuccessfully(t *testing.T) {
 			},
 		},
 		{
+			Id:             uuid.New(),
 			LocalName:      "Test Gym 2",
 			StreetName:     "Second Street",
 			BuildingNumber: "456",

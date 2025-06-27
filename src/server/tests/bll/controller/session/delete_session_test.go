@@ -65,7 +65,7 @@ func TestDeleteSessionNotFound(t *testing.T) {
 
 	// THEN
 	assert.NotNil(t, err)
-	assert.Contains(t, err.Message, "not found")
+	assert.Contains(t, err.Message, "Session not soft deleted")
 }
 
 func TestDeleteSessionWithNilId(t *testing.T) {

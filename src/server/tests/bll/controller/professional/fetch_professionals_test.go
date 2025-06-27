@@ -3,6 +3,7 @@ package professional_test
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
@@ -21,6 +22,7 @@ func TestFetchProfessionalsSuccessfully(t *testing.T) {
 	// Create professional records
 	professionals := []*model.Professional{
 		{
+			Id:            uuid.New(),
 			Name:          "Dr. John",
 			FirstLastName: "Doe",
 			Specialty:     "Cardiology",
@@ -33,6 +35,7 @@ func TestFetchProfessionalsSuccessfully(t *testing.T) {
 			},
 		},
 		{
+			Id:            uuid.New(),
 			Name:          "Jane",
 			FirstLastName: "Smith",
 			Specialty:     "Fitness Training",

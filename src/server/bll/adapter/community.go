@@ -80,6 +80,11 @@ func (c *Community) CreatePostgresqlCommunity(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
+	// Validate name is not empty
+	if name == "" {
+		return nil, &errors.BadRequestError.InvalidCommunityName
+	}
+
 	// Check for duplicate community name
 	existingCommunity, _ := c.DaoPostgresql.Community.GetCommunityByName(name)
 	if existingCommunity != nil {

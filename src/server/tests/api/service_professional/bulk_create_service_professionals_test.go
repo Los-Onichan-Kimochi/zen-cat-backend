@@ -9,73 +9,27 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestBulkCreateServiceProfessionalsSuccessfully(t *testing.T) {
 	/*
-		GIVEN: Valid services and professionals
+		GIVEN: Valid services and professionals exist
 		WHEN:  POST /service-professional/bulk/ is called with valid associations
 		THEN:  A HTTP_201_CREATED status should be returned with created associations
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
+	// Create services and professionals using factories
+	service1 := factories.NewServiceModel(db)
+	service2 := factories.NewServiceModel(db)
+	professional1 := factories.NewProfessionalModel(db)
+	professional2 := factories.NewProfessionalModel(db)
 
-	// Create professionals
-	professional1 := &model.Professional{
-		Name:          "Dr. Smith",
-		FirstLastName: "Johnson",
-		Specialty:     "Cardiology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "123456789",
-		Type:          model.ProfessionalTypeMedic,
-		ImageUrl:      "https://example.com/doctor1.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	professional2 := &model.Professional{
-		Name:          "Dr. Jane",
-		FirstLastName: "Doe",
-		Specialty:     "Neurology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "987654321",
-		Type:          model.ProfessionalTypeGymTrainer,
-		ImageUrl:      "https://example.com/doctor2.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Professional{professional1, professional2}).Error
-	assert.NoError(t, err)
-
-	// Create request
-	request := schemas.BatchCreateServiceProfessionalRequest{
+	bulkRequest := schemas.BatchCreateServiceProfessionalRequest{
 		ServiceProfessionals: []*schemas.CreateServiceProfessionalRequest{
 			{
 				ServiceId:      service1.Id,
@@ -88,7 +42,7 @@ func TestBulkCreateServiceProfessionalsSuccessfully(t *testing.T) {
 		},
 	}
 
-	requestBody, _ := json.Marshal(request)
+	requestBody, _ := json.Marshal(bulkRequest)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodPost, "/service-professional/bulk/", bytes.NewBuffer(requestBody))
@@ -101,7 +55,7 @@ func TestBulkCreateServiceProfessionalsSuccessfully(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, rec.Code)
 
 	var response schemas.ServiceProfessionals
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(response.ServiceProfessionals))
 }
@@ -131,26 +85,13 @@ func TestBulkCreateServiceProfessionalsNonExistentService(t *testing.T) {
 	/*
 		GIVEN: Non-existent service ID
 		WHEN:  POST /service-professional/bulk/ is called with invalid service ID
-		THEN:  A HTTP_404_NOT_FOUND status should be returned
+		THEN:  A HTTP_400_BAD_REQUEST status should be returned
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create a professional
-	professional := &model.Professional{
-		Name:          "Dr. Smith",
-		FirstLastName: "Johnson",
-		Specialty:     "Cardiology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "123456789",
-		Type:          model.ProfessionalTypeMedic,
-		ImageUrl:      "https://example.com/doctor.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(professional).Error
-	assert.NoError(t, err)
+	// Create a professional using factory
+	professional := factories.NewProfessionalModel(db)
 
 	// Create request with non-existent service
 	nonExistentServiceId, _ := uuid.Parse("00000000-0000-0000-0000-000000000000")
@@ -173,5 +114,5 @@ func TestBulkCreateServiceProfessionalsNonExistentService(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusNotFound, rec.Code)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }

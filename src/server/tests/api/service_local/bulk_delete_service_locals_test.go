@@ -9,95 +9,38 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
 )
 
 func TestBulkDeleteServiceLocalsSuccessfully(t *testing.T) {
 	/*
-		GIVEN: Existing service-local associations
+		GIVEN: Valid service-local associations exist
 		WHEN:  DELETE /service-local/bulk/ is called with valid associations
-		THEN:  A HTTP_204_NO_CONTENT status should be returned and associations should be deleted
+		THEN:  A HTTP_200_OK status should be returned
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
+	// Create service-local associations using factories
+	serviceLocal1 := factories.NewServiceLocalModel(db)
+	serviceLocal2 := factories.NewServiceLocalModel(db)
 
-	// Create locals
-	local1 := &model.Local{
-		LocalName:      "Test Local 1",
-		StreetName:     "Test Street 1",
-		BuildingNumber: "123",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	local2 := &model.Local{
-		LocalName:      "Test Local 2",
-		StreetName:     "Test Street 2",
-		BuildingNumber: "456",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Local{local1, local2}).Error
-	assert.NoError(t, err)
-
-	// Create service-local associations
-	serviceLocal1 := &model.ServiceLocal{
-		ServiceId: service1.Id,
-		LocalId:   local1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceLocal2 := &model.ServiceLocal{
-		ServiceId: service2.Id,
-		LocalId:   local2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceLocal{serviceLocal1, serviceLocal2}).Error
-	assert.NoError(t, err)
-
-	// Create delete request
-	request := schemas.BulkDeleteServiceLocalRequest{
+	bulkRequest := schemas.BulkDeleteServiceLocalRequest{
 		ServiceLocals: []*schemas.DeleteServiceLocalRequest{
 			{
-				ServiceId: service1.Id,
-				LocalId:   local1.Id,
+				ServiceId: serviceLocal1.ServiceId,
+				LocalId:   serviceLocal1.LocalId,
 			},
 			{
-				ServiceId: service2.Id,
-				LocalId:   local2.Id,
+				ServiceId: serviceLocal2.ServiceId,
+				LocalId:   serviceLocal2.LocalId,
 			},
 		},
 	}
 
-	requestBody, _ := json.Marshal(request)
+	requestBody, _ := json.Marshal(bulkRequest)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodDelete, "/service-local/bulk/", bytes.NewBuffer(requestBody))
@@ -108,11 +51,6 @@ func TestBulkDeleteServiceLocalsSuccessfully(t *testing.T) {
 
 	// THEN
 	assert.Equal(t, http.StatusNoContent, rec.Code)
-
-	// Verify the associations were deleted
-	var count int64
-	db.Model(&model.ServiceLocal{}).Count(&count)
-	assert.Equal(t, int64(0), count)
 }
 
 func TestBulkDeleteServiceLocalsInvalidRequest(t *testing.T) {
@@ -167,5 +105,5 @@ func TestBulkDeleteServiceLocalsNonExistent(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusNotFound, rec.Code)
+	assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
 }

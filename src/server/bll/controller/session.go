@@ -34,6 +34,11 @@ func (s *Session) CreateSession(
 	req schemas.CreateSessionRequest,
 	updatedBy string,
 ) (*schemas.Session, *errors.Error) {
+	// Validate session times
+	if !req.EndTime.After(req.StartTime) {
+		return nil, &errors.BadRequestError.SessionNotCreated
+	}
+
 	// Validate that the professional exists
 	_, err := s.Adapter.Professional.GetPostgresqlProfessional(req.ProfessionalId)
 	if err != nil {

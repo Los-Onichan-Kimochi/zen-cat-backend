@@ -48,7 +48,7 @@ func TestRegisterSuccessfully(t *testing.T) {
 	assert.Equal(t, firstLastName, result.User.FirstLastName)
 	assert.Equal(t, &secondLastName, result.User.SecondLastName)
 	assert.Equal(t, email, result.User.Email)
-	assert.Equal(t, model.UserRolClient, result.User.Rol) // Should default to client
+	assert.Equal(t, string(model.UserRolClient), string(result.User.Rol)) // Should default to client
 	assert.Equal(t, imageUrl, result.User.ImageUrl)
 
 	// Verify tokens are present

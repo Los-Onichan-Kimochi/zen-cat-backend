@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
 	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
@@ -15,56 +15,38 @@ import (
 
 func TestFetchOnboardingsSuccessfully(t *testing.T) {
 	/*
-		GIVEN: Multiple onboarding records exist
+		GIVEN: Multiple onboarding records exist in the system
 		WHEN:  GET /onboarding/ is called
-		THEN:  A HTTP_200_OK status should be returned with all onboardings
+		THEN:  A HTTP_200_OK status should be returned with list of onboarding records
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create users first
-	user1 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           "MEMBER",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	user2 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "Jane",
-		FirstLastName: "Smith",
-		Rol:           "MEMBER",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.User{user1, user2}).Error
-	assert.NoError(t, err)
+	// Create onboarding records using factories (which automatically create users)
+	email1 := utilsTest.GenerateRandomEmail()
+	email2 := utilsTest.GenerateRandomEmail()
 
-	// Create onboarding records
-	onboarding1 := &model.Onboarding{
-		UserId:         user1.Id,
-		DocumentType:   "DNI",
-		DocumentNumber: "12345678",
-		PhoneNumber:    "987654321",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	onboarding2 := &model.Onboarding{
-		UserId:         user2.Id,
-		DocumentType:   "PASSPORT",
-		DocumentNumber: "87654321",
-		PhoneNumber:    "123456789",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Onboarding{onboarding1, onboarding2}).Error
-	assert.NoError(t, err)
+	// Create first onboarding with unique user
+	docNum1 := "12345678"
+	phone1 := "987654321"
+	onboarding1 := factories.NewOnboardingModel(db, factories.OnboardingModelF{
+		DocumentNumber: &docNum1,
+		PhoneNumber:    &phone1,
+	})
+
+	// Update the user email to be unique
+	db.Model(&onboarding1.User).Update("email", email1)
+
+	// Create second onboarding with unique user
+	docNum2 := "87654321"
+	phone2 := "123456789"
+	onboarding2 := factories.NewOnboardingModel(db, factories.OnboardingModelF{
+		DocumentNumber: &docNum2,
+		PhoneNumber:    &phone2,
+	})
+
+	// Update the user email to be unique
+	db.Model(&onboarding2.User).Update("email", email2)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodGet, "/onboarding/", nil)
@@ -77,7 +59,7 @@ func TestFetchOnboardingsSuccessfully(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response schemas.Onboardings
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(response.Onboardings), 2)
 }

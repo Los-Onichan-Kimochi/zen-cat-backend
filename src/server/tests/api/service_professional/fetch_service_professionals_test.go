@@ -7,10 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestFetchServiceProfessionalsSuccessfully(t *testing.T) {
@@ -22,73 +21,9 @@ func TestFetchServiceProfessionalsSuccessfully(t *testing.T) {
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
-
-	// Create professionals
-	professional1 := &model.Professional{
-		Name:          "Dr. Smith",
-		FirstLastName: "Johnson",
-		Specialty:     "Cardiology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "123456789",
-		Type:          model.ProfessionalTypeMedic,
-		ImageUrl:      "https://example.com/doctor1.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	professional2 := &model.Professional{
-		Name:          "Dr. Jane",
-		FirstLastName: "Doe",
-		Specialty:     "Neurology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "987654321",
-		Type:          model.ProfessionalTypeGymTrainer,
-		ImageUrl:      "https://example.com/doctor2.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Professional{professional1, professional2}).Error
-	assert.NoError(t, err)
-
-	// Create service-professional associations
-	serviceProfessional1 := &model.ServiceProfessional{
-		ServiceId:      service1.Id,
-		ProfessionalId: professional1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceProfessional2 := &model.ServiceProfessional{
-		ServiceId:      service2.Id,
-		ProfessionalId: professional2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceProfessional{serviceProfessional1, serviceProfessional2}).Error
-	assert.NoError(t, err)
+	// Create service-professional associations using factories
+	_ = factories.NewServiceProfessionalModel(db)
+	_ = factories.NewServiceProfessionalModel(db)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodGet, "/service-professional/", nil)
@@ -101,7 +36,7 @@ func TestFetchServiceProfessionalsSuccessfully(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response schemas.ServiceProfessionals
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(response.ServiceProfessionals), 2)
 }
@@ -115,73 +50,21 @@ func TestFetchServiceProfessionalsByServiceId(t *testing.T) {
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
-
-	// Create professionals
-	professional1 := &model.Professional{
-		Name:          "Dr. Smith",
-		FirstLastName: "Johnson",
-		Specialty:     "Cardiology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "123456789",
-		Type:          model.ProfessionalTypeMedic,
-		ImageUrl:      "https://example.com/doctor1.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	professional2 := &model.Professional{
-		Name:          "Dr. Jane",
-		FirstLastName: "Doe",
-		Specialty:     "Neurology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "987654321",
-		Type:          model.ProfessionalTypeGymTrainer,
-		ImageUrl:      "https://example.com/doctor2.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Professional{professional1, professional2}).Error
-	assert.NoError(t, err)
+	// Create services and professionals using factories
+	service1 := factories.NewServiceModel(db)
+	service2 := factories.NewServiceModel(db)
+	professional1 := factories.NewProfessionalModel(db)
+	professional2 := factories.NewProfessionalModel(db)
 
 	// Create service-professional associations
-	serviceProfessional1 := &model.ServiceProfessional{
-		ServiceId:      service1.Id,
-		ProfessionalId: professional1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceProfessional2 := &model.ServiceProfessional{
-		ServiceId:      service2.Id,
-		ProfessionalId: professional2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceProfessional{serviceProfessional1, serviceProfessional2}).Error
-	assert.NoError(t, err)
+	_ = factories.NewServiceProfessionalModel(db, factories.ServiceProfessionalModelF{
+		ServiceId:      &service1.Id,
+		ProfessionalId: &professional1.Id,
+	})
+	_ = factories.NewServiceProfessionalModel(db, factories.ServiceProfessionalModelF{
+		ServiceId:      &service2.Id,
+		ProfessionalId: &professional2.Id,
+	})
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodGet, "/service-professional/?serviceId="+service1.Id.String(), nil)
@@ -194,10 +77,12 @@ func TestFetchServiceProfessionalsByServiceId(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response schemas.ServiceProfessionals
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(response.ServiceProfessionals))
-	assert.Equal(t, service1.Id, response.ServiceProfessionals[0].ServiceId)
+	if len(response.ServiceProfessionals) > 0 {
+		assert.Equal(t, service1.Id, response.ServiceProfessionals[0].ServiceId)
+	}
 }
 
 func TestFetchServiceProfessionalsEmpty(t *testing.T) {

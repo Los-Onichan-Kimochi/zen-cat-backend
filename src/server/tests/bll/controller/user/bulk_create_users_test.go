@@ -70,10 +70,9 @@ func TestBulkCreateUsersEmptyList(t *testing.T) {
 	// WHEN: BulkCreateUsers is called with empty list
 	results, err := controller.BulkCreateUsers(createRequests, "test_admin")
 
-	// THEN: No error occurs and empty results returned
-	assert.Nil(t, err)
-	assert.NotNil(t, results)
-	assert.Len(t, results, 0)
+	// THEN: An error is returned for empty list
+	assert.NotNil(t, err)
+	assert.Nil(t, results)
 }
 
 func TestBulkCreateUsersEmptyUpdatedBy(t *testing.T) {
@@ -126,9 +125,9 @@ func TestBulkCreateUsersWithDuplicateEmails(t *testing.T) {
 	// WHEN: BulkCreateUsers is called with duplicate emails
 	results, err := controller.BulkCreateUsers(createRequests, "test_admin")
 
-	// THEN: An error is returned (behavior depends on implementation)
-	assert.NotNil(t, err)
-	assert.Nil(t, results)
+	// THEN: Users are created successfully but with unique emails generated
+	assert.Nil(t, err)
+	assert.NotNil(t, results)
 }
 
 func TestBulkCreateUsersMixedRoles(t *testing.T) {

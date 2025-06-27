@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
@@ -70,7 +71,7 @@ func TestCreateReservationInvalidUser(t *testing.T) {
 
 	// Create session but use non-existent user
 	testSession := factories.NewSessionModel(db, factories.SessionModelF{})
-	nonExistentUserId := factories.NewUserModel(nil, factories.UserModelF{}).Id
+	nonExistentUserId := uuid.New()
 
 	createRequest := schemas.CreateReservationRequest{
 		Name:            "Test Reservation",
@@ -93,7 +94,7 @@ func TestCreateReservationInvalidSession(t *testing.T) {
 
 	// Create user but use non-existent session
 	testUser := factories.NewUserModel(db, factories.UserModelF{})
-	nonExistentSessionId := factories.NewSessionModel(nil, factories.SessionModelF{}).Id
+	nonExistentSessionId := uuid.New()
 
 	createRequest := schemas.CreateReservationRequest{
 		Name:            "Test Reservation",

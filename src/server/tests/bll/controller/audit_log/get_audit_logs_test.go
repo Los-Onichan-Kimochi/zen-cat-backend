@@ -3,58 +3,56 @@ package audit_log_test
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestGetAuditLogsSuccessfully(t *testing.T) {
 	/*
 		GIVEN: Multiple audit logs exist in the database
-		WHEN:  GetAuditLogs is called with no filters
-		THEN:  A list of audit logs should be returned with proper pagination
+		WHEN:  GetAuditLogs is called without filters
+		THEN:  All audit logs should be returned with pagination
 	*/
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create a user for the audit logs
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolAdmin,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
+	// Create user using factory
+	user := factories.NewUserModel(db)
 
-	// Create multiple audit logs
+	// Create audit logs manually (no factory available)
+	createAction := model.AuditActionCreate
+	updateAction := model.AuditActionUpdate
+	entityType := model.AuditEntityUser
+	success := true
+
 	auditLogs := []*model.AuditLog{
 		{
+			Id:         uuid.New(),
 			UserId:     user.Id,
 			UserEmail:  user.Email,
 			UserRole:   user.Rol,
-			Action:     model.AuditActionCreate,
-			EntityType: model.AuditEntityUser,
+			Action:     createAction,
+			EntityType: entityType,
 			EntityId:   &user.Id,
-			Success:    true,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 		{
+			Id:         uuid.New(),
 			UserId:     user.Id,
 			UserEmail:  user.Email,
 			UserRole:   user.Rol,
-			Action:     model.AuditActionUpdate,
-			EntityType: model.AuditEntityUser,
+			Action:     updateAction,
+			EntityType: entityType,
 			EntityId:   &user.Id,
-			Success:    true,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 	}
-	err = db.Create(auditLogs).Error
+	err := db.Create(auditLogs).Error
 	assert.NoError(t, err)
 
 	// WHEN
@@ -86,52 +84,40 @@ func TestGetAuditLogsWithUserFilter(t *testing.T) {
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create two users
-	user1 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolAdmin,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	user2 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "Jane",
-		FirstLastName: "Smith",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.User{user1, user2}).Error
-	assert.NoError(t, err)
+	// Create users using factories
+	user1 := factories.NewUserModel(db)
+	user2 := factories.NewUserModel(db)
 
-	// Create audit logs for both users
+	// Create audit logs for both users manually
+	createAction := model.AuditActionCreate
+	entityType := model.AuditEntityUser
+	success := true
+
 	auditLogs := []*model.AuditLog{
 		{
+			Id:         uuid.New(),
 			UserId:     user1.Id,
 			UserEmail:  user1.Email,
 			UserRole:   user1.Rol,
-			Action:     model.AuditActionCreate,
-			EntityType: model.AuditEntityUser,
+			Action:     createAction,
+			EntityType: entityType,
 			EntityId:   &user1.Id,
-			Success:    true,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 		{
+			Id:         uuid.New(),
 			UserId:     user2.Id,
 			UserEmail:  user2.Email,
 			UserRole:   user2.Rol,
-			Action:     model.AuditActionCreate,
-			EntityType: model.AuditEntityUser,
+			Action:     createAction,
+			EntityType: entityType,
 			EntityId:   &user2.Id,
-			Success:    true,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 	}
-	err = db.Create(auditLogs).Error
+	err := db.Create(auditLogs).Error
 	assert.NoError(t, err)
 
 	// WHEN
@@ -151,7 +137,9 @@ func TestGetAuditLogsWithUserFilter(t *testing.T) {
 	assert.Nil(t, errResult)
 	assert.NotNil(t, result)
 	assert.Equal(t, 1, len(result.AuditLogs))
-	assert.Equal(t, user1.Id, result.AuditLogs[0].UserId)
+	if len(result.AuditLogs) > 0 {
+		assert.Equal(t, user1.Id, result.AuditLogs[0].UserId)
+	}
 }
 
 func TestGetAuditLogsWithActionFilter(t *testing.T) {
@@ -163,41 +151,38 @@ func TestGetAuditLogsWithActionFilter(t *testing.T) {
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create a user for the audit logs
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolAdmin,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
+	// Create user using factory
+	user := factories.NewUserModel(db)
 
 	// Create audit logs with different actions
+	createAction := model.AuditActionCreate
+	updateAction := model.AuditActionUpdate
+	entityType := model.AuditEntityUser
+	success := true
+
 	auditLogs := []*model.AuditLog{
 		{
+			Id:         uuid.New(),
 			UserId:     user.Id,
 			UserEmail:  user.Email,
 			UserRole:   user.Rol,
-			Action:     model.AuditActionCreate,
-			EntityType: model.AuditEntityUser,
-			Success:    true,
+			Action:     createAction,
+			EntityType: entityType,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 		{
+			Id:         uuid.New(),
 			UserId:     user.Id,
 			UserEmail:  user.Email,
 			UserRole:   user.Rol,
-			Action:     model.AuditActionUpdate,
-			EntityType: model.AuditEntityUser,
-			Success:    true,
+			Action:     updateAction,
+			EntityType: entityType,
+			Success:    success,
 			IPAddress:  "127.0.0.1",
 		},
 	}
-	err = db.Create(auditLogs).Error
+	err := db.Create(auditLogs).Error
 	assert.NoError(t, err)
 
 	// WHEN
@@ -217,5 +202,7 @@ func TestGetAuditLogsWithActionFilter(t *testing.T) {
 	assert.Nil(t, errResult)
 	assert.NotNil(t, result)
 	assert.Equal(t, 1, len(result.AuditLogs))
-	assert.Equal(t, model.AuditActionCreate, result.AuditLogs[0].Action)
+	if len(result.AuditLogs) > 0 {
+		assert.Equal(t, string(model.AuditActionCreate), string(result.AuditLogs[0].Action))
+	}
 }

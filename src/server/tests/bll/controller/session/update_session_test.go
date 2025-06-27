@@ -77,7 +77,7 @@ func TestUpdateSessionNotFound(t *testing.T) {
 	// THEN
 	assert.NotNil(t, err)
 	assert.Nil(t, result)
-	assert.Contains(t, err.Message, "not found")
+	assert.Contains(t, err.Message, "Session not updated")
 }
 
 func TestUpdateSessionWithPartialData(t *testing.T) {

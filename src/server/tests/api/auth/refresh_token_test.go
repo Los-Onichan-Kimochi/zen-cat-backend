@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
@@ -23,24 +24,29 @@ func TestRefreshTokenSuccessfully(t *testing.T) {
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
+	// Hash the password properly
+	password := "password123"
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	assert.NoError(t, err)
+
 	// Create a user first
 	user := &model.User{
 		Email:         utilsTest.GenerateRandomEmail(),
 		Name:          "John",
 		FirstLastName: "Doe",
-		Password:      "$2a$10$hash", // Hashed password
+		Password:      string(hashedPassword),
 		Rol:           "MEMBER",
 		AuditFields: model.AuditFields{
 			UpdatedBy: "ADMIN",
 		},
 	}
-	err := db.Create(user).Error
+	err = db.Create(user).Error
 	assert.NoError(t, err)
 
 	// Login to get a valid token
 	loginRequest := schemas.LoginRequest{
 		Email:    user.Email,
-		Password: "password123",
+		Password: password,
 	}
 	loginBody, _ := json.Marshal(loginRequest)
 
@@ -49,12 +55,17 @@ func TestRefreshTokenSuccessfully(t *testing.T) {
 	loginRec := httptest.NewRecorder()
 	server.Echo.ServeHTTP(loginRec, loginReq)
 
-	var loginResponse schemas.TokenResponse
-	json.NewDecoder(loginRec.Body).Decode(&loginResponse)
+	// Check if login was successful
+	assert.Equal(t, http.StatusOK, loginRec.Code)
+
+	var loginResponse schemas.LoginResponse
+	err = json.NewDecoder(loginRec.Body).Decode(&loginResponse)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, loginResponse.Tokens.AccessToken)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodPost, "/auth/refresh/", nil)
-	req.Header.Set("Authorization", "Bearer "+loginResponse.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+loginResponse.Tokens.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	rec := httptest.NewRecorder()

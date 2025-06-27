@@ -91,12 +91,12 @@ func TestCreateSessionMissingRequiredFields(t *testing.T) {
 	/*
 		GIVEN: A request body missing required fields
 		WHEN:  POST /session/ is called with incomplete data
-		THEN:  A HTTP_404_NOT_FOUND status should be returned (foreign key validation fails)
+		THEN:  A HTTP_400_BAD_REQUEST status should be returned (validation fails)
 	*/
 	// GIVEN
 	server, _ := apiTest.NewApiServerTestWrapper(t)
 
-	// Missing required fields (professional_id is zero value)
+	// Missing required fields (professional_id is zero value, invalid time range)
 	sessionRequest := schemas.CreateSessionRequest{
 		Title:    "Incomplete Session",
 		Capacity: 10,
@@ -113,7 +113,7 @@ func TestCreateSessionMissingRequiredFields(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusNotFound, rec.Code)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
 func TestCreateSessionNonExistentProfessional(t *testing.T) {

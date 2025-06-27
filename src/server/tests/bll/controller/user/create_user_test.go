@@ -32,7 +32,7 @@ func TestCreateUserSuccessfully(t *testing.T) {
 	assert.Equal(t, createRequest.FirstLastName, result.FirstLastName)
 	assert.Equal(t, createRequest.SecondLastName, *result.SecondLastName)
 	assert.Equal(t, createRequest.Email, result.Email)
-	assert.Equal(t, createRequest.Rol, result.Rol)
+	assert.Equal(t, schemas.UserRol(createRequest.Rol), result.Rol)
 	assert.Equal(t, createRequest.ImageUrl, result.ImageUrl)
 	assert.NotEqual(t, "", result.Id)
 }
@@ -61,7 +61,7 @@ func TestCreateUserWithoutSecondLastName(t *testing.T) {
 	assert.Equal(t, createRequest.FirstLastName, result.FirstLastName)
 	assert.Nil(t, result.SecondLastName)
 	assert.Equal(t, createRequest.Email, result.Email)
-	assert.Equal(t, createRequest.Rol, result.Rol)
+	assert.Equal(t, schemas.UserRol(createRequest.Rol), result.Rol)
 }
 
 func TestCreateUserEmptyUpdatedBy(t *testing.T) {

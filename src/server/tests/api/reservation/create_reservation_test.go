@@ -33,6 +33,7 @@ func TestCreateReservationSuccessfully(t *testing.T) {
 	})
 
 	createReservationRequest := schemas.CreateReservationRequest{
+		Name:      "API Test Reservation",
 		UserId:    user.Id,
 		SessionId: session.Id,
 	}
@@ -79,6 +80,7 @@ func TestCreateReservationUserNotFound(t *testing.T) {
 	session := factories.NewSessionModel(db, factories.SessionModelF{})
 
 	createReservationRequest := schemas.CreateReservationRequest{
+		Name:      "Test Reservation - User Not Found",
 		UserId:    uuid.New(), // Non-existent user
 		SessionId: session.Id,
 	}
@@ -110,6 +112,7 @@ func TestCreateReservationSessionNotFound(t *testing.T) {
 	user := factories.NewUserModel(db, factories.UserModelF{})
 
 	createReservationRequest := schemas.CreateReservationRequest{
+		Name:      "Test Reservation - Session Not Found",
 		UserId:    user.Id,
 		SessionId: uuid.New(), // Non-existent session
 	}

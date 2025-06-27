@@ -29,16 +29,19 @@ func TestFetchServiceProfessionalsWithServiceFilter(t *testing.T) {
 	// Create service-professional associations
 	associations := []*model.ServiceProfessional{
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService1.Id,
 			ProfessionalId: testProfessional1.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService1.Id,
 			ProfessionalId: testProfessional2.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService2.Id,
 			ProfessionalId: testProfessional1.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
@@ -83,16 +86,19 @@ func TestFetchServiceProfessionalsWithProfessionalFilter(t *testing.T) {
 	// Create service-professional associations
 	associations := []*model.ServiceProfessional{
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService1.Id,
 			ProfessionalId: testProfessional1.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService2.Id,
 			ProfessionalId: testProfessional1.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService1.Id,
 			ProfessionalId: testProfessional2.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},

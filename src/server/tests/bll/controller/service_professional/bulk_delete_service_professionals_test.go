@@ -3,6 +3,7 @@ package service_professional_test
 import (
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
@@ -28,11 +29,13 @@ func TestBulkDeleteServiceProfessionalsSuccessfully(t *testing.T) {
 	// Create service-professional associations
 	associations := []*model.ServiceProfessional{
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService1.Id,
 			ProfessionalId: testProfessional1.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:             uuid.New(),
 			ServiceId:      testService2.Id,
 			ProfessionalId: testProfessional2.Id,
 			AuditFields:    model.AuditFields{UpdatedBy: "TEST_USER"},

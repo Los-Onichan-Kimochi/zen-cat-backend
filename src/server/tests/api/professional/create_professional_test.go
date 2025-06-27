@@ -89,12 +89,12 @@ func TestCreateProfessionalMissingRequiredFields(t *testing.T) {
 	/*
 		GIVEN: A request body missing required fields
 		WHEN:  POST /professional/ is called with incomplete data
-		THEN:  A HTTP_201_CREATED status should be returned (API accepts incomplete data)
+		THEN:  A HTTP_400_BAD_REQUEST status should be returned due to validation
 	*/
 	// GIVEN
 	server, _ := apiTest.NewApiServerTestWrapper(t)
 
-	// Missing some fields but API will still process it
+	// Missing required name field - should trigger validation error
 	professionalRequest := schemas.CreateProfessionalRequest{
 		Specialty: "Cardiology",
 	}
@@ -110,7 +110,7 @@ func TestCreateProfessionalMissingRequiredFields(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
 func TestCreateProfessionalDuplicateEmail(t *testing.T) {

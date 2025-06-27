@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
 )
@@ -21,65 +21,9 @@ func TestFetchServiceLocalsSuccessfully(t *testing.T) {
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
-
-	// Create locals
-	local1 := &model.Local{
-		LocalName:      "Test Local 1",
-		StreetName:     "Test Street 1",
-		BuildingNumber: "123",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	local2 := &model.Local{
-		LocalName:      "Test Local 2",
-		StreetName:     "Test Street 2",
-		BuildingNumber: "456",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Local{local1, local2}).Error
-	assert.NoError(t, err)
-
-	// Create service-local associations
-	serviceLocal1 := &model.ServiceLocal{
-		ServiceId: service1.Id,
-		LocalId:   local1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceLocal2 := &model.ServiceLocal{
-		ServiceId: service2.Id,
-		LocalId:   local2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceLocal{serviceLocal1, serviceLocal2}).Error
-	assert.NoError(t, err)
+	// Create service-local associations using factories
+	_ = factories.NewServiceLocalModel(db)
+	_ = factories.NewServiceLocalModel(db)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodGet, "/service-local/", nil)
@@ -92,7 +36,7 @@ func TestFetchServiceLocalsSuccessfully(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response schemas.ServiceLocals
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.GreaterOrEqual(t, len(response.ServiceLocals), 2)
 }
@@ -106,65 +50,23 @@ func TestFetchServiceLocalsByServiceId(t *testing.T) {
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
+	// Create services using factories
+	service1 := factories.NewServiceModel(db)
+	service2 := factories.NewServiceModel(db)
 
-	// Create locals
-	local1 := &model.Local{
-		LocalName:      "Test Local 1",
-		StreetName:     "Test Street 1",
-		BuildingNumber: "123",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	local2 := &model.Local{
-		LocalName:      "Test Local 2",
-		StreetName:     "Test Street 2",
-		BuildingNumber: "456",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Local{local1, local2}).Error
-	assert.NoError(t, err)
+	// Create locals using factories
+	local1 := factories.NewLocalModel(db)
+	local2 := factories.NewLocalModel(db)
 
 	// Create service-local associations
-	serviceLocal1 := &model.ServiceLocal{
-		ServiceId: service1.Id,
-		LocalId:   local1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceLocal2 := &model.ServiceLocal{
-		ServiceId: service2.Id,
-		LocalId:   local2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceLocal{serviceLocal1, serviceLocal2}).Error
-	assert.NoError(t, err)
+	_ = factories.NewServiceLocalModel(db, factories.ServiceLocalModelF{
+		ServiceId: &service1.Id,
+		LocalId:   &local1.Id,
+	})
+	_ = factories.NewServiceLocalModel(db, factories.ServiceLocalModelF{
+		ServiceId: &service2.Id,
+		LocalId:   &local2.Id,
+	})
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodGet, "/service-local/?serviceId="+service1.Id.String(), nil)
@@ -177,7 +79,7 @@ func TestFetchServiceLocalsByServiceId(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response schemas.ServiceLocals
-	err = json.NewDecoder(rec.Body).Decode(&response)
+	err := json.NewDecoder(rec.Body).Decode(&response)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(response.ServiceLocals))
 	assert.Equal(t, service1.Id, response.ServiceLocals[0].ServiceId)

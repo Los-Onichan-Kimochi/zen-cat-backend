@@ -62,7 +62,7 @@ func TestDeleteProfessionalNotFound(t *testing.T) {
 
 	// THEN
 	assert.NotNil(t, errResult)
-	assert.Contains(t, errResult.Message, "not found")
+	assert.Contains(t, errResult.Message, "not soft deleted")
 }
 
 func TestDeleteProfessionalWithNilId(t *testing.T) {

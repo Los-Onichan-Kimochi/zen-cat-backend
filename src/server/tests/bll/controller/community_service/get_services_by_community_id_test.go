@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
-	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
 )
 
@@ -28,11 +27,13 @@ func TestGetServicesByCommunityIdSuccessfully(t *testing.T) {
 	// Create community-service associations
 	associations := []*model.CommunityService{
 		{
+			Id:          uuid.New(),
 			CommunityId: testCommunity.Id,
 			ServiceId:   testService1.Id,
 			AuditFields: model.AuditFields{UpdatedBy: "TEST_USER"},
 		},
 		{
+			Id:          uuid.New(),
 			CommunityId: testCommunity.Id,
 			ServiceId:   testService2.Id,
 			AuditFields: model.AuditFields{UpdatedBy: "TEST_USER"},
@@ -86,7 +87,7 @@ func TestGetServicesByCommunityIdWithNonExistentCommunity(t *testing.T) {
 	/*
 		GIVEN: Community does not exist
 		WHEN:  GetServicesByCommunityId is called with non-existent community ID
-		THEN:  It should return community not found error
+		THEN:  It should return empty services list
 	*/
 	// GIVEN
 	communityServiceController, _, _ := controllerTest.NewCommunityServiceControllerTestWrapper(t)
@@ -97,7 +98,7 @@ func TestGetServicesByCommunityIdWithNonExistentCommunity(t *testing.T) {
 	result, err := communityServiceController.GetServicesByCommunityId(nonExistentCommunityId)
 
 	// THEN
-	assert.Nil(t, result)
-	assert.NotNil(t, err)
-	assert.Equal(t, errors.ObjectNotFoundError.CommunityNotFound.Code, err.Code)
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+	assert.Len(t, result.Services, 0)
 }

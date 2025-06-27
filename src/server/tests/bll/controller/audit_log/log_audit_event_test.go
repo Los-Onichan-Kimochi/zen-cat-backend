@@ -3,12 +3,11 @@ package audit_log_test
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestLogAuditEventSuccessfully(t *testing.T) {
@@ -20,18 +19,8 @@ func TestLogAuditEventSuccessfully(t *testing.T) {
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create a user for the audit event
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolAdmin,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
+	// Create a user using factory
+	user := factories.NewUserModel(db)
 
 	// Create audit context
 	userAgent := "Test User Agent"
@@ -60,7 +49,7 @@ func TestLogAuditEventSuccessfully(t *testing.T) {
 
 	// Verify the audit log was created
 	var auditLog model.AuditLog
-	err = db.Where("user_id = ? AND action = ?", user.Id, schemas.AuditActionCreate).First(&auditLog).Error
+	err := db.Where("user_id = ? AND action = ?", user.Id, schemas.AuditActionCreate).First(&auditLog).Error
 	assert.NoError(t, err)
 	assert.Equal(t, user.Id, auditLog.UserId)
 	assert.Equal(t, user.Email, auditLog.UserEmail)
@@ -78,18 +67,8 @@ func TestLogAuditEventWithFailure(t *testing.T) {
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create a user for the audit event
-	user := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create(user).Error
-	assert.NoError(t, err)
+	// Create a user using factory
+	user := factories.NewUserModel(db)
 
 	// Create audit context
 	auditContext := schemas.AuditContext{
@@ -116,7 +95,7 @@ func TestLogAuditEventWithFailure(t *testing.T) {
 
 	// Verify the audit log was created with failure
 	var auditLog model.AuditLog
-	err = db.Where("user_id = ? AND action = ?", user.Id, schemas.AuditActionCreate).First(&auditLog).Error
+	err := db.Where("user_id = ? AND action = ?", user.Id, schemas.AuditActionCreate).First(&auditLog).Error
 	assert.NoError(t, err)
 	assert.Equal(t, user.Id, auditLog.UserId)
 	assert.False(t, auditLog.Success)
@@ -126,19 +105,24 @@ func TestLogAuditEventWithFailure(t *testing.T) {
 
 func TestLogAuditEventWithSystemAction(t *testing.T) {
 	/*
-		GIVEN: System-level audit event (no specific user)
+		GIVEN: System-level audit event with admin user
 		WHEN:  LogAuditEvent is called with system context
 		THEN:  The audit event should be logged successfully
 	*/
 	// GIVEN
 	auditLogController, _, db := controllerTest.NewAuditLogControllerTestWrapper(t)
 
-	// Create system audit context (using a system user ID)
-	systemUserId := uuid.New()
+	// Create an admin user to represent system actions
+	adminRole := model.UserRolAdmin
+	systemUser := factories.NewUserModel(db, factories.UserModelF{
+		Rol: &adminRole,
+	})
+
+	// Create system audit context
 	auditContext := schemas.AuditContext{
-		UserId:    systemUserId,
-		UserEmail: "system@example.com",
-		UserRole:  schemas.UserRolAdmin,
+		UserId:    systemUser.Id,
+		UserEmail: systemUser.Email,
+		UserRole:  schemas.UserRol(systemUser.Rol),
 		IPAddress: "127.0.0.1",
 	}
 
@@ -159,10 +143,10 @@ func TestLogAuditEventWithSystemAction(t *testing.T) {
 
 	// Verify the audit log was created
 	var auditLog model.AuditLog
-	err := db.Where("user_id = ? AND action = ?", systemUserId, schemas.AuditActionDelete).First(&auditLog).Error
+	err := db.Where("user_id = ? AND action = ?", systemUser.Id, schemas.AuditActionDelete).First(&auditLog).Error
 	assert.NoError(t, err)
-	assert.Equal(t, systemUserId, auditLog.UserId)
-	assert.Equal(t, "system@example.com", auditLog.UserEmail)
+	assert.Equal(t, systemUser.Id, auditLog.UserId)
+	assert.Equal(t, systemUser.Email, auditLog.UserEmail)
 	assert.True(t, auditLog.Success)
 	assert.NotNil(t, auditLog.AdditionalInfo)
 }

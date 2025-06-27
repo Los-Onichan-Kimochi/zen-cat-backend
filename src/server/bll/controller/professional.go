@@ -49,6 +49,11 @@ func (p *Professional) CreateProfessional(
 	createProfessionalData schemas.CreateProfessionalRequest,
 	updatedBy string,
 ) (*schemas.Professional, *errors.Error) {
+	// Validate required fields
+	if createProfessionalData.Name == "" {
+		return nil, &errors.BadRequestError.ProfessionalNotCreated
+	}
+
 	var secondLastName *string
 	if createProfessionalData.SecondLastName != "" {
 		secondLastName = &createProfessionalData.SecondLastName

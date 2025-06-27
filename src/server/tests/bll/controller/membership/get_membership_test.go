@@ -83,7 +83,7 @@ func TestGetMembershipSuccessfully(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, membership.Id, result.Id)
 	assert.Equal(t, membership.Description, result.Description)
-	assert.Equal(t, membership.Status, result.Status)
+	assert.Equal(t, string(membership.Status), string(result.Status))
 	assert.Equal(t, membership.CommunityId, result.CommunityId)
 	assert.Equal(t, membership.UserId, result.UserId)
 	assert.Equal(t, membership.PlanId, result.PlanId)

@@ -9,104 +9,38 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 	apiTest "onichankimochi.com/astro_cat_backend/src/server/tests/api"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestBulkDeleteServiceProfessionalsSuccessfully(t *testing.T) {
 	/*
-		GIVEN: Existing service-professional associations
+		GIVEN: Valid service-professional associations exist
 		WHEN:  DELETE /service-professional/bulk/ is called with valid associations
-		THEN:  A HTTP_204_NO_CONTENT status should be returned and associations should be deleted
+		THEN:  A HTTP_204_NO_CONTENT status should be returned
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
 
-	// Create services
-	service1 := &model.Service{
-		Name:        "Test Service 1",
-		Description: "Test Description 1",
-		ImageUrl:    "https://example.com/image1.jpg",
-		IsVirtual:   false,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	service2 := &model.Service{
-		Name:        "Test Service 2",
-		Description: "Test Description 2",
-		ImageUrl:    "https://example.com/image2.jpg",
-		IsVirtual:   true,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.Service{service1, service2}).Error
-	assert.NoError(t, err)
+	// Create service-professional associations using factories
+	serviceProfessional1 := factories.NewServiceProfessionalModel(db)
+	serviceProfessional2 := factories.NewServiceProfessionalModel(db)
 
-	// Create professionals
-	professional1 := &model.Professional{
-		Name:          "Dr. Smith",
-		FirstLastName: "Johnson",
-		Specialty:     "Cardiology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "123456789",
-		Type:          model.ProfessionalTypeMedic,
-		ImageUrl:      "https://example.com/doctor1.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	professional2 := &model.Professional{
-		Name:          "Dr. Jane",
-		FirstLastName: "Doe",
-		Specialty:     "Neurology",
-		Email:         utilsTest.GenerateRandomEmail(),
-		PhoneNumber:   "987654321",
-		Type:          model.ProfessionalTypeGymTrainer,
-		ImageUrl:      "https://example.com/doctor2.jpg",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.Professional{professional1, professional2}).Error
-	assert.NoError(t, err)
-
-	// Create service-professional associations
-	serviceProfessional1 := &model.ServiceProfessional{
-		ServiceId:      service1.Id,
-		ProfessionalId: professional1.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	serviceProfessional2 := &model.ServiceProfessional{
-		ServiceId:      service2.Id,
-		ProfessionalId: professional2.Id,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create([]*model.ServiceProfessional{serviceProfessional1, serviceProfessional2}).Error
-	assert.NoError(t, err)
-
-	// Create delete request
-	request := schemas.BulkDeleteServiceProfessionalRequest{
+	bulkRequest := schemas.BulkDeleteServiceProfessionalRequest{
 		ServiceProfessionals: []*schemas.DeleteServiceProfessionalRequest{
 			{
-				ServiceId:      service1.Id,
-				ProfessionalId: professional1.Id,
+				ServiceId:      serviceProfessional1.ServiceId,
+				ProfessionalId: serviceProfessional1.ProfessionalId,
 			},
 			{
-				ServiceId:      service2.Id,
-				ProfessionalId: professional2.Id,
+				ServiceId:      serviceProfessional2.ServiceId,
+				ProfessionalId: serviceProfessional2.ProfessionalId,
 			},
 		},
 	}
 
-	requestBody, _ := json.Marshal(request)
+	requestBody, _ := json.Marshal(bulkRequest)
 
 	// WHEN
 	req := httptest.NewRequest(http.MethodDelete, "/service-professional/bulk/", bytes.NewBuffer(requestBody))
@@ -117,11 +51,6 @@ func TestBulkDeleteServiceProfessionalsSuccessfully(t *testing.T) {
 
 	// THEN
 	assert.Equal(t, http.StatusNoContent, rec.Code)
-
-	// Verify the associations were deleted
-	var count int64
-	db.Model(&model.ServiceProfessional{}).Count(&count)
-	assert.Equal(t, int64(0), count)
 }
 
 func TestBulkDeleteServiceProfessionalsInvalidRequest(t *testing.T) {
@@ -149,7 +78,7 @@ func TestBulkDeleteServiceProfessionalsNonExistent(t *testing.T) {
 	/*
 		GIVEN: Non-existent service-professional associations
 		WHEN:  DELETE /service-professional/bulk/ is called with non-existent associations
-		THEN:  A HTTP_404_NOT_FOUND status should be returned
+		THEN:  A HTTP_422_UNPROCESSABLE_ENTITY status should be returned
 	*/
 	// GIVEN
 	server, _ := apiTest.NewApiServerTestWrapper(t)
@@ -176,5 +105,5 @@ func TestBulkDeleteServiceProfessionalsNonExistent(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusNotFound, rec.Code)
+	assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
 }

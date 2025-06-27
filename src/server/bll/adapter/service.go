@@ -78,6 +78,11 @@ func (c *Service) CreatePostgresqlService(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
+	// Validate name is not empty
+	if name == "" {
+		return nil, &errors.BadRequestError.InvalidServiceName
+	}
+
 	serviceModel := &model.Service{
 		Id:          uuid.New(),
 		Name:        name,

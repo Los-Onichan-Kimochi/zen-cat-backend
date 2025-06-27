@@ -2,12 +2,10 @@ package membership_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
-	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
 	controllerTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/controller"
-	utilsTest "onichankimochi.com/astro_cat_backend/src/server/tests/utils"
 )
 
 func TestFetchMembershipsSuccessfully(t *testing.T) {
@@ -19,83 +17,23 @@ func TestFetchMembershipsSuccessfully(t *testing.T) {
 	// GIVEN
 	membershipController, _, db := controllerTest.NewMembershipControllerTestWrapper(t)
 
-	// Create users
-	user1 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "John",
-		FirstLastName: "Doe",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	user2 := &model.User{
-		Email:         utilsTest.GenerateRandomEmail(),
-		Name:          "Jane",
-		FirstLastName: "Smith",
-		Rol:           model.UserRolClient,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err := db.Create([]*model.User{user1, user2}).Error
-	assert.NoError(t, err)
+	// Create entities using factories
+	user1 := factories.NewUserModel(db)
+	user2 := factories.NewUserModel(db)
+	community := factories.NewCommunityModel(db)
+	plan := factories.NewPlanModel(db)
 
-	// Create a community
-	community := &model.Community{
-		Name:    "Test Community",
-		Purpose: "A test community",
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create(community).Error
-	assert.NoError(t, err)
-
-	// Create a plan
-	reservationLimit := 10
-	plan := &model.Plan{
-		Fee:              100.00,
-		Type:             model.PlanTypeMonthly,
-		ReservationLimit: &reservationLimit,
-		AuditFields: model.AuditFields{
-			UpdatedBy: "ADMIN",
-		},
-	}
-	err = db.Create(plan).Error
-	assert.NoError(t, err)
-
-	// Create membership records
-	startDate := time.Now()
-	endDate := time.Now().AddDate(0, 1, 0) // 1 month later
-	memberships := []*model.Membership{
-		{
-			Description: "Monthly membership 1",
-			StartDate:   startDate,
-			EndDate:     endDate,
-			Status:      model.MembershipStatusActive,
-			CommunityId: community.Id,
-			UserId:      user1.Id,
-			PlanId:      plan.Id,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Description: "Monthly membership 2",
-			StartDate:   startDate,
-			EndDate:     endDate,
-			Status:      model.MembershipStatusActive,
-			CommunityId: community.Id,
-			UserId:      user2.Id,
-			PlanId:      plan.Id,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-	}
-	err = db.Create(memberships).Error
-	assert.NoError(t, err)
+	// Create membership records using factories
+	_ = factories.NewMembershipModel(db, factories.MembershipModelF{
+		CommunityId: &community.Id,
+		UserId:      &user1.Id,
+		PlanId:      &plan.Id,
+	})
+	_ = factories.NewMembershipModel(db, factories.MembershipModelF{
+		CommunityId: &community.Id,
+		UserId:      &user2.Id,
+		PlanId:      &plan.Id,
+	})
 
 	// WHEN
 	result, errResult := membershipController.FetchMemberships()
