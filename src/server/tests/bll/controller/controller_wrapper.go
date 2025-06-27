@@ -211,3 +211,23 @@ func NewAuditLogControllerTestWrapper(
 	return controllerTestWrapper.testController.AuditLog, loggerMock,
 		controllerTestWrapper.astroCatPsqlDB
 }
+
+// Create new forgot password controller wrapper
+func NewForgotPasswordControllerTestWrapper(
+	t *testing.T,
+) (*controller.ForgotPassword, *logging.LoggerMock, *gorm.DB) {
+	controllerTestWrapper.restartDB(t)
+	loggerMock := controllerTestWrapper.logger.(*logging.LoggerMock)
+	return controllerTestWrapper.testController.ForgotPassword, loggerMock,
+		controllerTestWrapper.astroCatPsqlDB
+}
+
+// Create new login controller wrapper
+func NewLoginControllerTestWrapper(
+	t *testing.T,
+) (*controller.Login, *logging.LoggerMock, *gorm.DB) {
+	controllerTestWrapper.restartDB(t)
+	loggerMock := controllerTestWrapper.logger.(*logging.LoggerMock)
+	return controllerTestWrapper.testController.Login, loggerMock,
+		controllerTestWrapper.astroCatPsqlDB
+}
