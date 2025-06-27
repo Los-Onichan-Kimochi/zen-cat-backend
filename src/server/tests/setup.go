@@ -47,6 +47,92 @@ func (l *CustomLogger) Trace(
 	// Ignore trace logs
 }
 
+func ClearPostgresqlDatabaseTesting(
+	appLogger logging.Logger,
+	astroCatPsqlDB *gorm.DB,
+	envSetting *schemas.EnvSettings,
+	t *testing.T,
+) {
+	if envSetting.AstroCatPostgresHost != "localhost" {
+		msg := "Not allow clear Levels Postgres DB into instance different to localhost"
+		if t == nil {
+			appLogger.Panicf(
+				"%s. This function should only be used for tests in local environment",
+				msg,
+			)
+		} else {
+			t.Fatalf("%s. This function should only be used for tests in local environment", msg)
+		}
+		return
+	}
+
+	if astroCatPsqlDB != nil {
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+
+		originalLogger := astroCatPsqlDB.Logger
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
+		}
+
+		// Start a transaction
+		tx := astroCatPsqlDB.Begin()
+
+		// Disable foreign key constraints temporarily
+		tx.Exec("SET CONSTRAINTS ALL DEFERRED")
+
+		// First delete tables that have references to other tables
+		tablesToClear := []struct {
+			name  string
+			model any
+		}{
+			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
+			{"Membership", &model.Membership{}},
+			{"CommunityPlan", &model.CommunityPlan{}},
+			{"CommunityService", &model.CommunityService{}},
+			{"ServiceProfessional", &model.ServiceProfessional{}},
+			{"ServiceLocal", &model.ServiceLocal{}},
+			{"Reservation", &model.Reservation{}},
+			{"Session", &model.Session{}},
+			{"Onboarding", &model.Onboarding{}},
+			{"Template", &model.Template{}},
+
+			// Then delete independent tables
+			{"Professional", &model.Professional{}},
+			{"Local", &model.Local{}},
+			{"User", &model.User{}},
+			{"Plan", &model.Plan{}},
+			{"Service", &model.Service{}},
+			{"Community", &model.Community{}},
+		}
+
+		for _, table := range tablesToClear {
+			appLogger.Infof("Attempting to hard delete all records from %s table...", table.name)
+			if err := tx.Unscoped().Where("true").Delete(table.model).Error; err != nil {
+				tx.Rollback()
+				appLogger.Errorf("Error clearing %s table: %v", table.name, err)
+				return
+			}
+		}
+
+		// Reactivate foreign key constraints
+		tx.Exec("SET CONSTRAINTS ALL IMMEDIATE")
+
+		// Confirm the transaction
+		if err := tx.Commit().Error; err != nil {
+			appLogger.Errorf("Error committing transaction: %v", err)
+			return
+		}
+
+		if !envSetting.EnableSqlLogs {
+			astroCatPsqlDB.Logger = originalLogger
+		}
+
+	} else {
+		appLogger.Warn("astroCatPsqlDB is nil, skipping database clearing.")
+	}
+}
+
 // Remove all data from AstroCatPsql db.
 //   - Note: Only use for tests
 func ClearPostgresqlDatabase(
@@ -69,11 +155,11 @@ func ClearPostgresqlDatabase(
 	}
 
 	if astroCatPsqlDB != nil {
-		fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
+		// fmt.Println("...Clearing AstroCatPsql database (hard delete)...")
 
 		originalLogger := astroCatPsqlDB.Logger
 		if !envSetting.EnableSqlLogs {
-			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Info)
+			astroCatPsqlDB.Logger = originalLogger.LogMode(logger.Silent)
 		}
 
 		// Start a transaction
@@ -88,6 +174,7 @@ func ClearPostgresqlDatabase(
 			model any
 		}{
 			// First delete tables with foreign key dependencies
+			{"AuditLog", &model.AuditLog{}}, // Clear audit logs first to avoid FK constraints
 			{"Membership", &model.Membership{}},
 			{"CommunityPlan", &model.CommunityPlan{}},
 			{"CommunityService", &model.CommunityService{}},
@@ -143,6 +230,8 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy plans
 	reservationLimit := 8
+	reservationLimitBasic := 5
+	reservationLimitPremium := 15
 	plans := []*model.Plan{
 		{
 			Id:               uuid.New(),
@@ -156,6 +245,43 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		{
 			Id:               uuid.New(),
 			Fee:              1000.0,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Planes para runners
+		{
+			Id:               uuid.New(),
+			Fee:              49.90,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitBasic,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              89.90,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitPremium,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              499.00,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              899.00,
 			Type:             model.PlanTypeAnual,
 			ReservationLimit: nil,
 			AuditFields: model.AuditFields{
@@ -177,7 +303,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	communities := []*model.Community{
 		{
 			Id:                  mainCommunityId, // Fixed UUID for frontend integration
-			Name:                "ZenCat Wellness Community",
+			Name:                "Runners",
 			Purpose:             "Comunidad principal de bienestar que ofrece servicios de yoga, atención médica y fitness para mejorar tu calidad de vida",
 			ImageUrl:            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
 			NumberSubscriptions: 150,
@@ -211,10 +337,25 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy users
-	// Define a fixed UUID for the main test user that will be used in frontend
+	// Define fixed UUIDs for system and main test users
+	systemUserId, _ := uuid.Parse("00000000-0000-0000-0000-000000000000") // System user for anonymous events
 	mainUserId, _ := uuid.Parse("11111111-1111-1111-1111-111111111111")
 
 	users := []*model.User{
+		// SYSTEM user for anonymous/error events
+		{
+			Id:             systemUserId,
+			Name:           "SYSTEM",
+			FirstLastName:  "ANONYMOUS",
+			SecondLastName: nil,
+			Password:       hashedPassword, // Same hash but this user can't actually login
+			Email:          "system@zen-cat.internal",
+			Rol:            model.UserRolAdmin, // Admin role for system operations
+			ImageUrl:       "system-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 		{
 			Id:             mainUserId, // Fixed UUID for frontend integration
 			Name:           "Usuario",
@@ -642,19 +783,52 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy community plans
 	communityPlans := []*model.CommunityPlan{
-		// ZenCat Wellness Community plans
+		// Runners Community plans (4 total - 2 monthly tiers + 2 annual tiers)
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // ZenCat Wellness Community
-			PlanId:      plans[0].Id,       // Monthly Plan
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[2].Id,       // Monthly Basic Plan ($49.90)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // ZenCat Wellness Community
-			PlanId:      plans[1].Id,       // Annual Plan
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[3].Id,       // Monthly Premium Plan ($89.90)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[4].Id,       // Annual Basic Plan ($499.00)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[5].Id,       // Annual Premium Plan ($899.00)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Keep original plans for backward compatibility
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[0].Id,       // Original Monthly Plan ($70.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			PlanId:      plans[1].Id,       // Original Annual Plan ($1000.0)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1465,15 +1639,19 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy onboarding
+	district := "Lince"
+	province := "Lima"
+	region := "Lima"
 	onboardings := []*model.Onboarding{
 		{
 			Id:             uuid.New(),
 			PhoneNumber:    "123456789",
 			DocumentType:   model.DocumentTypeDni,
 			DocumentNumber: "12345678",
-			City:           "Lima",
 			PostalCode:     "15001",
-			District:       "Downtown",
+			District:       &district,
+			Province:       &province,
+			Region:         &region,
 			Address:        "Main St 123, Near Central Park",
 			UserId:         users[0].Id,
 			AuditFields: model.AuditFields{
@@ -1485,9 +1663,10 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PhoneNumber:    "987654321",
 			DocumentType:   model.DocumentTypeForeignerCard,
 			DocumentNumber: "87654321",
-			City:           "Lima",
 			PostalCode:     "15002",
-			District:       "Business",
+			District:       &district,
+			Province:       &province,
+			Region:         &region,
 			Address:        "Downtown Ave 456, Near Business Center",
 			UserId:         users[1].Id,
 			AuditFields: model.AuditFields{

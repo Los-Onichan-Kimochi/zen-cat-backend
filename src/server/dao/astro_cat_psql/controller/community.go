@@ -33,6 +33,18 @@ func (c *Community) GetCommunity(communityId uuid.UUID) (*model.Community, error
 	return community, nil
 }
 
+// Gets a community by name to check for duplicates.
+func (c *Community) GetCommunityByName(name string) (*model.Community, error) {
+	community := &model.Community{}
+
+	result := c.PostgresqlDB.First(&community, "name = ?", name)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return community, nil
+}
+
 // TODO: Add filters and sorting.
 // Fetch all communities.
 func (c *Community) FetchCommunities() ([]*model.Community, error) {

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -147,6 +148,9 @@ func (r *Reservation) UpdatePostgresqlReservation(
 func (r *Reservation) DeletePostgresqlReservation(reservationId uuid.UUID) *errors.Error {
 	err := r.DaoPostgresql.Reservation.DeleteReservation(reservationId)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.ReservationNotFound
+		}
 		return &errors.InternalServerError.Default
 	}
 

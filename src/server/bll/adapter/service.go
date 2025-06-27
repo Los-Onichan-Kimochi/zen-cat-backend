@@ -7,6 +7,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -26,13 +27,14 @@ func NewServiceAdapter(
 	}
 }
 
-// Gets a service from postgresql DB and adapts it to a Service schema.
-func (c *Service) GetPostgresqlService(
-	serviceId uuid.UUID,
-) (*schemas.Service, *errors.Error) {
-	serviceModel, err := c.DaoPostgresql.Service.GetService(serviceId)
+// Gets a service from a Postgresql DB given its ID and adapts it to a service schema.
+func (s *Service) GetPostgresqlService(id uuid.UUID) (*schemas.Service, *errors.Error) {
+	serviceModel, err := s.DaoPostgresql.Service.GetService(id)
 	if err != nil {
-		return nil, &errors.ObjectNotFoundError.ServiceNotFound
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.ServiceNotFound
+		}
+		return nil, &errors.BadRequestError.ServiceNotCreated
 	}
 
 	return &schemas.Service{
@@ -40,7 +42,6 @@ func (c *Service) GetPostgresqlService(
 		Name:        serviceModel.Name,
 		Description: serviceModel.Description,
 		ImageUrl:    serviceModel.ImageUrl,
-		IsVirtual:   serviceModel.IsVirtual,
 	}, nil
 }
 
@@ -77,6 +78,11 @@ func (c *Service) CreatePostgresqlService(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
+	// Validate name is not empty
+	if name == "" {
+		return nil, &errors.BadRequestError.InvalidServiceName
+	}
+
 	serviceModel := &model.Service{
 		Id:          uuid.New(),
 		Name:        name,
@@ -101,8 +107,8 @@ func (c *Service) CreatePostgresqlService(
 	}, nil
 }
 
-// Updates a service given fields in postgresql DB and returns it.
-func (c *Service) UpdatePostgresqlService(
+// Updates a service from a Postgresql DB given its ID and adapts it to a service schema.
+func (s *Service) UpdatePostgresqlService(
 	id uuid.UUID,
 	name *string,
 	description *string,
@@ -114,15 +120,11 @@ func (c *Service) UpdatePostgresqlService(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
-	serviceModel, err := c.DaoPostgresql.Service.UpdateService(
-		id,
-		name,
-		description,
-		imageUrl,
-		isVirtual,
-		updatedBy,
-	)
+	serviceModel, err := s.DaoPostgresql.Service.UpdateService(id, name, description, imageUrl, isVirtual, updatedBy)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.ServiceNotFound
+		}
 		return nil, &errors.BadRequestError.ServiceNotUpdated
 	}
 
@@ -135,9 +137,13 @@ func (c *Service) UpdatePostgresqlService(
 	}, nil
 }
 
-// Delets a service from postgresql BD
-func (l *Service) DeletePostgresqlService(serviceId uuid.UUID) *errors.Error {
-	if err := l.DaoPostgresql.Service.DeleteService(serviceId); err != nil {
+// Soft deletes a service from a Postgresql DB given its ID.
+func (s *Service) DeletePostgresqlService(id uuid.UUID) *errors.Error {
+	err := s.DaoPostgresql.Service.DeleteService(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.ServiceNotFound
+		}
 		return &errors.BadRequestError.ServiceNotSoftDeleted
 	}
 

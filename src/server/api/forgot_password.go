@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
@@ -25,6 +26,16 @@ func (a *Api) ForgotPassword(c echo.Context) error {
 
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Validate email format
+	if request.Email == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserEmail, c)
+	}
+
+	// Basic email format validation
+	if !strings.Contains(request.Email, "@") || !strings.Contains(request.Email, ".") {
+		return errors.HandleError(errors.BadRequestError.InvalidUpdatedByValue, c) // Using a generic bad request error for invalid email format
 	}
 
 	response, err := a.BllController.ForgotPassword.GenerateResetPin(request.Email)

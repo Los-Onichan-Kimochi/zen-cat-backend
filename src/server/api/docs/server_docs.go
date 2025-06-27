@@ -1032,6 +1032,67 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/community-service/{communityId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves all services that are linked to a given community, based on the community ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Get all services associated with a specific community.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Service"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (No services associated with the given community ID)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/community-service/{communityId}/{serviceId}/": {
             "get": {
                 "security": [
@@ -2307,6 +2368,545 @@ const docTemplateserver = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/membership/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all memberships.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Fetch Memberships.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Memberships"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates a new membership.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Create Membership.",
+                "parameters": [
+                    {
+                        "description": "Create Membership Request",
+                        "name": "createMembershipRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateMembershipRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Membership"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/membership/community/{communityId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets all memberships for a given community id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get Memberships by Community ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Memberships"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/membership/user/{userId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets all memberships for a given user id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get Memberships by User ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Memberships"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Creates a new membership for a specific user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Create Membership for User.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Create Membership For User Request",
+                        "name": "createMembershipForUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateMembershipForUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Membership"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/membership/{membershipId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a membership given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get Membership by ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Membership ID",
+                        "name": "membershipId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Membership"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Deletes a membership given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Delete Membership by ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Membership ID",
+                        "name": "membershipId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Updates a membership given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Update Membership by ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Membership ID",
+                        "name": "membershipId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update Membership Request",
+                        "name": "updateMembershipRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UpdateMembershipRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Membership"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -7433,12 +8033,59 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.CreateMembershipForUserRequest": {
+            "type": "object",
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/schemas.MembershipStatus"
+                }
+            }
+        },
+        "schemas.CreateMembershipRequest": {
+            "type": "object",
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/schemas.MembershipStatus"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.CreateOnboardingRequest": {
             "type": "object",
             "required": [
                 "address",
-                "city",
-                "district",
                 "document_number",
                 "document_type",
                 "phone_number",
@@ -7450,10 +8097,6 @@ const docTemplateserver = `{
                 },
                 "birth_date": {
                     "description": "Datos personales adicionales",
-                    "type": "string"
-                },
-                "city": {
-                    "description": "Dirección",
                     "type": "string"
                 },
                 "district": {
@@ -7478,6 +8121,13 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "postal_code": {
+                    "description": "Dirección",
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "region": {
                     "type": "string"
                 }
             }
@@ -7853,6 +8503,9 @@ const docTemplateserver = `{
                 "community": {
                     "$ref": "#/definitions/schemas.Community"
                 },
+                "community_id": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -7865,11 +8518,20 @@ const docTemplateserver = `{
                 "plan": {
                     "$ref": "#/definitions/schemas.Plan"
                 },
+                "plan_id": {
+                    "type": "string"
+                },
                 "start_date": {
                     "type": "string"
                 },
                 "status": {
                     "$ref": "#/definitions/schemas.MembershipStatus"
+                },
+                "user": {
+                    "$ref": "#/definitions/schemas.User"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -7886,6 +8548,17 @@ const docTemplateserver = `{
                 "MembershipStatusCancelled"
             ]
         },
+        "schemas.Memberships": {
+            "type": "object",
+            "properties": {
+                "memberships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Membership"
+                    }
+                }
+            }
+        },
         "schemas.Onboarding": {
             "type": "object",
             "properties": {
@@ -7894,10 +8567,6 @@ const docTemplateserver = `{
                 },
                 "birth_date": {
                     "description": "Datos personales adicionales",
-                    "type": "string"
-                },
-                "city": {
-                    "description": "Dirección",
                     "type": "string"
                 },
                 "district": {
@@ -7925,6 +8594,13 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "postal_code": {
+                    "description": "Dirección",
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "region": {
                     "type": "string"
                 }
             }
@@ -8292,6 +8968,32 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.UpdateMembershipRequest": {
+            "type": "object",
+            "properties": {
+                "community_id": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "plan_id": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/schemas.MembershipStatus"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.UpdateOnboardingRequest": {
             "type": "object",
             "properties": {
@@ -8300,10 +9002,6 @@ const docTemplateserver = `{
                 },
                 "birth_date": {
                     "description": "Datos personales adicionales",
-                    "type": "string"
-                },
-                "city": {
-                    "description": "Dirección",
                     "type": "string"
                 },
                 "district": {
@@ -8328,6 +9026,13 @@ const docTemplateserver = `{
                     "type": "string"
                 },
                 "postal_code": {
+                    "description": "Dirección",
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "region": {
                     "type": "string"
                 }
             }
@@ -8590,14 +9295,6 @@ const docTemplateserver = `{
                 1000000000,
                 60000000000,
                 3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -8608,14 +9305,7 @@ const docTemplateserver = `{
                 "Second",
                 "Minute",
                 "Hour",
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
+
             ]
         }
     }

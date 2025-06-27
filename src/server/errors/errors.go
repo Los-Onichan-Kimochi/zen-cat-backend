@@ -182,6 +182,10 @@ var (
 	// For 400 Bad Request errors
 	BadRequestError = struct {
 		InvalidUpdatedByValue         Error
+		InvalidCommunityName          Error
+		InvalidServiceName            Error
+		DuplicateCommunityName        Error
+		DuplicateUserEmail            Error
 		CommunityNotCreated           Error
 		CommunityNotUpdated           Error
 		CommunityNotSoftDeleted       Error
@@ -200,6 +204,7 @@ var (
 		InvalidPlanType               Error
 		MembershipNotCreated          Error
 		MembershipNotUpdated          Error
+		MembershipNotDeleted          Error
 		OnboardingNotCreated          Error
 		OnboardingNotUpdated          Error
 		UserNotCreated                Error
@@ -219,8 +224,24 @@ var (
 		SessionNotSoftDeleted         Error
 	}{
 		InvalidUpdatedByValue: Error{
-			Code:    "REQUEST_ERROR_002",
-			Message: "Invalid updated by value error",
+			Code:    "BAD_REQUEST_ERROR_001",
+			Message: "Invalid updated by value",
+		},
+		InvalidCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_004",
+			Message: "Community name cannot be empty",
+		},
+		InvalidServiceName: Error{
+			Code:    "BAD_REQUEST_ERROR_005",
+			Message: "Service name cannot be empty",
+		},
+		DuplicateCommunityName: Error{
+			Code:    "BAD_REQUEST_ERROR_002",
+			Message: "Community name already exists",
+		},
+		DuplicateUserEmail: Error{
+			Code:    "BAD_REQUEST_ERROR_003",
+			Message: "User email already exists",
 		},
 		CommunityNotCreated: Error{
 			Code:    "COMMUNITY_ERROR_002",
@@ -265,6 +286,10 @@ var (
 		MembershipNotUpdated: Error{
 			Code:    "MEMBERSHIP_ERROR_003",
 			Message: "Membership not updated",
+		},
+		MembershipNotDeleted: Error{
+			Code:    "MEMBERSHIP_ERROR_005",
+			Message: "Membership not deleted",
 		},
 		OnboardingNotCreated: Error{
 			Code:    "ONBOARDING_ERROR_002",
@@ -384,6 +409,16 @@ var (
 		},
 	}
 
+	// For 403 Forbidden errors
+	ForbiddenError = struct {
+		InsufficientPrivileges Error
+	}{
+		InsufficientPrivileges: Error{
+			Code:    "FORBIDDEN_ERROR_001",
+			Message: "Insufficient privileges to access this resource",
+		},
+	}
+
 	// For 409 Conflict errors
 	ConflictError = struct {
 		CommunityPlanAlreadyExists       Error
@@ -489,6 +524,12 @@ func HandleError(err Error, c echo.Context) error {
 
 	case isInErrorGroup(err, InternalServerError):
 		statusCode = http.StatusInternalServerError
+
+	case isInErrorGroup(err, AuthenticationError):
+		statusCode = http.StatusUnauthorized
+
+	case isInErrorGroup(err, ForbiddenError):
+		statusCode = http.StatusForbidden
 
 	default:
 		statusCode = http.StatusInternalServerError // Default case for other errors

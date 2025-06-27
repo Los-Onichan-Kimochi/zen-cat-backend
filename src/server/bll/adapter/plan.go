@@ -2,12 +2,12 @@ package adapter
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"onichankimochi.com/astro_cat_backend/src/logging"
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
-
-	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
 type Plan struct {
@@ -26,11 +26,14 @@ func NewPlanAdapter(
 	}
 }
 
-// Gets a plan from postgresql DB and adapts it to a Plan schema.
-func (p *Plan) GetPostgresqlPlan(planId uuid.UUID) (*schemas.Plan, *errors.Error) {
-	planModel, err := p.DaoPostgresql.Plan.GetPlan(planId)
+// Gets a plan from a Postgresql DB given its ID and adapts it to a plan schema.
+func (p *Plan) GetPostgresqlPlan(id uuid.UUID) (*schemas.Plan, *errors.Error) {
+	planModel, err := p.DaoPostgresql.Plan.GetPlan(id)
 	if err != nil {
-		return nil, &errors.ObjectNotFoundError.PlanNotFound
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.PlanNotFound
+		}
+		return nil, &errors.BadRequestError.PlanNotCreated
 	}
 
 	return &schemas.Plan{
@@ -132,9 +135,9 @@ func (p *Plan) BulkCreatePostgresqlPlans(
 	return plans, nil
 }
 
-// Updates a plan in postgresql DB and returns it as a Plan schema.
+// Updates a plan from a Postgresql DB given its ID and adapts it to a plan schema.
 func (p *Plan) UpdatePostgresqlPlan(
-	planId uuid.UUID,
+	id uuid.UUID,
 	fee *float64,
 	planType *model.PlanType,
 	reservationLimit *int,
@@ -144,14 +147,11 @@ func (p *Plan) UpdatePostgresqlPlan(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
-	planModel, err := p.DaoPostgresql.Plan.UpdatePlan(
-		planId,
-		fee,
-		planType,
-		reservationLimit,
-		updatedBy,
-	)
+	planModel, err := p.DaoPostgresql.Plan.UpdatePlan(id, fee, planType, reservationLimit, updatedBy)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.PlanNotFound
+		}
 		return nil, &errors.BadRequestError.PlanNotUpdated
 	}
 
@@ -163,10 +163,13 @@ func (p *Plan) UpdatePostgresqlPlan(
 	}, nil
 }
 
-// Deletes a plan from postgresql DB.
-func (p *Plan) DeletePostgresqlPlan(planId uuid.UUID) *errors.Error {
-	err := p.DaoPostgresql.Plan.DeletePlan(planId)
+// Soft deletes a plan from a Postgresql DB given its ID.
+func (p *Plan) DeletePostgresqlPlan(id uuid.UUID) *errors.Error {
+	err := p.DaoPostgresql.Plan.DeletePlan(id)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.PlanNotFound
+		}
 		return &errors.BadRequestError.PlanNotSoftDeleted
 	}
 
