@@ -66,12 +66,12 @@ func (cs *CommunityService) GetCommunityService(
 ) (*schemas.CommunityService, *errors.Error) {
 	communityId, err := uuid.Parse(communityIdString)
 	if err != nil {
-		return nil, &errors.UnprocessableEntityError.InvalidCommunityId
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	serviceId, err := uuid.Parse(serviceIdString)
 	if err != nil {
-		return nil, &errors.UnprocessableEntityError.InvalidServiceId
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	return cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)
@@ -81,7 +81,6 @@ func (cs *CommunityService) GetCommunityService(
 func (cs *CommunityService) GetServicesByCommunityId(
 	communityId uuid.UUID,
 ) (*schemas.Services, *errors.Error) {
-
 	services, err := cs.Adapter.CommunityService.GetPostgresqlServicesByCommunityId(communityId)
 	if err != nil {
 		return nil, err
@@ -97,12 +96,12 @@ func (cs *CommunityService) DeleteCommunityService(
 ) *errors.Error {
 	communityId, parseErr := uuid.Parse(communityIdString)
 	if parseErr != nil {
-		return &errors.UnprocessableEntityError.InvalidCommunityId
+		return &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
-	serviceId, parseErrS := uuid.Parse(serviceIdString)
-	if parseErrS != nil {
-		return &errors.UnprocessableEntityError.InvalidServiceId
+	serviceId, parseErr := uuid.Parse(serviceIdString)
+	if parseErr != nil {
+		return &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
 	_, err := cs.Adapter.CommunityService.GetPostgresqlCommunityService(communityId, serviceId)

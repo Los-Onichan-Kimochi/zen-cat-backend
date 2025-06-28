@@ -21,6 +21,9 @@ test:
 test-go:
 	go test -p 1 -count=1 ./src/server/tests/...
 
+test-go-sum:
+	gotestsum --format pkgname  -- -p 1 -count=1 ./src/server/tests/...
+	
 # Runners
 run:
 	cd src/server && go run main.go

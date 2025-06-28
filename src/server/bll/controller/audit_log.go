@@ -39,7 +39,7 @@ func (a *AuditLog) LogAuditEvent(
 	return a.Adapter.AuditLog.LogAuditEvent(context, event)
 }
 
-// GetAuditLogs retrieves audit logs with filtering and pagination
+// GetAuditLogs retrieves audit logs with filtering and pagination (only successful operations)
 func (a *AuditLog) GetAuditLogs(
 	userIdsStr string,
 	actionsStr string,
@@ -121,7 +121,13 @@ func (a *AuditLog) GetAuditLogById(id uuid.UUID) (*schemas.AuditLog, *errors.Err
 
 // GetAuditStats returns statistics about audit logs
 func (a *AuditLog) GetAuditStats(daysStr string) (*schemas.AuditStats, *errors.Error) {
-	return a.Adapter.AuditLog.GetAuditStats(daysStr)
+	return a.Adapter.AuditLog.GetAuditStats(daysStr, nil) // No success filter
+}
+
+// GetErrorStats returns statistics about error logs
+func (a *AuditLog) GetErrorStats(daysStr string) (*schemas.AuditStats, *errors.Error) {
+	successFilter := false
+	return a.Adapter.AuditLog.GetAuditStats(daysStr, &successFilter) // Filter for failed operations only
 }
 
 // DeleteOldAuditLogs deletes audit logs older than the specified number of days

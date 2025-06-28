@@ -174,5 +174,8 @@ func (s *Session) FetchSessions(
 
 // Creates sessions given their models.
 func (s *Session) BulkCreateSessions(sessions []*model.Session) error {
+	if len(sessions) == 0 {
+		return nil
+	}
 	return s.PostgresqlDB.Create(&sessions).Error
 }

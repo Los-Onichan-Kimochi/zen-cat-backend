@@ -72,7 +72,6 @@ func (a *AuditLog) LogAuditEvent(
 			auditLog.NewValues = &newStr
 		}
 	}
-
 	if err := a.PostgresqlDB.Create(auditLog).Error; err != nil {
 		a.logger.Error("Failed to log audit event: ", err)
 		return err
@@ -171,18 +170,25 @@ func (a *AuditLog) DeleteOldAuditLogs(daysOld int) error {
 }
 
 // GetAuditStats returns statistics about audit logs
-func (a *AuditLog) GetAuditStats(days int) (map[string]interface{}, error) {
+func (a *AuditLog) GetAuditStats(days int, successFilter *bool) (map[string]interface{}, error) {
 	stats := make(map[string]interface{})
 
 	// Date range
 	endDate := time.Now()
 	startDate := endDate.AddDate(0, 0, -days)
 
+	// Build base query with date range
+	baseQuery := a.PostgresqlDB.Model(&model.AuditLog{}).
+		Where("created_at >= ? AND created_at <= ?", startDate, endDate)
+
+	// Add success filter if provided
+	if successFilter != nil {
+		baseQuery = baseQuery.Where("success = ?", *successFilter)
+	}
+
 	// Total events in period
 	var totalEvents int64
-	if err := a.PostgresqlDB.Model(&model.AuditLog{}).
-		Where("created_at >= ? AND created_at <= ?", startDate, endDate).
-		Count(&totalEvents).Error; err != nil {
+	if err := baseQuery.Count(&totalEvents).Error; err != nil {
 		return nil, err
 	}
 	stats["total_events"] = totalEvents
@@ -192,12 +198,13 @@ func (a *AuditLog) GetAuditStats(days int) (map[string]interface{}, error) {
 		Action string
 		Count  int64
 	}
-	if err := a.PostgresqlDB.Model(&model.AuditLog{}).
+	actionQuery := a.PostgresqlDB.Model(&model.AuditLog{}).
 		Select("action, COUNT(*) as count").
-		Where("created_at >= ? AND created_at <= ?", startDate, endDate).
-		Group("action").
-		Order("count DESC").
-		Scan(&actionStats).Error; err != nil {
+		Where("created_at >= ? AND created_at <= ?", startDate, endDate)
+	if successFilter != nil {
+		actionQuery = actionQuery.Where("success = ?", *successFilter)
+	}
+	if err := actionQuery.Group("action").Order("count DESC").Scan(&actionStats).Error; err != nil {
 		return nil, err
 	}
 	stats["actions"] = actionStats
@@ -207,12 +214,13 @@ func (a *AuditLog) GetAuditStats(days int) (map[string]interface{}, error) {
 		UserRole string
 		Count    int64
 	}
-	if err := a.PostgresqlDB.Model(&model.AuditLog{}).
+	roleQuery := a.PostgresqlDB.Model(&model.AuditLog{}).
 		Select("user_role, COUNT(*) as count").
-		Where("created_at >= ? AND created_at <= ?", startDate, endDate).
-		Group("user_role").
-		Order("count DESC").
-		Scan(&roleStats).Error; err != nil {
+		Where("created_at >= ? AND created_at <= ?", startDate, endDate)
+	if successFilter != nil {
+		roleQuery = roleQuery.Where("success = ?", *successFilter)
+	}
+	if err := roleQuery.Group("user_role").Order("count DESC").Scan(&roleStats).Error; err != nil {
 		return nil, err
 	}
 	stats["user_roles"] = roleStats
@@ -222,27 +230,52 @@ func (a *AuditLog) GetAuditStats(days int) (map[string]interface{}, error) {
 		EntityType string
 		Count      int64
 	}
-	if err := a.PostgresqlDB.Model(&model.AuditLog{}).
+	entityQuery := a.PostgresqlDB.Model(&model.AuditLog{}).
 		Select("entity_type, COUNT(*) as count").
-		Where("created_at >= ? AND created_at <= ?", startDate, endDate).
-		Group("entity_type").
-		Order("count DESC").
-		Scan(&entityStats).Error; err != nil {
+		Where("created_at >= ? AND created_at <= ?", startDate, endDate)
+	if successFilter != nil {
+		entityQuery = entityQuery.Where("success = ?", *successFilter)
+	}
+	if err := entityQuery.Group("entity_type").Order("count DESC").Scan(&entityStats).Error; err != nil {
 		return nil, err
 	}
 	stats["entity_types"] = entityStats
 
 	// Success/failure ratio
 	var successCount, failureCount int64
-	a.PostgresqlDB.Model(&model.AuditLog{}).
-		Where("created_at >= ? AND created_at <= ? AND success = ?", startDate, endDate, true).
-		Count(&successCount)
-	a.PostgresqlDB.Model(&model.AuditLog{}).
-		Where("created_at >= ? AND created_at <= ? AND success = ?", startDate, endDate, false).
-		Count(&failureCount)
+	if successFilter != nil {
+		// If filtering by success, all events have the same success status
+		if *successFilter {
+			successCount = totalEvents
+			failureCount = 0
+		} else {
+			successCount = 0
+			failureCount = totalEvents
+		}
+	} else {
+		// Count both success and failure when no filter is applied
+		a.PostgresqlDB.Model(&model.AuditLog{}).
+			Where("created_at >= ? AND created_at <= ? AND success = ?", startDate, endDate, true).
+			Count(&successCount)
+		a.PostgresqlDB.Model(&model.AuditLog{}).
+			Where("created_at >= ? AND created_at <= ? AND success = ?", startDate, endDate, false).
+			Count(&failureCount)
+	}
 
 	stats["success_count"] = successCount
 	stats["failure_count"] = failureCount
+
+	// Calcular usuarios activos (únicos que no sean "sin autenticar")
+	var activeUsers int64
+	activeUsersQuery := a.PostgresqlDB.Model(&model.AuditLog{}).
+		Select("COUNT(DISTINCT user_email) as active_users").
+		Where("created_at >= ? AND created_at <= ? AND user_email != ? AND user_email != ?",
+			startDate, endDate, "sin autenticar", "")
+	if err := activeUsersQuery.Scan(&activeUsers).Error; err != nil {
+		a.logger.Warn("Failed to calculate active users: ", err)
+		activeUsers = 0
+	}
+	stats["active_users"] = activeUsers
 
 	return stats, nil
 }

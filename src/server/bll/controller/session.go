@@ -34,6 +34,11 @@ func (s *Session) CreateSession(
 	req schemas.CreateSessionRequest,
 	updatedBy string,
 ) (*schemas.Session, *errors.Error) {
+	// Validate session times
+	if !req.EndTime.After(req.StartTime) {
+		return nil, &errors.BadRequestError.SessionNotCreated
+	}
+
 	// Validate that the professional exists
 	_, err := s.Adapter.Professional.GetPostgresqlProfessional(req.ProfessionalId)
 	if err != nil {
@@ -178,7 +183,7 @@ func (s *Session) FetchSessions(
 func (s *Session) BulkCreateSessions(
 	createSessionsData []*schemas.CreateSessionRequest,
 	updatedBy string,
-) ([]*schemas.Session, *errors.Error) {
+) (*schemas.Sessions, *errors.Error) {
 	// Validate all professionals and locals exist
 	for _, sessionData := range createSessionsData {
 		// Validate that the professional exists
@@ -196,7 +201,12 @@ func (s *Session) BulkCreateSessions(
 		}
 	}
 
-	return s.Adapter.Session.BulkCreatePostgresqlSessions(createSessionsData, updatedBy)
+	sessions, err := s.Adapter.Session.BulkCreatePostgresqlSessions(createSessionsData, updatedBy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Sessions{Sessions: sessions}, nil
 }
 
 // Checks for session conflicts

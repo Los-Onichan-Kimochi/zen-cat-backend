@@ -54,6 +54,16 @@ func (a *Api) Register(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	// Manual validation for required fields
+	if request.Name == "" || request.FirstLastName == "" || request.Email == "" || request.Password == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Additional validation for password length (min=6 as per schema)
+	if len(request.Password) < 6 {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
 	response, err := a.BllController.Login.Register(
 		request.Name,
 		request.FirstLastName,

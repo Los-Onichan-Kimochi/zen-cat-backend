@@ -141,3 +141,7 @@ func (u *User) ChangePassword(
 
 	return nil
 }
+
+func (u *User) GetUserStats() (*schemas.UserStats, *errors.Error) {
+	return u.Adapter.User.GetUserStats()
+}

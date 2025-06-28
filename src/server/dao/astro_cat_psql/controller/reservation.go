@@ -158,10 +158,12 @@ func (r *Reservation) UpdateReservation(
 
 // Deletes a reservation.
 func (r *Reservation) DeleteReservation(reservationId uuid.UUID) error {
-	result := r.PostgresqlDB.Delete(&model.Reservation{}, reservationId)
+	result := r.PostgresqlDB.Where("id = ?", reservationId).Delete(&model.Reservation{})
 	if result.Error != nil {
 		return result.Error
 	}
+
+	// Check if any rows were affected
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound
 	}
