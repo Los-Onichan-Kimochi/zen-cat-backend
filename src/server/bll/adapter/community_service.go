@@ -213,3 +213,19 @@ func (cs *CommunityService) FetchPostgresqlCommunityServices(
 
 	return communityServices, nil
 }
+
+// Gets a specific community-service association by its ID and adapts it.
+func (cs *CommunityService) GetPostgresqlCommunityServiceById(
+	id uuid.UUID,
+) (*schemas.CommunityService, *errors.Error) {
+	communityServiceModel, err := cs.DaoPostgresql.CommunityService.GetCommunityServiceById(id)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.CommunityServiceNotFound
+	}
+
+	return &schemas.CommunityService{
+		Id:          communityServiceModel.Id,
+		CommunityId: communityServiceModel.CommunityId,
+		ServiceId:   communityServiceModel.ServiceId,
+	}, nil
+}

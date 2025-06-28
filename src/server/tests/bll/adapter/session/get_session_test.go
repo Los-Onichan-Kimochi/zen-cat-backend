@@ -73,7 +73,7 @@ func TestFetchSessionsSuccessfully(t *testing.T) {
 	})
 
 	// WHEN - Fetch all sessions
-	sessions, err := adapter.FetchPostgresqlSessions(nil, nil, nil)
+	sessions, err := adapter.FetchPostgresqlSessions(nil, nil, nil, nil)
 
 	// THEN
 	assert.Nil(t, err)
@@ -115,7 +115,7 @@ func TestFetchSessionsWithProfessionalFilter(t *testing.T) {
 	})
 
 	// WHEN - Filter by professional1
-	sessions, err := adapter.FetchPostgresqlSessions([]uuid.UUID{professional1.Id}, nil, nil)
+	sessions, err := adapter.FetchPostgresqlSessions([]uuid.UUID{professional1.Id}, nil, nil, nil)
 
 	// THEN
 	assert.Nil(t, err)
@@ -147,7 +147,7 @@ func TestFetchSessionsEmpty(t *testing.T) {
 	adapter, _, _ := adapterTest.NewSessionAdapterTestWrapper(t)
 
 	// WHEN
-	sessions, err := adapter.FetchPostgresqlSessions(nil, nil, nil)
+	sessions, err := adapter.FetchPostgresqlSessions(nil, nil, nil, nil)
 
 	// THEN
 	assert.Nil(t, err)

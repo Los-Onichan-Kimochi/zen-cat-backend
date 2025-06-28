@@ -176,3 +176,14 @@ func (cs *CommunityService) FetchCommunityServices(
 
 	return communityServices, nil
 }
+
+// Gets a specific community-service association by its ID.
+func (cs *CommunityService) GetCommunityServiceById(id uuid.UUID) (*model.CommunityService, error) {
+	var communityService model.CommunityService
+	result := cs.PostgresqlDB.Where("id = ?", id).First(&communityService)
+	if result.Error != nil {
+		return nil, result.Error // Returns gorm.ErrRecordNotFound if not found
+	}
+
+	return &communityService, nil
+}

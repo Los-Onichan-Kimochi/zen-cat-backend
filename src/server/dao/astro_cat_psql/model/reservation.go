@@ -27,6 +27,8 @@ type Reservation struct {
 	User      User      `gorm:"foreignKey:UserId"`
 	SessionId uuid.UUID `gorm:"type:uuid"`
 	Session   Session   `gorm:"foreignKey:SessionId"`
+	MembershipId *uuid.UUID  `gorm:"type:uuid"`
+	Membership   *Membership `gorm:"foreignKey:MembershipId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Reservation) TableName() string {

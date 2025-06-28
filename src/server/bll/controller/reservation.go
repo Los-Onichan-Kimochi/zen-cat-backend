@@ -117,6 +117,14 @@ func (r *Reservation) CreateReservation(
 		return nil, sessionErr
 	}
 
+	// Validate that the membership exists if provided
+	if createReservationData.MembershipId != nil {
+		_, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*createReservationData.MembershipId)
+		if membershipErr != nil {
+			return nil, membershipErr
+		}
+	}
+
 	// Modify `registered_count` field of the session
 	session.RegisteredCount++
 	_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
@@ -131,6 +139,7 @@ func (r *Reservation) CreateReservation(
 		nil,
 		nil,
 		nil,
+		nil,
 		updatedBy,
 	)
 
@@ -140,6 +149,7 @@ func (r *Reservation) CreateReservation(
 		createReservationData.State,
 		createReservationData.UserId,
 		createReservationData.SessionId,
+		createReservationData.MembershipId,
 		updatedBy,
 	)
 }
@@ -166,6 +176,14 @@ func (r *Reservation) UpdateReservation(
 		}
 	}
 
+	// Validate that the membership exists if provided
+	if updateReservationData.MembershipId != nil {
+		_, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*updateReservationData.MembershipId)
+		if membershipErr != nil {
+			return nil, membershipErr
+		}
+	}
+
 	return r.Adapter.Reservation.UpdatePostgresqlReservation(
 		reservationId,
 		updateReservationData.Name,
@@ -173,6 +191,7 @@ func (r *Reservation) UpdateReservation(
 		updateReservationData.State,
 		updateReservationData.UserId,
 		updateReservationData.SessionId,
+		updateReservationData.MembershipId,
 		updatedBy,
 	)
 }

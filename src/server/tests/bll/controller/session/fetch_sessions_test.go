@@ -50,7 +50,7 @@ func TestFetchSessionsSuccessfully(t *testing.T) {
 	})
 
 	// WHEN
-	result, err := controller.FetchSessions([]string{}, []string{}, []string{})
+	result, err := controller.FetchSessions([]string{}, []string{}, []string{}, []string{})
 
 	// THEN
 	assert.Nil(t, err)
@@ -68,7 +68,7 @@ func TestFetchSessionsEmpty(t *testing.T) {
 	controller, _, _ := controllerTest.NewSessionControllerTestWrapper(t)
 
 	// WHEN
-	result, err := controller.FetchSessions([]string{}, []string{}, []string{})
+	result, err := controller.FetchSessions([]string{}, []string{}, []string{}, []string{})
 
 	// THEN
 	assert.Nil(t, err)
@@ -116,7 +116,7 @@ func TestFetchSessionsWithFilters(t *testing.T) {
 	})
 
 	// WHEN - Filter by first professional
-	result, err := controller.FetchSessions([]string{testProfessional1.Id.String()}, []string{}, []string{})
+	result, err := controller.FetchSessions([]string{testProfessional1.Id.String()}, []string{}, []string{}, []string{})
 
 	// THEN
 	assert.Nil(t, err)

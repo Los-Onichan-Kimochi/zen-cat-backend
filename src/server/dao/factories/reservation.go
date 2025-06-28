@@ -17,6 +17,7 @@ type ReservationModelF struct {
 	LastModification *time.Time
 	UserId           *uuid.UUID
 	SessionId        *uuid.UUID
+	MembershipId     *uuid.UUID
 }
 
 // Create a new reservation on DB
@@ -26,6 +27,9 @@ func NewReservationModel(db *gorm.DB, option ...ReservationModelF) *model.Reserv
 
 	// Create default session if not provided
 	session := NewSessionModel(db)
+
+	// Create default membership if not provided
+	membership := NewMembershipModel(db)
 
 	now := time.Now()
 
@@ -37,6 +41,7 @@ func NewReservationModel(db *gorm.DB, option ...ReservationModelF) *model.Reserv
 		LastModification: now,
 		UserId:           user.Id,
 		SessionId:        session.Id,
+		MembershipId:     &membership.Id,
 		AuditFields: model.AuditFields{
 			UpdatedBy: "ADMIN",
 		},
@@ -64,6 +69,9 @@ func NewReservationModel(db *gorm.DB, option ...ReservationModelF) *model.Reserv
 		}
 		if parameters.SessionId != nil {
 			reservation.SessionId = *parameters.SessionId
+		}
+		if parameters.MembershipId != nil {
+			reservation.MembershipId = parameters.MembershipId
 		}
 	}
 

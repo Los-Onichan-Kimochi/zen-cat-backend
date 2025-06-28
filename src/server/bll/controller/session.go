@@ -52,6 +52,15 @@ func (s *Session) CreateSession(
 			return nil, err
 		}
 	}
+	
+	// Validate that the community service exists if provided
+	if req.CommunityServiceId != nil {
+		// Get the community service to validate it exists
+		_, err := s.Adapter.CommunityService.GetPostgresqlCommunityServiceById(*req.CommunityServiceId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return s.Adapter.Session.CreatePostgresqlSession(
 		req.Title,
@@ -62,6 +71,7 @@ func (s *Session) CreateSession(
 		req.SessionLink,
 		req.ProfessionalId,
 		req.LocalId,
+		req.CommunityServiceId,
 		updatedBy,
 	)
 }
@@ -92,6 +102,15 @@ func (s *Session) UpdateSession(
 			return nil, err
 		}
 	}
+	
+	// Validate that the community service exists if provided
+	if req.CommunityServiceId != nil {
+		// Get the community service to validate it exists
+		_, err := s.Adapter.CommunityService.GetPostgresqlCommunityServiceById(*req.CommunityServiceId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return s.Adapter.Session.UpdatePostgresqlSession(
 		sessionId,
@@ -105,6 +124,7 @@ func (s *Session) UpdateSession(
 		req.SessionLink,
 		req.ProfessionalId,
 		req.LocalId,
+		req.CommunityServiceId,
 		updatedBy,
 	)
 }
@@ -127,6 +147,7 @@ func (s *Session) BulkDeleteSessions(
 func (s *Session) FetchSessions(
 	professionalIds []string,
 	localIds []string,
+	communityServiceIds []string,
 	states []string,
 ) (*schemas.Sessions, *errors.Error) {
 	// Validate and convert professionalIds to UUIDs if provided.
@@ -166,10 +187,30 @@ func (s *Session) FetchSessions(
 			parsedLocalIds = append(parsedLocalIds, parsedId)
 		}
 	}
+	
+	// Validate and convert communityServiceIds to UUIDs if provided.
+	parsedCommunityServiceIds := []uuid.UUID{}
+	if len(communityServiceIds) > 0 {
+		for _, id := range communityServiceIds {
+			parsedId, err := uuid.Parse(id)
+			if err != nil {
+				return nil, &errors.UnprocessableEntityError.InvalidCommunityServiceId
+			}
+
+			// Validate that the community service exists
+			_, newErr := s.Adapter.CommunityService.GetPostgresqlCommunityServiceById(parsedId)
+			if newErr != nil {
+				return nil, newErr
+			}
+
+			parsedCommunityServiceIds = append(parsedCommunityServiceIds, parsedId)
+		}
+	}
 
 	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
 		parsedProfessionalIds,
 		parsedLocalIds,
+		parsedCommunityServiceIds,
 		states,
 	)
 	if err != nil {
@@ -215,6 +256,7 @@ func (s *Session) CheckConflicts(
 ) (*schemas.ConflictResult, *errors.Error) {
 	// Get all sessions for the specific date
 	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{},
 		[]uuid.UUID{},
 		[]uuid.UUID{},
 		[]string{},
@@ -271,6 +313,7 @@ func (s *Session) GetAvailability(
 ) (*schemas.AvailabilityResult, *errors.Error) {
 	// Get all sessions for the specific date
 	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{},
 		[]uuid.UUID{},
 		[]uuid.UUID{},
 		[]string{},
@@ -334,4 +377,54 @@ func (s *Session) isSameDate(date1, date2 time.Time) bool {
 // Helper function to check if two time ranges overlap
 func (s *Session) hasTimeOverlap(start1, end1, start2, end2 time.Time) bool {
 	return start1.Before(end2) && end1.After(start2)
+}
+
+// Creates multiple sessions
+func (s *Session) BatchCreateSessions(
+	req schemas.BatchCreateSessionRequest,
+	updatedBy string,
+) (*schemas.Sessions, *errors.Error) {
+	sessions, err := s.Adapter.Session.BulkCreatePostgresqlSessions(
+		req.Sessions,
+		updatedBy,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Sessions{Sessions: sessions}, nil
+}
+
+// Fetch all sessions by professional ID.
+func (s *Session) FetchSessionsByProfessionalId(
+	professionalId uuid.UUID,
+) (*schemas.Sessions, *errors.Error) {
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{professionalId},
+		nil,
+		nil,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Sessions{Sessions: sessions}, nil
+}
+
+// Fetch all sessions by local ID.
+func (s *Session) FetchSessionsByLocalId(
+	localId uuid.UUID,
+) (*schemas.Sessions, *errors.Error) {
+	sessions, err := s.Adapter.Session.FetchPostgresqlSessions(
+		nil,
+		[]uuid.UUID{localId},
+		nil,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Sessions{Sessions: sessions}, nil
 }
