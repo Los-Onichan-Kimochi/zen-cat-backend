@@ -44,6 +44,7 @@ func (r *Reservation) GetPostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
+		MembershipId:     reservationModel.MembershipId,
 	}, nil
 }
 
@@ -72,6 +73,7 @@ func (r *Reservation) FetchPostgresqlReservations(
 			LastModification: reservationModel.LastModification,
 			UserId:           reservationModel.UserId,
 			SessionId:        reservationModel.SessionId,
+			MembershipId:     reservationModel.MembershipId,
 		}
 	}
 
@@ -85,14 +87,20 @@ func (r *Reservation) CreatePostgresqlReservation(
 	state string,
 	userId uuid.UUID,
 	sessionId uuid.UUID,
+	membershipId *uuid.UUID,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
 	reservationModel, err := r.DaoPostgresql.Reservation.CreateReservation(
 		name,
 		reservationTime,
 		state,
 		userId,
 		sessionId,
+		membershipId,
 		updatedBy,
 	)
 	if err != nil {
@@ -107,6 +115,7 @@ func (r *Reservation) CreatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
+		MembershipId:     reservationModel.MembershipId,
 	}, nil
 }
 
@@ -118,8 +127,13 @@ func (r *Reservation) UpdatePostgresqlReservation(
 	state *string,
 	userId *uuid.UUID,
 	sessionId *uuid.UUID,
+	membershipId *uuid.UUID,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
+	if updatedBy == "" {
+		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
 	reservationModel, err := r.DaoPostgresql.Reservation.UpdateReservation(
 		reservationId,
 		name,
@@ -127,6 +141,7 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		state,
 		userId,
 		sessionId,
+		membershipId,
 		updatedBy,
 	)
 	if err != nil {
@@ -141,6 +156,7 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
+		MembershipId:     reservationModel.MembershipId,
 	}, nil
 }
 

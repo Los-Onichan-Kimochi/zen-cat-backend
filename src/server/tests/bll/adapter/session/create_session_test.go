@@ -21,6 +21,7 @@ func TestCreateSessionSuccessfully(t *testing.T) {
 
 	professional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
 	local := factories.NewLocalModel(db, factories.LocalModelF{})
+	communityService := factories.NewCommunityServiceModel(db, factories.CommunityServiceModelF{})
 
 	title := "Test Session"
 	date := time.Now().AddDate(0, 0, 1) // Tomorrow
@@ -40,6 +41,7 @@ func TestCreateSessionSuccessfully(t *testing.T) {
 		&sessionLink,
 		professional.Id,
 		&local.Id,
+		&communityService.Id,
 		updatedBy,
 	)
 
@@ -66,6 +68,7 @@ func TestCreateSessionWithoutLocal(t *testing.T) {
 	adapter, _, db := adapterTest.NewSessionAdapterTestWrapper(t)
 
 	professional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
+	communityService := factories.NewCommunityServiceModel(db, factories.CommunityServiceModelF{})
 
 	title := "Online Session"
 	date := time.Now().AddDate(0, 0, 1)
@@ -85,6 +88,7 @@ func TestCreateSessionWithoutLocal(t *testing.T) {
 		&sessionLink,
 		professional.Id,
 		nil, // No local
+		&communityService.Id,
 		updatedBy,
 	)
 
@@ -106,6 +110,7 @@ func TestCreateSessionWithEmptyUpdatedBy(t *testing.T) {
 	adapter, _, db := adapterTest.NewSessionAdapterTestWrapper(t)
 
 	professional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
+	communityService := factories.NewCommunityServiceModel(db, factories.CommunityServiceModelF{})
 
 	title := "Test Session"
 	date := time.Now().AddDate(0, 0, 1)
@@ -124,6 +129,7 @@ func TestCreateSessionWithEmptyUpdatedBy(t *testing.T) {
 		nil,
 		professional.Id,
 		nil,
+		&communityService.Id,
 		updatedBy,
 	)
 

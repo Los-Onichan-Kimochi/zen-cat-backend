@@ -289,6 +289,40 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/auth/logout/": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Logout user session (audit purposes)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User logout",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/refresh/": {
             "post": {
                 "security": [
@@ -1691,7 +1725,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Gets a community given its id with its image.",
+                "description": "Get community information with image bytes.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1716,6 +1750,223 @@ const docTemplateserver = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.CommunityWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/error-log/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve error logs with optional filtering and pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ErrorLog"
+                ],
+                "summary": "Get Error Logs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comma-separated user IDs",
+                        "name": "userIds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated action types",
+                        "name": "actions",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated entity types",
+                        "name": "entityTypes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated user roles",
+                        "name": "userRoles",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "startDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "endDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page size (default: 50, max: 200)",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditLogs"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/error-log/stats/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve error statistics for the specified time period",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ErrorLog"
+                ],
+                "summary": "Get Error Statistics",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Number of days to include in stats (default: 30)",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditStats"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/error-log/{auditLogId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieve a specific error log by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ErrorLog"
+                ],
+                "summary": "Get Error Log by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Audit Log ID",
+                        "name": "auditLogId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.AuditLog"
                         }
                     },
                     "400": {
@@ -6134,6 +6385,16 @@ const docTemplateserver = `{
                             "type": "string"
                         },
                         "collectionFormat": "csv",
+                        "description": "Community Service IDs",
+                        "name": "communityServiceIds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Session States",
                         "name": "states",
                         "in": "query"
@@ -7027,7 +7288,7 @@ const docTemplateserver = `{
                 }
             }
         },
-        "/user/check-exists": {
+        "/user/check-email/": {
             "get": {
                 "security": [
                     {
@@ -7075,6 +7336,58 @@ const docTemplateserver = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/stats/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get user statistics including role distribution and recent connections.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User Statistics.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserStats"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -7287,6 +7600,88 @@ const docTemplateserver = `{
                     }
                 }
             }
+        },
+        "/user/{userId}/role/": {
+            "patch": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Changes the role of a user given its id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change User Role.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Change Role Request",
+                        "name": "changeRoleRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ChangeUserRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -7336,6 +7731,7 @@ const docTemplateserver = `{
                 "BULK_CREATE",
                 "BULK_DELETE",
                 "LOGIN",
+                "LOGOUT",
                 "REGISTER",
                 "SUBSCRIBE",
                 "UNSUBSCRIBE",
@@ -7350,6 +7746,7 @@ const docTemplateserver = `{
                 "AuditActionBulkCreate",
                 "AuditActionBulkDelete",
                 "AuditActionLogin",
+                "AuditActionLogout",
                 "AuditActionRegister",
                 "AuditActionSubscribe",
                 "AuditActionUnsubscribe",
@@ -7480,6 +7877,9 @@ const docTemplateserver = `{
                     "items": {
                         "$ref": "#/definitions/schemas.ActionStat"
                     }
+                },
+                "active_users": {
+                    "type": "integer"
                 },
                 "entity_types": {
                     "type": "array",
@@ -7786,6 +8186,14 @@ const docTemplateserver = `{
                 },
                 "new_password": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.ChangeUserRoleRequest": {
+            "type": "object",
+            "properties": {
+                "rol": {
+                    "$ref": "#/definitions/schemas.UserRol"
                 }
             }
         },
@@ -8178,6 +8586,9 @@ const docTemplateserver = `{
         "schemas.CreateReservationRequest": {
             "type": "object",
             "properties": {
+                "membership_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -8247,6 +8658,9 @@ const docTemplateserver = `{
             "properties": {
                 "capacity": {
                     "type": "integer"
+                },
+                "community_service_id": {
+                    "type": "string"
                 },
                 "date": {
                     "type": "string"
@@ -8602,6 +9016,9 @@ const docTemplateserver = `{
                 },
                 "region": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -8726,6 +9143,9 @@ const docTemplateserver = `{
                 "last_modification": {
                     "type": "string"
                 },
+                "membership_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -8840,6 +9260,9 @@ const docTemplateserver = `{
             "properties": {
                 "capacity": {
                     "type": "integer"
+                },
+                "community_service_id": {
+                    "type": "string"
                 },
                 "date": {
                     "type": "string"
@@ -9083,6 +9506,9 @@ const docTemplateserver = `{
         "schemas.UpdateReservationRequest": {
             "type": "object",
             "properties": {
+                "membership_id": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -9122,6 +9548,9 @@ const docTemplateserver = `{
             "properties": {
                 "capacity": {
                     "type": "integer"
+                },
+                "community_service_id": {
+                    "type": "string"
                 },
                 "date": {
                     "type": "string"
@@ -9225,6 +9654,29 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.UserConnection": {
+            "type": "object",
+            "properties": {
+                "connection_ip": {
+                    "type": "string"
+                },
+                "last_login": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/schemas.UserRol"
+                },
+                "user_email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.UserProfile": {
             "type": "object",
             "properties": {
@@ -9255,12 +9707,25 @@ const docTemplateserver = `{
             "type": "string",
             "enum": [
                 "ADMINISTRATOR",
-                "CLIENT"
+                "CLIENT",
+                "GUEST"
             ],
             "x-enum-varnames": [
                 "UserRolAdmin",
-                "UserRolClient"
+                "UserRolClient",
+                "UserRolGuest"
             ]
+        },
+        "schemas.UserRoleDistribution": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "role": {
+                    "$ref": "#/definitions/schemas.UserRol"
+                }
+            }
         },
         "schemas.UserRoleStat": {
             "type": "object",
@@ -9270,6 +9735,35 @@ const docTemplateserver = `{
                 },
                 "user_role": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.UserStats": {
+            "type": "object",
+            "properties": {
+                "admin_count": {
+                    "type": "integer"
+                },
+                "client_count": {
+                    "type": "integer"
+                },
+                "guest_count": {
+                    "type": "integer"
+                },
+                "recent_connections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.UserConnection"
+                    }
+                },
+                "role_distribution": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.UserRoleDistribution"
+                    }
+                },
+                "total_users": {
+                    "type": "integer"
                 }
             }
         },
@@ -9287,16 +9781,11 @@ const docTemplateserver = `{
         "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -9305,16 +9794,11 @@ const docTemplateserver = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
                 "Minute",
-                "Hour",
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

@@ -18,6 +18,7 @@ type Session struct {
 	SessionLink     *string    `json:"session_link"`
 	ProfessionalId  uuid.UUID  `json:"professional_id"`
 	LocalId         *uuid.UUID `json:"local_id"`
+	CommunityServiceId *uuid.UUID `json:"community_service_id"`
 }
 
 type Sessions struct {
@@ -25,14 +26,15 @@ type Sessions struct {
 }
 
 type CreateSessionRequest struct {
-	Title          string     `json:"title"`
-	Date           time.Time  `json:"date"`
-	StartTime      time.Time  `json:"start_time"`
-	EndTime        time.Time  `json:"end_time"`
-	Capacity       int        `json:"capacity"`
-	SessionLink    *string    `json:"session_link"`
-	ProfessionalId uuid.UUID  `json:"professional_id"`
-	LocalId        *uuid.UUID `json:"local_id"`
+	Title             string     `json:"title"`
+	Date              time.Time  `json:"date"`
+	StartTime         time.Time  `json:"start_time"`
+	EndTime           time.Time  `json:"end_time"`
+	Capacity          int        `json:"capacity"`
+	SessionLink       *string    `json:"session_link"`
+	ProfessionalId    uuid.UUID  `json:"professional_id"`
+	LocalId           *uuid.UUID `json:"local_id"`
+	CommunityServiceId *uuid.UUID `json:"community_service_id"`
 }
 
 type UpdateSessionRequest struct {
@@ -46,6 +48,7 @@ type UpdateSessionRequest struct {
 	SessionLink     *string    `json:"session_link"`
 	ProfessionalId  *uuid.UUID `json:"professional_id"`
 	LocalId         *uuid.UUID `json:"local_id"`
+	CommunityServiceId *uuid.UUID `json:"community_service_id"`
 }
 
 type BatchCreateSessionRequest struct {

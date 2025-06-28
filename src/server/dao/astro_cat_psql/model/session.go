@@ -32,6 +32,9 @@ type Session struct {
 	Professional   Professional `gorm:"foreignKey:ProfessionalId"`
 	LocalId        *uuid.UUID   `gorm:"type:uuid"`
 	Local          *Local       `gorm:"foreignKey:LocalId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	
+	CommunityServiceId *uuid.UUID       `gorm:"type:uuid"`
+	CommunityService   *CommunityService `gorm:"foreignKey:CommunityServiceId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Session) TableName() string {

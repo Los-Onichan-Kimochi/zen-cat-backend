@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"onichankimochi.com/astro_cat_backend/src/server/dao/factories"
+	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	adapterTest "onichankimochi.com/astro_cat_backend/src/server/tests/bll/adapter"
 )
 
@@ -20,6 +21,7 @@ func TestCreateReservationSuccessfully(t *testing.T) {
 
 	user := factories.NewUserModel(db, factories.UserModelF{})
 	session := factories.NewSessionModel(db, factories.SessionModelF{})
+	membership := factories.NewMembershipModel(db, factories.MembershipModelF{})
 
 	name := "Test Reservation"
 	reservationTime := time.Now().AddDate(0, 0, 1) // Tomorrow
@@ -33,6 +35,7 @@ func TestCreateReservationSuccessfully(t *testing.T) {
 		state,
 		user.Id,
 		session.Id,
+		&membership.Id,
 		updatedBy,
 	)
 
@@ -45,6 +48,43 @@ func TestCreateReservationSuccessfully(t *testing.T) {
 	assert.Equal(t, user.Id, reservation.UserId)
 	assert.Equal(t, session.Id, reservation.SessionId)
 	assert.Equal(t, reservationTime.Format("2006-01-02 15:04:05"), reservation.ReservationTime.Format("2006-01-02 15:04:05"))
+	assert.Equal(t, &membership.Id, reservation.MembershipId)
+}
+
+func TestCreateReservationEmptyUpdatedBy(t *testing.T) {
+	/*
+		GIVEN: Valid reservation data but empty updatedBy
+		WHEN:  CreatePostgresqlReservation is called with empty updatedBy
+		THEN:  An error is returned
+	*/
+	// GIVEN
+	adapter, _, db := adapterTest.NewReservationAdapterTestWrapper(t)
+
+	// Create dependencies
+	user := factories.NewUserModel(db, factories.UserModelF{})
+	session := factories.NewSessionModel(db, factories.SessionModelF{})
+	membership := factories.NewMembershipModel(db, factories.MembershipModelF{})
+
+	name := "Test Reservation"
+	reservationTime := time.Now()
+	state := "CONFIRMED"
+	emptyUpdatedBy := ""
+
+	// WHEN
+	reservation, err := adapter.CreatePostgresqlReservation(
+		name,
+		reservationTime,
+		state,
+		user.Id,
+		session.Id,
+		&membership.Id,
+		emptyUpdatedBy,
+	)
+
+	// THEN
+	assert.NotNil(t, err)
+	assert.Nil(t, reservation)
+	assert.Equal(t, errors.BadRequestError.InvalidUpdatedByValue.Code, err.Code)
 }
 
 func TestCreateReservationWithDifferentStates(t *testing.T) {
@@ -58,6 +98,7 @@ func TestCreateReservationWithDifferentStates(t *testing.T) {
 
 	user := factories.NewUserModel(db, factories.UserModelF{})
 	session := factories.NewSessionModel(db, factories.SessionModelF{})
+	membership := factories.NewMembershipModel(db, factories.MembershipModelF{})
 
 	states := []string{"PENDING", "CONFIRMED", "CANCELLED"}
 	updatedBy := "test-admin"
@@ -70,6 +111,7 @@ func TestCreateReservationWithDifferentStates(t *testing.T) {
 			state,
 			user.Id,
 			session.Id,
+			&membership.Id,
 			updatedBy,
 		)
 
@@ -91,6 +133,7 @@ func TestCreateReservationWithPastDate(t *testing.T) {
 
 	user := factories.NewUserModel(db, factories.UserModelF{})
 	session := factories.NewSessionModel(db, factories.SessionModelF{})
+	membership := factories.NewMembershipModel(db, factories.MembershipModelF{})
 
 	name := "Past Reservation"
 	reservationTime := time.Now().AddDate(0, 0, -1) // Yesterday
@@ -104,6 +147,7 @@ func TestCreateReservationWithPastDate(t *testing.T) {
 		state,
 		user.Id,
 		session.Id,
+		&membership.Id,
 		updatedBy,
 	)
 
