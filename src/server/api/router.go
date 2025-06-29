@@ -179,7 +179,10 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 
 	// ServiceProfessional endpoints (admin only)
 	serviceProfessional := a.Echo.Group("/service-professional")
-	serviceProfessional.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
+	serviceProfessional.Use(
+		mw.JWTMiddleware,
+		mw.AdminOnlyMiddleware,
+	) // Apply JWT + Admin middleware
 	serviceProfessional.POST("/", a.CreateServiceProfessional)
 	serviceProfessional.GET("/:serviceId/:professionalId/", a.GetServiceProfessional)
 	serviceProfessional.DELETE("/:serviceId/:professionalId/", a.DeleteServiceProfessional)
