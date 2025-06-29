@@ -52,7 +52,7 @@ func (s *Session) CreateSession(
 			return nil, err
 		}
 	}
-	
+
 	// Validate that the community service exists if provided
 	if req.CommunityServiceId != nil {
 		// Get the community service to validate it exists
@@ -62,6 +62,35 @@ func (s *Session) CreateSession(
 		}
 	}
 
+	// Check for conflicts
+	conflictCheck := schemas.CheckConflictRequest{
+		Date:               req.Date,
+		StartTime:          req.StartTime,
+		EndTime:            req.EndTime,
+		ProfessionalId:     req.ProfessionalId,
+		LocalId:            req.LocalId,
+		CommunityServiceId: req.CommunityServiceId,
+	}
+
+	conflictResult, conflictErr := s.CheckConflicts(conflictCheck)
+	if conflictErr != nil {
+		return nil, conflictErr
+	}
+
+	if conflictResult.HasConflict {
+		// Create specific error message
+		var conflictDetails []string
+		if len(conflictResult.ProfessionalConflicts) > 0 {
+			conflictDetails = append(conflictDetails, "conflicto de profesional")
+		}
+		if len(conflictResult.LocalConflicts) > 0 {
+			conflictDetails = append(conflictDetails, "conflicto de local")
+		}
+
+		return nil, &errors.ConflictError.SessionTimeConflict
+	}
+
+	// Create session if no conflicts
 	return s.Adapter.Session.CreatePostgresqlSession(
 		req.Title,
 		req.Date,
@@ -102,13 +131,75 @@ func (s *Session) UpdateSession(
 			return nil, err
 		}
 	}
-	
+
 	// Validate that the community service exists if provided
 	if req.CommunityServiceId != nil {
 		// Get the community service to validate it exists
 		_, err := s.Adapter.CommunityService.GetPostgresqlCommunityServiceById(*req.CommunityServiceId)
 		if err != nil {
 			return nil, err
+		}
+	}
+
+	// Check for conflicts if relevant fields are being updated
+	if req.Date != nil || req.StartTime != nil || req.EndTime != nil || req.ProfessionalId != nil || req.LocalId != nil {
+		// Get current session for default values
+		currentSession, err := s.Adapter.Session.GetPostgresqlSession(sessionId)
+		if err != nil {
+			return nil, err
+		}
+
+		// Prepare data for conflict check
+		checkDate := currentSession.Date
+		if req.Date != nil {
+			checkDate = *req.Date
+		}
+
+		checkStartTime := currentSession.StartTime
+		if req.StartTime != nil {
+			checkStartTime = *req.StartTime
+		}
+
+		checkEndTime := currentSession.EndTime
+		if req.EndTime != nil {
+			checkEndTime = *req.EndTime
+		}
+
+		checkProfessionalId := currentSession.ProfessionalId
+		if req.ProfessionalId != nil {
+			checkProfessionalId = *req.ProfessionalId
+		}
+
+		checkLocalId := currentSession.LocalId
+		if req.LocalId != nil {
+			checkLocalId = req.LocalId
+		}
+
+		conflictCheck := schemas.CheckConflictRequest{
+			Date:               checkDate,
+			StartTime:          checkStartTime,
+			EndTime:            checkEndTime,
+			ProfessionalId:     checkProfessionalId,
+			LocalId:            checkLocalId,
+			CommunityServiceId: currentSession.CommunityServiceId,
+		}
+
+		conflictResult, conflictErr := s.CheckConflicts(conflictCheck)
+		if conflictErr != nil {
+			return nil, conflictErr
+		}
+
+		if conflictResult.HasConflict {
+			// Create specific error message
+			var conflictDetails []string
+			if len(conflictResult.ProfessionalConflicts) > 0 {
+				conflictDetails = append(conflictDetails, "conflicto de profesional")
+			}
+			if len(conflictResult.LocalConflicts) > 0 {
+				conflictDetails = append(conflictDetails, "conflicto de local")
+			}
+
+			return nil, &errors.ConflictError.SessionTimeConflict
 		}
 	}
 
@@ -187,7 +278,7 @@ func (s *Session) FetchSessions(
 			parsedLocalIds = append(parsedLocalIds, parsedId)
 		}
 	}
-	
+
 	// Validate and convert communityServiceIds to UUIDs if provided.
 	parsedCommunityServiceIds := []uuid.UUID{}
 	if len(communityServiceIds) > 0 {
@@ -225,19 +316,55 @@ func (s *Session) BulkCreateSessions(
 	createSessionsData []*schemas.CreateSessionRequest,
 	updatedBy string,
 ) (*schemas.Sessions, *errors.Error) {
-	// Validate all professionals and locals exist
+	// Validate that all professionals and locals exist
 	for _, sessionData := range createSessionsData {
-		// Validate that the professional exists
 		_, err := s.Adapter.Professional.GetPostgresqlProfessional(sessionData.ProfessionalId)
 		if err != nil {
 			return nil, err
 		}
-
-		// Validate that the local exists if provided
 		if sessionData.LocalId != nil {
 			_, err := s.Adapter.Local.GetPostgresqlLocal(*sessionData.LocalId)
 			if err != nil {
 				return nil, err
+			}
+		}
+	}
+
+	// Check conflicts with database and within the batch
+	for i, sessionData := range createSessionsData {
+		// 1. Check against database
+		conflictCheck := schemas.CheckConflictRequest{
+			Date:               sessionData.Date,
+			StartTime:          sessionData.StartTime,
+			EndTime:            sessionData.EndTime,
+			ProfessionalId:     sessionData.ProfessionalId,
+			LocalId:            sessionData.LocalId,
+			CommunityServiceId: sessionData.CommunityServiceId,
+		}
+		conflictResult, conflictErr := s.CheckConflicts(conflictCheck)
+		if conflictErr != nil {
+			return nil, conflictErr
+		}
+		if conflictResult.HasConflict {
+			return nil, &errors.ConflictError.SessionTimeConflict
+		}
+		// 2. Check against rest of batch (internal conflicts)
+		for j, other := range createSessionsData {
+			if i == j {
+				continue
+			}
+			// Same day
+			if !s.isSameDate(sessionData.Date, other.Date) {
+				continue
+			}
+			// Professional conflict
+			if sessionData.ProfessionalId == other.ProfessionalId && s.hasTimeOverlap(sessionData.StartTime, sessionData.EndTime, other.StartTime, other.EndTime) {
+				return nil, &errors.ConflictError.SessionTimeConflict
+			}
+			// Local conflict - only one activity allowed per local at a time
+			if sessionData.LocalId != nil && other.LocalId != nil && *sessionData.LocalId == *other.LocalId &&
+				s.hasTimeOverlap(sessionData.StartTime, sessionData.EndTime, other.StartTime, other.EndTime) {
+				return nil, &errors.ConflictError.SessionTimeConflict
 			}
 		}
 	}
@@ -291,7 +418,7 @@ func (s *Session) CheckConflicts(
 				professionalConflicts = append(professionalConflicts, session)
 			}
 
-			// Check local conflict (if both sessions are presential)
+			// Check local conflict - only one activity allowed per local at a time
 			if req.LocalId != nil && session.LocalId != nil && *session.LocalId == *req.LocalId {
 				localConflicts = append(localConflicts, session)
 			}
