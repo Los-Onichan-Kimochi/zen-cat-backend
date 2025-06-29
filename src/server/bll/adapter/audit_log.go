@@ -32,6 +32,7 @@ func (a *AuditLog) LogAuditEvent(
 	context schemas.AuditContext,
 	event schemas.AuditEvent,
 ) *errors.Error {
+
 	if err := a.DaoPostgresql.AuditLog.LogAuditEvent(
 		context.UserId,
 		context.UserEmail,
@@ -176,7 +177,7 @@ func (a *AuditLog) GetAuditLogById(id uuid.UUID) (*schemas.AuditLog, *errors.Err
 }
 
 // GetAuditStats returns statistics about audit logs
-func (a *AuditLog) GetAuditStats(daysStr string) (*schemas.AuditStats, *errors.Error) {
+func (a *AuditLog) GetAuditStats(daysStr string, successFilter *bool) (*schemas.AuditStats, *errors.Error) {
 	days := 30 // Default to 30 days
 	if daysStr != "" {
 		if parsedDays, err := strconv.Atoi(daysStr); err == nil && parsedDays > 0 {
@@ -184,7 +185,7 @@ func (a *AuditLog) GetAuditStats(daysStr string) (*schemas.AuditStats, *errors.E
 		}
 	}
 
-	statsData, err := a.DaoPostgresql.AuditLog.GetAuditStats(days)
+	statsData, err := a.DaoPostgresql.AuditLog.GetAuditStats(days, successFilter)
 	if err != nil {
 		a.logger.Error("Failed to get audit stats: ", err)
 		return nil, &errors.InternalServerError.Default
@@ -195,6 +196,7 @@ func (a *AuditLog) GetAuditStats(daysStr string) (*schemas.AuditStats, *errors.E
 		TotalEvents:  statsData["total_events"].(int64),
 		SuccessCount: statsData["success_count"].(int64),
 		FailureCount: statsData["failure_count"].(int64),
+		ActiveUsers:  statsData["active_users"].(int64),
 	}
 
 	// Convert actions

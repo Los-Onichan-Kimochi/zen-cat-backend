@@ -9,6 +9,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -83,6 +84,9 @@ func (cp *CommunityPlan) DeletePostgresqlCommunityPlan(
 ) *errors.Error {
 	err := cp.DaoPostgresql.CommunityPlan.DeleteCommunityPlan(communityId, planId)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.CommunityPlanNotFound
+		}
 		return &errors.BadRequestError.CommunityPlanNotDeleted
 	}
 

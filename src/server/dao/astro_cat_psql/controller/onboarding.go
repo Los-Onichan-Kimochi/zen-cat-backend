@@ -69,9 +69,10 @@ func (o *Onboarding) UpdateOnboarding(
 	phoneNumber *string,
 	birthDate *time.Time,
 	gender *model.Gender,
-	city *string,
 	postalCode *string,
 	district *string,
+	province *string,
+	region *string,
 	address *string,
 	updatedBy string,
 ) (*model.Onboarding, error) {
@@ -94,9 +95,6 @@ func (o *Onboarding) UpdateOnboarding(
 	if gender != nil {
 		updateFields["gender"] = *gender
 	}
-	if city != nil {
-		updateFields["city"] = *city
-	}
 	if postalCode != nil {
 		updateFields["postal_code"] = *postalCode
 	}
@@ -106,7 +104,12 @@ func (o *Onboarding) UpdateOnboarding(
 	if address != nil {
 		updateFields["address"] = *address
 	}
-
+	if province != nil {
+		updateFields["province"] = *province
+	}
+	if region != nil {
+		updateFields["region"] = *region
+	}
 	var onboarding model.Onboarding
 	if len(updateFields) == 1 {
 		if err := o.PostgresqlDB.First(&onboarding, "id = ?", id).Error; err != nil {

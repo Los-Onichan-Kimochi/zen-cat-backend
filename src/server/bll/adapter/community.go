@@ -7,6 +7,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
+	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
 
@@ -32,7 +33,10 @@ func (c *Community) GetPostgresqlCommunity(
 ) (*schemas.Community, *errors.Error) {
 	communityModel, err := c.DaoPostgresql.Community.GetCommunity(communityId)
 	if err != nil {
-		return nil, &errors.ObjectNotFoundError.CommunityNotFound
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.CommunityNotFound
+		}
+		return nil, &errors.BadRequestError.CommunityNotCreated
 	}
 
 	return &schemas.Community{
@@ -65,7 +69,7 @@ func (c *Community) FetchPostgresqlCommunities() ([]*schemas.Community, *errors.
 	return communities, nil
 }
 
-// Creates a community into postgresql DB and returns it.
+// Creates a community.
 func (c *Community) CreatePostgresqlCommunity(
 	name string,
 	purpose string,
@@ -74,6 +78,17 @@ func (c *Community) CreatePostgresqlCommunity(
 ) (*schemas.Community, *errors.Error) {
 	if updatedBy == "" {
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
+	}
+
+	// Validate name is not empty
+	if name == "" {
+		return nil, &errors.BadRequestError.InvalidCommunityName
+	}
+
+	// Check for duplicate community name
+	existingCommunity, _ := c.DaoPostgresql.Community.GetCommunityByName(name)
+	if existingCommunity != nil {
+		return nil, &errors.BadRequestError.DuplicateCommunityName
 	}
 
 	communityModel := &model.Community{
@@ -141,7 +156,7 @@ func (c *Community) BulkCreatePostgresqlCommunities(
 	return communities, nil
 }
 
-// Updates a community given fields in postgresql DB and returns it.
+// Updates a community from a Postgresql DB given its ID and adapts it to a community schema.
 func (c *Community) UpdatePostgresqlCommunity(
 	id uuid.UUID,
 	name *string,
@@ -153,14 +168,11 @@ func (c *Community) UpdatePostgresqlCommunity(
 		return nil, &errors.BadRequestError.InvalidUpdatedByValue
 	}
 
-	communityModel, err := c.DaoPostgresql.Community.UpdateCommunity(
-		id,
-		name,
-		purpose,
-		imageUrl,
-		updatedBy,
-	)
+	communityModel, err := c.DaoPostgresql.Community.UpdateCommunity(id, name, purpose, imageUrl, updatedBy)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, &errors.ObjectNotFoundError.CommunityNotFound
+		}
 		return nil, &errors.BadRequestError.CommunityNotUpdated
 	}
 
@@ -177,6 +189,9 @@ func (c *Community) UpdatePostgresqlCommunity(
 func (c *Community) DeletePostgresqlCommunity(communityId uuid.UUID) *errors.Error {
 	err := c.DaoPostgresql.Community.DeleteCommunity(communityId)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &errors.ObjectNotFoundError.CommunityNotFound
+		}
 		return &errors.BadRequestError.CommunityNotSoftDeleted
 	}
 

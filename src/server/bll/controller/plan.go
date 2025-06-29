@@ -64,6 +64,11 @@ func (p *Plan) CreatePlan(
 		return nil, &errors.BadRequestError.InvalidPlanType
 	}
 
+	// Validate fee is not negative
+	if createPlanData.Fee < 0 {
+		return nil, &errors.BadRequestError.PlanNotCreated
+	}
+
 	return p.Adapter.Plan.CreatePostgresqlPlan(
 		createPlanData.Fee,
 		createPlanData.Type,

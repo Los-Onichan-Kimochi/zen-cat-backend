@@ -18,6 +18,7 @@ const (
 
 	// User actions
 	AuditActionLogin             AuditActionType = "LOGIN"
+	AuditActionLogout            AuditActionType = "LOGOUT"
 	AuditActionRegister          AuditActionType = "REGISTER"
 	AuditActionSubscribe         AuditActionType = "SUBSCRIBE"
 	AuditActionUnsubscribe       AuditActionType = "UNSUBSCRIBE"
@@ -59,7 +60,7 @@ type AuditLog struct {
 	IPAddress      string          `gorm:"size:45"`                // User's IP address
 	UserAgent      *string         `gorm:"size:500"`               // User's browser/client info
 	AdditionalInfo *string         `gorm:"type:text"`              // Additional context (e.g., bulk operation details)
-	Success        bool            `gorm:"not null;default:true"`  // Whether the action was successful
+	Success        bool            `gorm:"not null"`               // Whether the action was successful
 	ErrorMessage   *string         `gorm:"size:1000"`              // Error message if action failed
 	CreatedAt      time.Time       `gorm:"autoCreateTime;index"`   // When the action occurred
 

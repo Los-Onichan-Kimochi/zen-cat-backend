@@ -38,6 +38,7 @@ func (s *Session) CreatePostgresqlSession(
 	sessionLink *string,
 	professionalId uuid.UUID,
 	localId *uuid.UUID,
+	communityServiceId *uuid.UUID,
 	updatedBy string,
 ) (*schemas.Session, *errors.Error) {
 	if updatedBy == "" {
@@ -56,6 +57,7 @@ func (s *Session) CreatePostgresqlSession(
 		SessionLink:     sessionLink,
 		ProfessionalId:  professionalId,
 		LocalId:         localId,
+		CommunityServiceId: communityServiceId,
 		AuditFields: model.AuditFields{
 			UpdatedBy: updatedBy,
 		},
@@ -78,6 +80,7 @@ func (s *Session) CreatePostgresqlSession(
 		SessionLink:     sessionModel.SessionLink,
 		ProfessionalId:  sessionModel.ProfessionalId,
 		LocalId:         sessionModel.LocalId,
+		CommunityServiceId: sessionModel.CommunityServiceId,
 	}, nil
 }
 
@@ -100,6 +103,7 @@ func (s *Session) GetPostgresqlSession(sessionId uuid.UUID) (*schemas.Session, *
 		SessionLink:     sessionModel.SessionLink,
 		ProfessionalId:  sessionModel.ProfessionalId,
 		LocalId:         sessionModel.LocalId,
+		CommunityServiceId: sessionModel.CommunityServiceId,
 	}, nil
 }
 
@@ -116,6 +120,7 @@ func (s *Session) UpdatePostgresqlSession(
 	sessionLink *string,
 	professionalId *uuid.UUID,
 	localId *uuid.UUID,
+	communityServiceId *uuid.UUID,
 	updatedBy string,
 ) (*schemas.Session, *errors.Error) {
 	if updatedBy == "" {
@@ -135,6 +140,7 @@ func (s *Session) UpdatePostgresqlSession(
 		sessionLink,
 		professionalId,
 		localId,
+		communityServiceId,
 		updatedBy,
 	)
 	if err != nil {
@@ -153,6 +159,7 @@ func (s *Session) UpdatePostgresqlSession(
 		SessionLink:     sessionModel.SessionLink,
 		ProfessionalId:  sessionModel.ProfessionalId,
 		LocalId:         sessionModel.LocalId,
+		CommunityServiceId: sessionModel.CommunityServiceId,
 	}, nil
 }
 
@@ -170,9 +177,10 @@ func (s *Session) DeletePostgresqlSession(sessionId uuid.UUID) *errors.Error {
 func (s *Session) FetchPostgresqlSessions(
 	professionalIds []uuid.UUID,
 	localIds []uuid.UUID,
+	communityServiceIds []uuid.UUID,
 	states []string,
 ) ([]*schemas.Session, *errors.Error) {
-	sessionModels, err := s.DaoPostgresql.Session.FetchSessions(professionalIds, localIds, states)
+	sessionModels, err := s.DaoPostgresql.Session.FetchSessions(professionalIds, localIds, communityServiceIds, states)
 	if err != nil {
 		return nil, &errors.ObjectNotFoundError.SessionNotFound
 	}
@@ -191,6 +199,7 @@ func (s *Session) FetchPostgresqlSessions(
 			SessionLink:     sessionModel.SessionLink,
 			ProfessionalId:  sessionModel.ProfessionalId,
 			LocalId:         sessionModel.LocalId,
+			CommunityServiceId: sessionModel.CommunityServiceId,
 		}
 	}
 
@@ -220,6 +229,7 @@ func (s *Session) BulkCreatePostgresqlSessions(
 			SessionLink:     sessionData.SessionLink,
 			ProfessionalId:  sessionData.ProfessionalId,
 			LocalId:         sessionData.LocalId,
+			CommunityServiceId: sessionData.CommunityServiceId,
 			AuditFields: model.AuditFields{
 				UpdatedBy: updatedBy,
 			},
@@ -244,6 +254,7 @@ func (s *Session) BulkCreatePostgresqlSessions(
 			SessionLink:     sessionModel.SessionLink,
 			ProfessionalId:  sessionModel.ProfessionalId,
 			LocalId:         sessionModel.LocalId,
+			CommunityServiceId: sessionModel.CommunityServiceId,
 		}
 	}
 

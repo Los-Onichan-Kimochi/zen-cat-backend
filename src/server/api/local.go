@@ -112,6 +112,11 @@ func (a *Api) BulkCreateLocals(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	// Check for missing Locals field which means invalid JSON binding
+	if request.Locals == nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
 	response, newErr := a.BllController.Local.BulkCreateLocals(
 		request.Locals,
 		updatedBy,
@@ -202,6 +207,11 @@ func (a *Api) DeleteLocal(c echo.Context) error {
 func (a *Api) BulkDeleteLocals(c echo.Context) error {
 	var request schemas.BulkDeleteLocalRequest
 	if err := c.Bind(&request); err != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	// Check for missing Locals field which means invalid JSON binding
+	if request.Locals == nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 

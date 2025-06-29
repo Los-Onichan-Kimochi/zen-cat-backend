@@ -33,6 +33,7 @@ definitions:
     - BULK_CREATE
     - BULK_DELETE
     - LOGIN
+    - LOGOUT
     - REGISTER
     - SUBSCRIBE
     - UNSUBSCRIBE
@@ -47,6 +48,7 @@ definitions:
     - AuditActionBulkCreate
     - AuditActionBulkDelete
     - AuditActionLogin
+    - AuditActionLogout
     - AuditActionRegister
     - AuditActionSubscribe
     - AuditActionUnsubscribe
@@ -143,6 +145,8 @@ definitions:
         items:
           $ref: '#/definitions/schemas.ActionStat'
         type: array
+      active_users:
+        type: integer
       entity_types:
         items:
           $ref: '#/definitions/schemas.EntityTypeStat'
@@ -340,14 +344,20 @@ definitions:
     - email
     - new_password
     type: object
+  schemas.ChangeUserRoleRequest:
+    properties:
+      rol:
+        $ref: '#/definitions/schemas.UserRol'
+    type: object
   schemas.CheckConflictRequest:
     properties:
+      community_service_id:
+        type: string
       date:
         type: string
       end_time:
         type: string
       exclude_id:
-        description: Para excluir sesión en modo edición
         type: string
       local_id:
         type: string
@@ -499,15 +509,44 @@ definitions:
       street_name:
         type: string
     type: object
+  schemas.CreateMembershipForUserRequest:
+    properties:
+      community_id:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      plan_id:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/schemas.MembershipStatus'
+    type: object
+  schemas.CreateMembershipRequest:
+    properties:
+      community_id:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      plan_id:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/schemas.MembershipStatus'
+      user_id:
+        type: string
+    type: object
   schemas.CreateOnboardingRequest:
     properties:
       address:
         type: string
       birth_date:
         description: Datos personales adicionales
-        type: string
-      city:
-        description: Dirección
         type: string
       district:
         type: string
@@ -523,11 +562,14 @@ definitions:
         description: Contacto
         type: string
       postal_code:
+        description: Dirección
+        type: string
+      province:
+        type: string
+      region:
         type: string
     required:
     - address
-    - city
-    - district
     - document_number
     - document_type
     - phone_number
@@ -563,6 +605,8 @@ definitions:
     type: object
   schemas.CreateReservationRequest:
     properties:
+      membership_id:
+        type: string
       name:
         type: string
       reservation_time:
@@ -609,6 +653,8 @@ definitions:
     properties:
       capacity:
         type: integer
+      community_service_id:
+        type: string
       date:
         type: string
       end_time:
@@ -779,6 +825,8 @@ definitions:
     properties:
       community:
         $ref: '#/definitions/schemas.Community'
+      community_id:
+        type: string
       description:
         type: string
       end_date:
@@ -787,10 +835,16 @@ definitions:
         type: string
       plan:
         $ref: '#/definitions/schemas.Plan'
+      plan_id:
+        type: string
       start_date:
         type: string
       status:
         $ref: '#/definitions/schemas.MembershipStatus'
+      user:
+        $ref: '#/definitions/schemas.User'
+      user_id:
+        type: string
     type: object
   schemas.MembershipStatus:
     enum:
@@ -802,15 +856,19 @@ definitions:
     - MembershipStatusActive
     - MembershipStatusExpired
     - MembershipStatusCancelled
+  schemas.Memberships:
+    properties:
+      memberships:
+        items:
+          $ref: '#/definitions/schemas.Membership'
+        type: array
+    type: object
   schemas.Onboarding:
     properties:
       address:
         type: string
       birth_date:
         description: Datos personales adicionales
-        type: string
-      city:
-        description: Dirección
         type: string
       district:
         type: string
@@ -828,6 +886,13 @@ definitions:
         description: Contacto
         type: string
       postal_code:
+        description: Dirección
+        type: string
+      province:
+        type: string
+      region:
+        type: string
+      user_id:
         type: string
     type: object
   schemas.Onboardings:
@@ -910,6 +975,8 @@ definitions:
         type: string
       last_modification:
         type: string
+      membership_id:
+        type: string
       name:
         type: string
       reservation_time:
@@ -984,6 +1051,8 @@ definitions:
     properties:
       capacity:
         type: integer
+      community_service_id:
+        type: string
       date:
         type: string
       end_time:
@@ -1067,15 +1136,29 @@ definitions:
       street_name:
         type: string
     type: object
+  schemas.UpdateMembershipRequest:
+    properties:
+      community_id:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      plan_id:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/schemas.MembershipStatus'
+      user_id:
+        type: string
+    type: object
   schemas.UpdateOnboardingRequest:
     properties:
       address:
         type: string
       birth_date:
         description: Datos personales adicionales
-        type: string
-      city:
-        description: Dirección
         type: string
       district:
         type: string
@@ -1091,6 +1174,11 @@ definitions:
         description: Contacto
         type: string
       postal_code:
+        description: Dirección
+        type: string
+      province:
+        type: string
+      region:
         type: string
     type: object
   schemas.UpdatePlanRequest:
@@ -1123,6 +1211,8 @@ definitions:
     type: object
   schemas.UpdateReservationRequest:
     properties:
+      membership_id:
+        type: string
       name:
         type: string
       reservation_time:
@@ -1149,6 +1239,8 @@ definitions:
     properties:
       capacity:
         type: integer
+      community_service_id:
+        type: string
       date:
         type: string
       end_time:
@@ -1216,6 +1308,21 @@ definitions:
       second_last_name:
         type: string
     type: object
+  schemas.UserConnection:
+    properties:
+      connection_ip:
+        type: string
+      last_login:
+        type: string
+      role:
+        $ref: '#/definitions/schemas.UserRol'
+      user_email:
+        type: string
+      user_id:
+        type: string
+      user_name:
+        type: string
+    type: object
   schemas.UserProfile:
     properties:
       email:
@@ -1237,16 +1344,44 @@ definitions:
     enum:
     - ADMINISTRATOR
     - CLIENT
+    - GUEST
     type: string
     x-enum-varnames:
     - UserRolAdmin
     - UserRolClient
+    - UserRolGuest
+  schemas.UserRoleDistribution:
+    properties:
+      count:
+        type: integer
+      role:
+        $ref: '#/definitions/schemas.UserRol'
+    type: object
   schemas.UserRoleStat:
     properties:
       count:
         type: integer
       user_role:
         type: string
+    type: object
+  schemas.UserStats:
+    properties:
+      admin_count:
+        type: integer
+      client_count:
+        type: integer
+      guest_count:
+        type: integer
+      recent_connections:
+        items:
+          $ref: '#/definitions/schemas.UserConnection'
+        type: array
+      role_distribution:
+        items:
+          $ref: '#/definitions/schemas.UserRoleDistribution'
+        type: array
+      total_users:
+        type: integer
     type: object
   schemas.Users:
     properties:
@@ -1265,8 +1400,6 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1283,8 +1416,6 @@ definitions:
     - Second
     - Minute
     - Hour
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -1472,6 +1603,27 @@ paths:
       summary: Get Audit Statistics
       tags:
       - AuditLog
+  /auth/logout/:
+    post:
+      consumes:
+      - application/json
+      description: Logout user session (audit purposes)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            type: string
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: User logout
+      tags:
+      - Auth
   /auth/refresh/:
     post:
       consumes:
@@ -1856,6 +2008,47 @@ paths:
       security:
       - JWT: []
       summary: Create CommunityService.
+      tags:
+      - CommunityService
+  /community-service/{communityId}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all services that are linked to a given community, based
+        on the community ID.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Service'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (No services associated with the given community
+            ID)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get all services associated with a specific community.
       tags:
       - CommunityService
   /community-service/{communityId}/{serviceId}/:
@@ -2244,7 +2437,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Gets a community given its id with its image.
+      description: Get community information with image bytes.
       parameters:
       - description: Community ID
         in: path
@@ -2371,6 +2564,145 @@ paths:
       summary: Bulk Delete Communities.
       tags:
       - Community
+  /error-log/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve error logs with optional filtering and pagination
+      parameters:
+      - description: Comma-separated user IDs
+        in: query
+        name: userIds
+        type: string
+      - description: Comma-separated action types
+        in: query
+        name: actions
+        type: string
+      - description: Comma-separated entity types
+        in: query
+        name: entityTypes
+        type: string
+      - description: Comma-separated user roles
+        in: query
+        name: userRoles
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: startDate
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: endDate
+        type: string
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        type: string
+      - description: 'Page size (default: 50, max: 200)'
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.AuditLogs'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Error Logs
+      tags:
+      - ErrorLog
+  /error-log/{auditLogId}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific error log by its ID
+      parameters:
+      - description: Audit Log ID
+        in: path
+        name: auditLogId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.AuditLog'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Error Log by ID
+      tags:
+      - ErrorLog
+  /error-log/stats/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve error statistics for the specified time period
+      parameters:
+      - description: 'Number of days to include in stats (default: 30)'
+        in: query
+        name: days
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.AuditStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Error Statistics
+      tags:
+      - ErrorLog
   /forgot-password/:
     post:
       consumes:
@@ -2778,6 +3110,353 @@ paths:
       summary: Get Current User Info
       tags:
       - Login
+  /membership/:
+    get:
+      consumes:
+      - application/json
+      description: Fetch all memberships.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Memberships'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Fetch Memberships.
+      tags:
+      - Membership
+    post:
+      consumes:
+      - application/json
+      description: Creates a new membership.
+      parameters:
+      - description: Create Membership Request
+        in: body
+        name: createMembershipRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateMembershipRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Membership'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Membership.
+      tags:
+      - Membership
+  /membership/{membershipId}/:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a membership given its id.
+      parameters:
+      - description: Membership ID
+        in: path
+        name: membershipId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Delete Membership by ID.
+      tags:
+      - Membership
+    get:
+      consumes:
+      - application/json
+      description: Gets a membership given its id.
+      parameters:
+      - description: Membership ID
+        in: path
+        name: membershipId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Membership'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Membership by ID.
+      tags:
+      - Membership
+    patch:
+      consumes:
+      - application/json
+      description: Updates a membership given its id.
+      parameters:
+      - description: Membership ID
+        in: path
+        name: membershipId
+        required: true
+        type: string
+      - description: Update Membership Request
+        in: body
+        name: updateMembershipRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateMembershipRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Membership'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Update Membership by ID.
+      tags:
+      - Membership
+  /membership/community/{communityId}/:
+    get:
+      consumes:
+      - application/json
+      description: Gets all memberships for a given community id.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Memberships'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Memberships by Community ID.
+      tags:
+      - Membership
+  /membership/user/{userId}/:
+    get:
+      consumes:
+      - application/json
+      description: Gets all memberships for a given user id.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Memberships'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Memberships by User ID.
+      tags:
+      - Membership
+    post:
+      consumes:
+      - application/json
+      description: Creates a new membership for a specific user.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Create Membership For User Request
+        in: body
+        name: createMembershipForUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateMembershipForUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/schemas.Membership'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Create Membership for User.
+      tags:
+      - Membership
   /onboarding/:
     get:
       consumes:
@@ -4839,6 +5518,13 @@ paths:
         name: localIds
         type: array
       - collectionFormat: csv
+        description: Community Service IDs
+        in: query
+        items:
+          type: string
+        name: communityServiceIds
+        type: array
+      - collectionFormat: csv
         description: Session States
         in: query
         items:
@@ -5430,6 +6116,59 @@ paths:
       summary: Update User.
       tags:
       - User
+  /user/{userId}/role/:
+    patch:
+      consumes:
+      - application/json
+      description: Changes the role of a user given its id.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Change Role Request
+        in: body
+        name: changeRoleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ChangeUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "403":
+          description: Forbidden - Admin role required
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Change User Role.
+      tags:
+      - User
   /user/bulk-create/:
     post:
       consumes:
@@ -5549,7 +6288,7 @@ paths:
       summary: Change password with email
       tags:
       - User
-  /user/check-exists:
+  /user/check-email/:
     get:
       consumes:
       - application/json
@@ -5586,6 +6325,39 @@ paths:
       security:
       - JWT: []
       summary: Check User Exists by Email.
+      tags:
+      - User
+  /user/stats/:
+    get:
+      consumes:
+      - application/json
+      description: Get user statistics including role distribution and recent connections.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserStats'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "403":
+          description: Forbidden - Admin role required
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get User Statistics.
       tags:
       - User
 swagger: "2.0"

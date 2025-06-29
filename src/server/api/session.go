@@ -46,6 +46,7 @@ func (a *Api) GetSession(c echo.Context) error {
 // @Security			JWT
 // @Param 				professionalIds query []string false "Professional IDs"
 // @Param 				localIds query []string false "Local IDs"
+// @Param 				communityServiceIds query []string false "Community Service IDs"
 // @Param 				states query []string false "Session States"
 // @Success 			200 {object} schemas.Sessions "OK"
 // @Failure 			400 {object} errors.Error "Bad Request"
@@ -57,6 +58,7 @@ func (a *Api) GetSession(c echo.Context) error {
 func (a *Api) FetchSessions(c echo.Context) error {
 	professionalIdsString := c.QueryParam("professionalIds")
 	localIdsString := c.QueryParam("localIds")
+	communityServiceIdsString := c.QueryParam("communityServiceIds")
 	statesString := c.QueryParam("states")
 
 	professionalIds := []string{}
@@ -68,13 +70,18 @@ func (a *Api) FetchSessions(c echo.Context) error {
 	if localIdsString != "" {
 		localIds = strings.Split(localIdsString, ",")
 	}
+	
+	communityServiceIds := []string{}
+	if communityServiceIdsString != "" {
+		communityServiceIds = strings.Split(communityServiceIdsString, ",")
+	}
 
 	states := []string{}
 	if statesString != "" {
 		states = strings.Split(statesString, ",")
 	}
 
-	response, err := a.BllController.Session.FetchSessions(professionalIds, localIds, states)
+	response, err := a.BllController.Session.FetchSessions(professionalIds, localIds, communityServiceIds, states)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}

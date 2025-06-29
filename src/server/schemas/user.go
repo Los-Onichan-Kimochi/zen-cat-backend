@@ -7,6 +7,7 @@ type UserRol string
 const (
 	UserRolAdmin  UserRol = "ADMINISTRATOR"
 	UserRolClient UserRol = "CLIENT"
+	UserRolGuest  UserRol = "GUEST"
 )
 
 type User struct {
@@ -66,4 +67,33 @@ type ChangePasswordInput struct {
 type CheckUserExistsResponse struct {
 	Email  string `json:"email"`
 	Exists bool   `json:"exists"`
+}
+
+// Schema for role management
+type ChangeUserRoleRequest struct {
+	Rol UserRol `json:"rol"`
+}
+
+// Schema for user statistics
+type UserStats struct {
+	TotalUsers        int64                  `json:"total_users"`
+	AdminCount        int64                  `json:"admin_count"`
+	ClientCount       int64                  `json:"client_count"`
+	GuestCount        int64                  `json:"guest_count"`
+	RoleDistribution  []UserRoleDistribution `json:"role_distribution"`
+	RecentConnections []UserConnection       `json:"recent_connections"`
+}
+
+type UserRoleDistribution struct {
+	Role  UserRol `json:"role"`
+	Count int64   `json:"count"`
+}
+
+type UserConnection struct {
+	UserId       uuid.UUID `json:"user_id"`
+	UserEmail    string    `json:"user_email"`
+	UserName     string    `json:"user_name"`
+	Role         UserRol   `json:"role"`
+	LastLogin    *string   `json:"last_login"`
+	ConnectionIP *string   `json:"connection_ip"`
 }

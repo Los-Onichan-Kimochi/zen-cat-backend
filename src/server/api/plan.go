@@ -214,6 +214,12 @@ func (a *Api) BulkDeletePlans(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	// Validate that request has plans
+	if len(request.Plans) == 0 {
+		// Empty list is valid and should return 204
+		return c.NoContent(http.StatusNoContent)
+	}
+
 	if err := a.BllController.Plan.BulkDeletePlans(request); err != nil {
 		return errors.HandleError(*err, c)
 	}

@@ -69,9 +69,10 @@ func (o *Onboarding) CreateOnboardingForUser(
 		createOnboardingRequest.PhoneNumber,
 		birthDateStr,
 		createOnboardingRequest.Gender,
-		createOnboardingRequest.City,
 		createOnboardingRequest.PostalCode,
 		createOnboardingRequest.District,
+		createOnboardingRequest.Province,
+		createOnboardingRequest.Region,
 		createOnboardingRequest.Address,
 		updatedBy,
 	)
@@ -96,9 +97,10 @@ func (o *Onboarding) UpdateOnboarding(
 		updateOnboardingRequest.PhoneNumber,
 		birthDateStr,
 		updateOnboardingRequest.Gender,
-		updateOnboardingRequest.City,
 		updateOnboardingRequest.PostalCode,
 		updateOnboardingRequest.District,
+		updateOnboardingRequest.Province,
+		updateOnboardingRequest.Region,
 		updateOnboardingRequest.Address,
 		updatedBy,
 	)
