@@ -205,3 +205,129 @@ func TestCreateReservationDuplicateUserSession(t *testing.T) {
 		assert.Nil(t, err)
 	}
 }
+
+func TestCreateReservationUserTimeConflict(t *testing.T) {
+	// GIVEN: User already has reservation for a different session at the same time
+	controller, _, db := controllerTest.NewReservationControllerTestWrapper(t)
+
+	// Create dependencies
+	testUser := factories.NewUserModel(db, factories.UserModelF{})
+	testProfessional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
+	testLocal := factories.NewLocalModel(db, factories.LocalModelF{})
+
+	// Create two sessions at the same time
+	sessionDate := time.Now().Add(24 * time.Hour)
+	session1StartTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 10, 0, 0, 0, time.UTC)
+	session1EndTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 11, 0, 0, 0, time.UTC)
+	session2StartTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 10, 30, 0, 0, time.UTC) // Overlaps
+	session2EndTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 11, 30, 0, 0, time.UTC)
+
+	session1 := factories.NewSessionModel(db, factories.SessionModelF{
+		ProfessionalId: &testProfessional.Id,
+		LocalId:        &testLocal.Id,
+		Date:           &sessionDate,
+		StartTime:      &session1StartTime,
+		EndTime:        &session1EndTime,
+	})
+
+	session2 := factories.NewSessionModel(db, factories.SessionModelF{
+		ProfessionalId: &testProfessional.Id,
+		LocalId:        &testLocal.Id,
+		Date:           &sessionDate,
+		StartTime:      &session2StartTime,
+		EndTime:        &session2EndTime,
+	})
+
+	// Create first reservation
+	createRequest1 := schemas.CreateReservationRequest{
+		Name:            "First Reservation",
+		ReservationTime: sessionDate,
+		State:           "CONFIRMED",
+		UserId:          testUser.Id,
+		SessionId:       session1.Id,
+	}
+
+	// Create second reservation (conflicting time)
+	createRequest2 := schemas.CreateReservationRequest{
+		Name:            "Second Reservation",
+		ReservationTime: sessionDate,
+		UserId:          testUser.Id,
+		SessionId:       session2.Id,
+	}
+
+	// Create first reservation
+	_, err1 := controller.CreateReservation(createRequest1, "test_admin")
+	assert.Nil(t, err1)
+
+	// WHEN: CreateReservation is called for same user but different session at overlapping time
+	result, err := controller.CreateReservation(createRequest2, "test_admin")
+
+	// THEN: Should return conflict error
+	assert.NotNil(t, err)
+	assert.Nil(t, result)
+	assert.Equal(t, "CONFLICT_ERROR_002", err.Code)
+	assert.Contains(t, err.Message, "User has another reservation at the same time")
+}
+
+func TestCreateReservationUserDifferentTimes(t *testing.T) {
+	// GIVEN: User has reservation for a session at a different time
+	controller, _, db := controllerTest.NewReservationControllerTestWrapper(t)
+
+	// Create dependencies
+	testUser := factories.NewUserModel(db, factories.UserModelF{})
+	testProfessional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
+	testLocal := factories.NewLocalModel(db, factories.LocalModelF{})
+
+	// Create two sessions at different times
+	sessionDate := time.Now().Add(24 * time.Hour)
+	session1StartTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 10, 0, 0, 0, time.UTC)
+	session1EndTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 11, 0, 0, 0, time.UTC)
+	session2StartTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 14, 0, 0, 0, time.UTC) // Different time
+	session2EndTime := time.Date(sessionDate.Year(), sessionDate.Month(), sessionDate.Day(), 15, 0, 0, 0, time.UTC)
+
+	session1 := factories.NewSessionModel(db, factories.SessionModelF{
+		ProfessionalId: &testProfessional.Id,
+		LocalId:        &testLocal.Id,
+		Date:           &sessionDate,
+		StartTime:      &session1StartTime,
+		EndTime:        &session1EndTime,
+	})
+
+	session2 := factories.NewSessionModel(db, factories.SessionModelF{
+		ProfessionalId: &testProfessional.Id,
+		LocalId:        &testLocal.Id,
+		Date:           &sessionDate,
+		StartTime:      &session2StartTime,
+		EndTime:        &session2EndTime,
+	})
+
+	// Create first reservation
+	createRequest1 := schemas.CreateReservationRequest{
+		Name:            "First Reservation",
+		ReservationTime: sessionDate,
+		UserId:          testUser.Id,
+		SessionId:       session1.Id,
+	}
+
+	// Create second reservation (different time)
+	createRequest2 := schemas.CreateReservationRequest{
+		Name:            "Second Reservation",
+		ReservationTime: sessionDate,
+		UserId:          testUser.Id,
+		SessionId:       session2.Id,
+	}
+
+	// Create first reservation
+	_, err1 := controller.CreateReservation(createRequest1, "test_admin")
+	assert.Nil(t, err1)
+
+	// WHEN: CreateReservation is called for same user but different session at different time
+	result, err := controller.CreateReservation(createRequest2, "test_admin")
+
+	// THEN: Should succeed
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, createRequest2.Name, result.Name)
+	assert.Equal(t, createRequest2.UserId, result.UserId)
+	assert.Equal(t, createRequest2.SessionId, result.SessionId)
+}

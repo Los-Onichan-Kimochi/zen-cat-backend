@@ -427,6 +427,7 @@ var (
 		ServiceLocalAlreadyExists        Error
 		UserAlreadyExists                Error
 		SessionTimeConflict              Error
+		UserReservationTimeConflict      Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -451,6 +452,10 @@ var (
 		SessionTimeConflict: Error{
 			Code:    "CONFLICT_ERROR_001",
 			Message: "Session time conflict detected",
+		},
+		UserReservationTimeConflict: Error{
+			Code:    "CONFLICT_ERROR_002",
+			Message: "User has another reservation at the same time",
 		},
 	}
 

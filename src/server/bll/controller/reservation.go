@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
@@ -125,6 +127,34 @@ func (r *Reservation) CreateReservation(
 		}
 	}
 
+	// Check for user reservation conflicts (user cannot be in two sessions at the same time)
+	userReservations, reservationErr := r.Adapter.Reservation.FetchPostgresqlReservations(
+		[]uuid.UUID{createReservationData.UserId},
+		[]uuid.UUID{},
+		[]string{"CONFIRMED"}, // Only CONFIRMED reservations block new reservations
+	)
+	if reservationErr != nil {
+		return nil, reservationErr
+	}
+
+	// Check each existing reservation for time conflicts
+	for _, existingReservation := range userReservations {
+		if existingReservation.SessionId == createReservationData.SessionId {
+			continue
+		}
+
+		existingSession, existingSessionErr := r.Adapter.Session.GetPostgresqlSession(existingReservation.SessionId)
+		if existingSessionErr != nil {
+			continue
+		}
+
+		if r.isSameDate(session.Date, existingSession.Date) {
+			if r.hasTimeOverlap(session.StartTime, session.EndTime, existingSession.StartTime, existingSession.EndTime) {
+				return nil, &errors.ConflictError.UserReservationTimeConflict
+			}
+		}
+	}
+
 	// Modify `registered_count` field of the session
 	session.RegisteredCount++
 	_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
@@ -208,4 +238,16 @@ func (r *Reservation) BulkDeleteReservations(
 	return r.Adapter.Reservation.BulkDeletePostgresqlReservations(
 		bulkDeleteReservationData.Reservations,
 	)
+}
+
+// Helper function to check if two dates are the same day
+func (r *Reservation) isSameDate(date1, date2 time.Time) bool {
+	y1, m1, d1 := date1.Date()
+	y2, m2, d2 := date2.Date()
+	return y1 == y2 && m1 == m2 && d1 == d2
+}
+
+// Helper function to check if two time ranges overlap
+func (r *Reservation) hasTimeOverlap(start1, end1, start2, end2 time.Time) bool {
+	return start1.Before(end2) && end1.After(start2)
 }
