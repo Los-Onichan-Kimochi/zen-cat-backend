@@ -75,6 +75,14 @@ func NewEnvSettings(logger logging.Logger) *EnvSettings {
 	}
 
 	mainPort := os.Getenv("MAIN_PORT")
+	// Railway uses PORT environment variable
+	if mainPort == "" {
+		mainPort = os.Getenv("PORT")
+	}
+	// Default port if none is specified
+	if mainPort == "" {
+		mainPort = "8080"
+	}
 
 	astroCatPostgresHost := os.Getenv("ASTRO_CAT_POSTGRES_HOST")
 	astroCatPostgresPort := os.Getenv("ASTRO_CAT_POSTGRES_PORT")

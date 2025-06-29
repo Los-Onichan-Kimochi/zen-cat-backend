@@ -39,13 +39,6 @@ astrocat-backend
 *.coverage
 coverage.out
 
-# Node modules (si hay frontend tools)
-node_modules/
-
-# Temporary files
-*.tmp
-*.temp
-
 # Docker
 Dockerfile
 .dockerignore
@@ -60,4 +53,4 @@ Makefile
 
 # Test files
 *_test.go
-tests/ 
+tests/
