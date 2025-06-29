@@ -10,10 +10,5 @@
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 5
-  },
-  "variables": {
-    "ENABLE_SQL_LOGS": "false",
-    "ENABLE_SWAGGER": "true",
-    "MAIN_PORT": "8080"
   }
 }
