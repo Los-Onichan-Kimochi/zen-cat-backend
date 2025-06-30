@@ -26,7 +26,6 @@ type Membership struct {
 	User        User             `json:"user"`
 	PlanId      uuid.UUID        `json:"plan_id"`
 	Plan        Plan             `json:"plan"`
-	User        User             `json:"user"`
 }
 
 type Memberships struct {
