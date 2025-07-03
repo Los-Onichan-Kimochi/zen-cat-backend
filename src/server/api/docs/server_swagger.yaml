@@ -496,6 +496,10 @@ definitions:
         type: integer
       district:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       local_name:
@@ -784,6 +788,33 @@ definitions:
         type: string
       id:
         type: string
+      image_url:
+        type: string
+      local_name:
+        type: string
+      province:
+        type: string
+      reference:
+        type: string
+      region:
+        type: string
+      street_name:
+        type: string
+    type: object
+  schemas.LocalWithImage:
+    properties:
+      building_number:
+        type: string
+      capacity:
+        type: integer
+      district:
+        type: string
+      id:
+        type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       local_name:
@@ -1123,6 +1154,10 @@ definitions:
         type: integer
       district:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       local_name:
@@ -1400,6 +1435,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1416,6 +1453,8 @@ definitions:
     - Second
     - Minute
     - Hour
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2962,6 +3001,49 @@ paths:
       security:
       - JWT: []
       summary: Update Local.
+      tags:
+      - Local
+  /local/{localId}/image/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a local given its id with image bytes.
+      parameters:
+      - description: Local ID
+        in: path
+        name: localId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.LocalWithImage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Local with image.
       tags:
       - Local
   /local/bulk-create/:

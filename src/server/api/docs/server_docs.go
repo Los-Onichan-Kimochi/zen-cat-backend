@@ -2534,6 +2534,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/local/{localId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a local given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Get Local with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LocalWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/login/": {
             "post": {
                 "description": "Authenticate user with email and password, returns user info and tokens",
@@ -8423,6 +8490,12 @@ const docTemplateserver = `{
                 "district": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8855,6 +8928,47 @@ const docTemplateserver = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.LocalWithImage": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -9373,6 +9487,12 @@ const docTemplateserver = `{
                 "district": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -9791,6 +9911,8 @@ const docTemplateserver = `{
                 1000000000,
                 60000000000,
                 3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -9807,6 +9929,8 @@ const docTemplateserver = `{
                 "Second",
                 "Minute",
                 "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

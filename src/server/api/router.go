@@ -90,6 +90,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	local := a.Echo.Group("/local")
 	local.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	local.GET("/:localId/", a.GetLocal)
+	local.GET("/:localId/image/", a.GetLocalWithImage)
 	local.GET("/", a.FetchLocals)
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
