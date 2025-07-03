@@ -39,6 +39,7 @@ func TestUpdateSessionSuccessfully(t *testing.T) {
 		nil, // Don't update session link
 		nil, // Don't update professional
 		nil, // Don't update local
+		nil, // Don't update community service
 		updatedBy,
 	)
 
@@ -68,7 +69,7 @@ func TestUpdateSessionWithEmptyUpdatedBy(t *testing.T) {
 	updatedSession, err := adapter.UpdatePostgresqlSession(
 		session.Id,
 		&newTitle,
-		nil, nil, nil, nil, nil, nil, nil, nil, nil,
+		nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 		updatedBy,
 	)
 
@@ -90,6 +91,7 @@ func TestUpdateSessionWithCompleteData(t *testing.T) {
 	session := factories.NewSessionModel(db, factories.SessionModelF{})
 	newProfessional := factories.NewProfessionalModel(db, factories.ProfessionalModelF{})
 	newLocal := factories.NewLocalModel(db, factories.LocalModelF{})
+	newCommunityService := factories.NewCommunityServiceModel(db, factories.CommunityServiceModelF{})
 
 	newTitle := "Completely Updated Session"
 	newDate := time.Now().AddDate(0, 0, 2)
@@ -114,6 +116,7 @@ func TestUpdateSessionWithCompleteData(t *testing.T) {
 		&newSessionLink,
 		&newProfessional.Id,
 		&newLocal.Id,
+		&newCommunityService.Id,
 		updatedBy,
 	)
 
@@ -127,6 +130,7 @@ func TestUpdateSessionWithCompleteData(t *testing.T) {
 	assert.Equal(t, &newSessionLink, updatedSession.SessionLink)
 	assert.Equal(t, newProfessional.Id, updatedSession.ProfessionalId)
 	assert.Equal(t, &newLocal.Id, updatedSession.LocalId)
+	assert.Equal(t, &newCommunityService.Id, updatedSession.CommunityServiceId)
 }
 
 func TestDeleteSessionSuccessfully(t *testing.T) {

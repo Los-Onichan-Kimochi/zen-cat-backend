@@ -34,6 +34,7 @@ func (s *Session) GetSession(sessionId uuid.UUID) (*model.Session, error) {
 
 	result := s.PostgresqlDB.Preload("Professional").
 		Preload("Local").
+		Preload("CommunityService").
 		First(&session, "id = ?", sessionId)
 	if result.Error != nil {
 		return nil, result.Error
@@ -55,6 +56,7 @@ func (s *Session) UpdateSession(
 	sessionLink *string,
 	professionalId *uuid.UUID,
 	localId *uuid.UUID,
+	communityServiceId *uuid.UUID,
 	updatedBy string,
 ) (*model.Session, error) {
 	updateFields := map[string]any{
@@ -89,6 +91,9 @@ func (s *Session) UpdateSession(
 	}
 	if localId != nil {
 		updateFields["local_id"] = *localId
+	}
+	if communityServiceId != nil {
+		updateFields["community_service_id"] = *communityServiceId
 	}
 
 	// Check if there are any fields to update
@@ -149,17 +154,21 @@ func (s *Session) BulkDeleteSessions(sessionIds []uuid.UUID) error {
 func (s *Session) FetchSessions(
 	professionalIds []uuid.UUID,
 	localIds []uuid.UUID,
+	communityServiceIds []uuid.UUID,
 	states []string,
 ) ([]*model.Session, error) {
 	sessions := []*model.Session{}
 
-	query := s.PostgresqlDB.Model(&model.Session{}).Preload("Professional").Preload("Local")
+	query := s.PostgresqlDB.Model(&model.Session{}).Preload("Professional").Preload("Local").Preload("CommunityService")
 
 	if len(professionalIds) > 0 {
 		query = query.Where("professional_id IN (?)", professionalIds)
 	}
 	if len(localIds) > 0 {
 		query = query.Where("local_id IN (?)", localIds)
+	}
+	if len(communityServiceIds) > 0 {
+		query = query.Where("community_service_id IN (?)", communityServiceIds)
 	}
 	if len(states) > 0 {
 		query = query.Where("state IN (?)", states)

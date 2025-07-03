@@ -426,6 +426,8 @@ var (
 		ServiceProfessionalAlreadyExists Error
 		ServiceLocalAlreadyExists        Error
 		UserAlreadyExists                Error
+		SessionTimeConflict              Error
+		UserReservationTimeConflict      Error
 	}{
 		CommunityPlanAlreadyExists: Error{
 			Code:    "COMMUNITY_PLAN_ERROR_006",
@@ -446,6 +448,14 @@ var (
 		ServiceProfessionalAlreadyExists: Error{
 			Code:    "SERVICE_PROFESSIONAL_ERROR_003",
 			Message: "Service-Professional association already exists",
+		},
+		SessionTimeConflict: Error{
+			Code:    "CONFLICT_ERROR_001",
+			Message: "Session time conflict detected",
+		},
+		UserReservationTimeConflict: Error{
+			Code:    "CONFLICT_ERROR_002",
+			Message: "User has another reservation at the same time",
 		},
 	}
 

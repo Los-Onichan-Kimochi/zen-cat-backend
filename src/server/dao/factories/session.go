@@ -21,6 +21,7 @@ type SessionModelF struct {
 	SessionLink     *string
 	ProfessionalId  *uuid.UUID
 	LocalId         *uuid.UUID
+	CommunityServiceId *uuid.UUID
 }
 
 // Create a new session on DB
@@ -30,6 +31,9 @@ func NewSessionModel(db *gorm.DB, option ...SessionModelF) *model.Session {
 
 	// Create default local if not provided
 	local := NewLocalModel(db)
+	
+	// Create default community service if not provided
+	communityService := NewCommunityServiceModel(db)
 
 	now := time.Now()
 	startTime := now.Add(1 * time.Hour)
@@ -50,6 +54,7 @@ func NewSessionModel(db *gorm.DB, option ...SessionModelF) *model.Session {
 		SessionLink:     &sessionLink,
 		ProfessionalId:  professional.Id,
 		LocalId:         &local.Id,
+		CommunityServiceId: &communityService.Id,
 		AuditFields: model.AuditFields{
 			UpdatedBy: "ADMIN",
 		},
@@ -89,6 +94,9 @@ func NewSessionModel(db *gorm.DB, option ...SessionModelF) *model.Session {
 		}
 		if parameters.LocalId != nil {
 			session.LocalId = parameters.LocalId
+		}
+		if parameters.CommunityServiceId != nil {
+			session.CommunityServiceId = parameters.CommunityServiceId
 		}
 	}
 

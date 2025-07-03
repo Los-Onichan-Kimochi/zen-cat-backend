@@ -721,6 +721,59 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			UserId:      users[1].Id,
 			PlanId:      plans[1].Id,
 		},
+		// Añadir membresías para los demás usuarios
+		{
+			Id:          uuid.New(),
+			Description: "Monthly Wellness Membership - María",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[2].Id, // María
+			PlanId:      plans[0].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Monthly Wellness Membership - Carlos",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[3].Id, // Carlos
+			PlanId:      plans[0].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Monthly Wellness Membership - Ana",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[4].Id, // Ana
+			PlanId:      plans[0].Id,
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Monthly Wellness Membership - Luis",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[5].Id, // Luis
+			PlanId:      plans[0].Id,
+		},
 	}
 	for _, membership := range memberships {
 		if err := astroCatPsqlDB.Create(membership).Error; err != nil {
@@ -1015,262 +1068,226 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	sessions := []*model.Session{
 		// Sesión que ya terminó (ayer)
 		{
-			Id:              uuid.New(),
-			Title:           "Morning Yoga",
-			Date:            baseDate.Add(-24 * time.Hour),             // Ayer
-			StartTime:       baseDate.Add(-24*time.Hour + 8*time.Hour), // Ayer 8:00 AM
-			EndTime:         baseDate.Add(-24*time.Hour + 9*time.Hour), // Ayer 9:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 5, // Test-1, María, Carlos(anulled), Ana, Luis
-			Capacity:        20,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
-			LocalId:         &locals[1].Id,       // Local Yoga
+			Id:                 uuid.New(),
+			Title:              "Morning Yoga",
+			Date:               baseDate.Add(-24 * time.Hour),             // Ayer
+			StartTime:          baseDate.Add(-24*time.Hour + 8*time.Hour), // Ayer 8:00 AM
+			EndTime:            baseDate.Add(-24*time.Hour + 9*time.Hour), // Ayer 9:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    5, // Test-1, María, Carlos(anulled), Ana, Luis
+			Capacity:           20,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[0].Id,      // John - Yoga Trainer
+			LocalId:            &locals[1].Id,            // Local Yoga
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		// Sesión de hoy por la tarde (futura si es mañana, pasada si es noche)
 		{
-			Id:              uuid.New(),
-			Title:           "Evening Gym",
-			Date:            baseDate,
-			StartTime:       baseDate.Add(18 * time.Hour), // Hoy 6:00 PM
-			EndTime:         baseDate.Add(19 * time.Hour), // Hoy 7:00 PM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 3, // Admin, María, Carlos(cancelled)
-			Capacity:        15,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[0].Id,       // Local Gym
+			Id:                 uuid.New(),
+			Title:              "Evening Gym",
+			Date:               baseDate,
+			StartTime:          baseDate.Add(18 * time.Hour), // Hoy 6:00 PM
+			EndTime:            baseDate.Add(19 * time.Hour), // Hoy 7:00 PM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    3, // Admin, María, Carlos(cancelled)
+			Capacity:           15,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[0].Id,            // Local Gym
+			CommunityServiceId: &communityServices[2].Id, // ZenCat Wellness Community - Gimnasio
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		// Sesión que está en curso (hora actual +/- 30 min)
 		{
-			Id:              uuid.New(),
-			Title:           "Advanced Yoga Workshop",
-			Date:            baseDate,
-			StartTime:       now.Add(-30 * time.Minute), // Empezó hace 30 minutos
-			EndTime:         now.Add(30 * time.Minute),  // Termina en 30 minutos
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 4, // Test-1, María, Ana, Luis(done)
-			Capacity:        12,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
-			LocalId:         &locals[2].Id,       // Studio Zen
+			Id:                 uuid.New(),
+			Title:              "Advanced Yoga Workshop",
+			Date:               baseDate,
+			StartTime:          now.Add(-30 * time.Minute), // Empezó hace 30 minutos
+			EndTime:            now.Add(30 * time.Minute),  // Termina en 30 minutos
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    4, // Test-1, María, Ana, Luis(done)
+			Capacity:           12,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[3].Id,      // Laura - Advanced Yoga Trainer
+			LocalId:            &locals[2].Id,            // Studio Zen
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		// Sesión futura para mañana
 		{
-			Id:              uuid.New(),
-			Title:           "Personal Training Session",
-			Date:            baseDate.Add(24 * time.Hour),              // Tomorrow
-			StartTime:       baseDate.Add(24*time.Hour + 16*time.Hour), // 4:00 PM tomorrow
-			EndTime:         baseDate.Add(24*time.Hour + 17*time.Hour), // 5:00 PM tomorrow
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 1, // Carlos
-			Capacity:        4,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[3].Id,       // Fitness Plus
+			Id:                 uuid.New(),
+			Title:              "Personal Training Session",
+			Date:               baseDate.Add(24 * time.Hour),              // Tomorrow
+			StartTime:          baseDate.Add(24*time.Hour + 16*time.Hour), // 4:00 PM tomorrow
+			EndTime:            baseDate.Add(24*time.Hour + 17*time.Hour), // 5:00 PM tomorrow
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    1, // Carlos
+			Capacity:           4,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[3].Id,            // Fitness Plus
+			CommunityServiceId: &communityServices[4].Id, // Maternal Care Community - Entrenamiento Funcional
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Medical Consultation",
-			Date:            baseDate.Add(48 * time.Hour),              // Day after tomorrow
-			StartTime:       baseDate.Add(48*time.Hour + 14*time.Hour), // 2:00 PM
-			EndTime:         baseDate.Add(48*time.Hour + 15*time.Hour), // 3:00 PM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 2, // Ana, Luis
-			Capacity:        5,
-			SessionLink:     strPtr("https://meet.example.com/medical-session"),
-			ProfessionalId:  professionals[1].Id, // Jane - Medic
-			LocalId:         nil,                 // Virtual session
+			Id:                 uuid.New(),
+			Title:              "Medical Consultation",
+			Date:               baseDate.Add(48 * time.Hour),              // Day after tomorrow
+			StartTime:          baseDate.Add(48*time.Hour + 14*time.Hour), // 2:00 PM
+			EndTime:            baseDate.Add(48*time.Hour + 15*time.Hour), // 3:00 PM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    2, // Ana, Luis
+			Capacity:           5,
+			SessionLink:        strPtr("https://meet.example.com/medical-session"),
+			ProfessionalId:     professionals[1].Id,      // Jane - Medic
+			LocalId:            nil,                      // Virtual session
+			CommunityServiceId: &communityServices[1].Id, // ZenCat Wellness Community - Cita médica
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Weekend Yoga Flow",
-			Date:            baseDate.Add(72 * time.Hour),              // 3 days from now
-			StartTime:       baseDate.Add(72*time.Hour + 9*time.Hour),  // 9:00 AM
-			EndTime:         baseDate.Add(72*time.Hour + 10*time.Hour), // 10:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 5, // Test-1, Admin, María, Carlos, Ana
-			Capacity:        15,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
-			LocalId:         &locals[1].Id,       // Local Yoga
+			Id:                 uuid.New(),
+			Title:              "Weekend Yoga Flow",
+			Date:               baseDate.Add(72 * time.Hour),              // 3 days from now
+			StartTime:          baseDate.Add(72*time.Hour + 9*time.Hour),  // 9:00 AM
+			EndTime:            baseDate.Add(72*time.Hour + 10*time.Hour), // 10:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    5, // Test-1, Admin, María, Carlos, Ana
+			Capacity:           15,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[0].Id,      // John - Yoga Trainer
+			LocalId:            &locals[1].Id,            // Local Yoga
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Strength Training Bootcamp",
-			Date:            baseDate.Add(96 * time.Hour),             // 4 days from now
-			StartTime:       baseDate.Add(96*time.Hour + 7*time.Hour), // 7:00 AM
-			EndTime:         baseDate.Add(96*time.Hour + 8*time.Hour), // 8:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 5, // Test-1, María, Carlos, Ana, Luis(done)
-			Capacity:        25,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[3].Id,       // Fitness Plus
+			Id:                 uuid.New(),
+			Title:              "Strength Training Bootcamp",
+			Date:               baseDate.Add(96 * time.Hour),             // 4 days from now
+			StartTime:          baseDate.Add(96*time.Hour + 7*time.Hour), // 7:00 AM
+			EndTime:            baseDate.Add(96*time.Hour + 8*time.Hour), // 8:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    5, // Test-1, María, Carlos, Ana, Luis(done)
+			Capacity:           25,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[3].Id,            // Fitness Plus
+			CommunityServiceId: &communityServices[2].Id, // ZenCat Wellness Community - Gimnasio
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "General Health Checkup",
-			Date:            baseDate.Add(120 * time.Hour),              // 5 days from now
-			StartTime:       baseDate.Add(120*time.Hour + 11*time.Hour), // 11:00 AM
-			EndTime:         baseDate.Add(120*time.Hour + 12*time.Hour), // 12:00 PM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 1, // Admin
-			Capacity:        3,
-			SessionLink:     strPtr("https://meet.example.com/health-checkup"),
-			ProfessionalId:  professionals[4].Id, // Roberto - General Medicine
-			LocalId:         nil,                 // Virtual session
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Más sesiones para hoy con diferentes horarios
-		{
-			Id:              uuid.New(),
-			Title:           "Morning Yoga Session",
-			Date:            baseDate,
-			StartTime:       baseDate.Add(6 * time.Hour), // 6:00 AM
-			EndTime:         baseDate.Add(7 * time.Hour), // 7:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 2,
-			Capacity:        15,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
-			LocalId:         &locals[0].Id,       // Pabellón A - San Miguel
+			Id:                 uuid.New(),
+			Title:              "Gym Session",
+			Date:               baseDate,
+			StartTime:          baseDate.Add(8 * time.Hour), // 8:00 AM
+			EndTime:            baseDate.Add(9 * time.Hour), // 9:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    5,
+			Capacity:           25,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[3].Id,            // Pabellón B
+			CommunityServiceId: &communityServices[2].Id, // ZenCat Wellness Community - Gimnasio
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Functional Training",
-			Date:            baseDate,
-			StartTime:       baseDate.Add(7 * time.Hour), // 7:00 AM
-			EndTime:         baseDate.Add(8 * time.Hour), // 8:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 3,
-			Capacity:        20,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[1].Id,       // Pabellón A - San Juan de Lurigancho
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:              uuid.New(),
-			Title:           "Gym Session",
-			Date:            baseDate,
-			StartTime:       baseDate.Add(8 * time.Hour), // 8:00 AM
-			EndTime:         baseDate.Add(9 * time.Hour), // 9:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 5,
-			Capacity:        25,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[3].Id,       // Pabellón B
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:              uuid.New(),
-			Title:           "Zen Yoga",
-			Date:            baseDate,
-			StartTime:       baseDate.Add(9 * time.Hour),  // 9:00 AM
-			EndTime:         baseDate.Add(10 * time.Hour), // 10:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 1,
-			Capacity:        18,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
-			LocalId:         &locals[4].Id,       // Studio Zen
+			Id:                 uuid.New(),
+			Title:              "Zen Yoga",
+			Date:               baseDate,
+			StartTime:          baseDate.Add(9 * time.Hour),  // 9:00 AM
+			EndTime:            baseDate.Add(10 * time.Hour), // 10:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    1,
+			Capacity:           18,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[3].Id,      // Laura - Advanced Yoga Trainer
+			LocalId:            &locals[4].Id,            // Studio Zen
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		// Sesiones para mañana con más horarios
 		{
-			Id:              uuid.New(),
-			Title:           "Early Morning Yoga",
-			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
-			StartTime:       baseDate.Add(24*time.Hour + 5*time.Hour), // 5:00 AM
-			EndTime:         baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 0,
-			Capacity:        15,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[0].Id, // John - Yoga Trainer
-			LocalId:         &locals[0].Id,       // Pabellón A - San Miguel
+			Id:                 uuid.New(),
+			Title:              "Early Morning Yoga",
+			Date:               baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:          baseDate.Add(24*time.Hour + 5*time.Hour), // 5:00 AM
+			EndTime:            baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    0,
+			Capacity:           15,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[0].Id,      // John - Yoga Trainer
+			LocalId:            &locals[0].Id,            // Pabellón A - San Miguel
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Morning Gym",
-			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
-			StartTime:       baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
-			EndTime:         baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 1,
-			Capacity:        20,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[1].Id,       // Pabellón A - San Juan de Lurigancho
+			Id:                 uuid.New(),
+			Title:              "Morning Gym",
+			Date:               baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:          baseDate.Add(24*time.Hour + 6*time.Hour), // 6:00 AM
+			EndTime:            baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    1,
+			Capacity:           20,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[1].Id,            // Pabellón A - San Juan de Lurigancho
+			CommunityServiceId: &communityServices[2].Id, // ZenCat Wellness Community - Gimnasio
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Yoga Flow",
-			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
-			StartTime:       baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
-			EndTime:         baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 2,
-			Capacity:        12,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[3].Id, // Laura - Advanced Yoga Trainer
-			LocalId:         &locals[2].Id,       // Pabellón A - Santa María del Carmen
+			Id:                 uuid.New(),
+			Title:              "Yoga Flow",
+			Date:               baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:          baseDate.Add(24*time.Hour + 7*time.Hour), // 7:00 AM
+			EndTime:            baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    2,
+			Capacity:           12,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[3].Id,      // Laura - Advanced Yoga Trainer
+			LocalId:            &locals[2].Id,            // Pabellón A - Santa María del Carmen
+			CommunityServiceId: &communityServices[0].Id, // ZenCat Wellness Community - Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
-			Id:              uuid.New(),
-			Title:           "Power Training",
-			Date:            baseDate.Add(24 * time.Hour),             // Tomorrow
-			StartTime:       baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
-			EndTime:         baseDate.Add(24*time.Hour + 9*time.Hour), // 9:00 AM
-			State:           model.SessionStateScheduled,
-			RegisteredCount: 3,
-			Capacity:        25,
-			SessionLink:     nil,
-			ProfessionalId:  professionals[2].Id, // Pedro - Gym Trainer
-			LocalId:         &locals[3].Id,       // Pabellón B
+			Id:                 uuid.New(),
+			Title:              "Power Training",
+			Date:               baseDate.Add(24 * time.Hour),             // Tomorrow
+			StartTime:          baseDate.Add(24*time.Hour + 8*time.Hour), // 8:00 AM
+			EndTime:            baseDate.Add(24*time.Hour + 9*time.Hour), // 9:00 AM
+			State:              model.SessionStateScheduled,
+			RegisteredCount:    3,
+			Capacity:           25,
+			SessionLink:        nil,
+			ProfessionalId:     professionals[2].Id,      // Pedro - Gym Trainer
+			LocalId:            &locals[3].Id,            // Pabellón B
+			CommunityServiceId: &communityServices[4].Id, // Maternal Care Community - Entrenamiento Funcional
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1294,6 +1311,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[0].Id, // Test-1
 			SessionId:        sessions[0].Id,
+			MembershipId:     &memberships[0].Id, // Membership for Test-1
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1306,6 +1324,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[2].Id, // María
 			SessionId:        sessions[0].Id,
+			MembershipId:     &memberships[3].Id, // Membership for María
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1318,6 +1337,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[3].Id, // Carlos
 			SessionId:        sessions[0].Id,
+			MembershipId:     &memberships[4].Id, // Membership for Carlos
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1330,6 +1350,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[4].Id, // Ana
 			SessionId:        sessions[0].Id,
+			MembershipId:     &memberships[5].Id, // Membership for Ana
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1342,6 +1363,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[5].Id, // Luis
 			SessionId:        sessions[0].Id,
+			MembershipId:     &memberships[6].Id, // Membership for Luis
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1356,6 +1378,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[1].Id, // Test-2 (Admin)
 			SessionId:        sessions[1].Id,
+			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1368,6 +1391,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[2].Id, // María
 			SessionId:        sessions[1].Id,
+			MembershipId:     &memberships[3].Id, // Membership for María
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1380,6 +1404,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[3].Id, // Carlos
 			SessionId:        sessions[1].Id,
+			MembershipId:     &memberships[4].Id, // Membership for Carlos
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1394,6 +1419,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[0].Id, // Test-1
 			SessionId:        sessions[2].Id,
+			MembershipId:     &memberships[0].Id, // Membership for Test-1
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1406,6 +1432,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[2].Id, // María
 			SessionId:        sessions[2].Id,
+			MembershipId:     &memberships[3].Id, // Membership for María
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1418,6 +1445,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[4].Id, // Ana
 			SessionId:        sessions[2].Id,
+			MembershipId:     &memberships[5].Id, // Membership for Ana
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1430,6 +1458,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[5].Id, // Luis
 			SessionId:        sessions[2].Id,
+			MembershipId:     &memberships[6].Id, // Membership for Luis
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1444,6 +1473,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[3].Id, // Carlos
 			SessionId:        sessions[3].Id,
+			MembershipId:     &memberships[4].Id, // Membership for Carlos
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1458,6 +1488,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[4].Id, // Ana
 			SessionId:        sessions[4].Id,
+			MembershipId:     &memberships[5].Id, // Membership for Ana
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1470,6 +1501,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[5].Id, // Luis
 			SessionId:        sessions[4].Id,
+			MembershipId:     &memberships[6].Id, // Membership for Luis
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1484,6 +1516,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[0].Id, // Test-1
 			SessionId:        sessions[5].Id,
+			MembershipId:     &memberships[0].Id, // Membership for Test-1
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1496,6 +1529,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[1].Id, // Test-2 (Admin)
 			SessionId:        sessions[5].Id,
+			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1508,6 +1542,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[2].Id, // María
 			SessionId:        sessions[5].Id,
+			MembershipId:     &memberships[3].Id, // Membership for María
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1520,6 +1555,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[3].Id, // Carlos
 			SessionId:        sessions[5].Id,
+			MembershipId:     &memberships[4].Id, // Membership for Carlos
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1532,6 +1568,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[4].Id, // Ana
 			SessionId:        sessions[5].Id,
+			MembershipId:     &memberships[5].Id, // Membership for Ana
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1546,6 +1583,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[0].Id, // Test-1
 			SessionId:        sessions[6].Id,
+			MembershipId:     &memberships[0].Id, // Membership for Test-1
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1558,6 +1596,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[2].Id, // María
 			SessionId:        sessions[6].Id,
+			MembershipId:     &memberships[3].Id, // Membership for María
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1570,6 +1609,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[3].Id, // Carlos
 			SessionId:        sessions[6].Id,
+			MembershipId:     &memberships[4].Id, // Membership for Carlos
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1582,6 +1622,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[4].Id, // Ana
 			SessionId:        sessions[6].Id,
+			MembershipId:     &memberships[5].Id, // Membership for Ana
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1594,6 +1635,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[5].Id, // Luis
 			SessionId:        sessions[6].Id,
+			MembershipId:     &memberships[6].Id, // Membership for Luis
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1608,6 +1650,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			LastModification: time.Now(),
 			UserId:           users[1].Id, // Test-2 (Admin)
 			SessionId:        sessions[7].Id,
+			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
