@@ -23,10 +23,10 @@ type CreateCommunityRequest struct {
 }
 
 type UpdateCommunityRequest struct {
-	Name     *string `json:"name"`
-	Purpose  *string `json:"purpose"`
-	ImageUrl *string `json:"image_url"`
-	ImageBytes []byte `json:"image_bytes"`
+	Name       *string `json:"name"`
+	Purpose    *string `json:"purpose"`
+	ImageUrl   *string `json:"image_url"`
+	ImageBytes []byte  `json:"image_bytes"`
 }
 
 type BatchCreateCommunityRequest struct {

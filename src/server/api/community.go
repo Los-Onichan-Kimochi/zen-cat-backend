@@ -65,7 +65,10 @@ func (a *Api) GetCommunityWithImage(c echo.Context) error {
 	var imageBytes []byte
 	// Try to download image from S3, but don't fail if S3 is not available (e.g., during tests)
 	if response.ImageUrl != "" {
-		downloadedBytes, s3Err := a.S3Service.DownloadFile(schemas.CommunityS3Prefix, response.ImageUrl)
+		downloadedBytes, s3Err := a.S3Service.DownloadFile(
+			schemas.CommunityS3Prefix,
+			response.ImageUrl,
+		)
 		if s3Err == nil {
 			imageBytes = downloadedBytes
 		}
