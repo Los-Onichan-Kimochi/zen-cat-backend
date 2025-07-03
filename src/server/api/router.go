@@ -206,6 +206,11 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	errorLog.GET("/:auditLogId/", a.GetErrorLogById)
 	errorLog.GET("/stats/", a.GetErrorStats)
 
+	// Reports endpoints (admin only)
+	reports := a.Echo.Group("/reports")
+	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
+	reports.GET("/services", a.GetServiceReport)
+
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 
 	// Onboarding endpoints (client only)
