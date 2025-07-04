@@ -180,3 +180,19 @@ func (u *User) UpdateUserPassword(userId uuid.UUID, hashedPassword string) error
 	}
 	return nil
 }
+
+func (u *User) GetUsersByIds(userIds []uuid.UUID) ([]*model.User, error) {
+	var users []*model.User
+	result := u.PostgresqlDB.
+		Preload("Memberships").
+		Preload("Memberships.Community").
+		Preload("Memberships.Plan").
+		Preload("Onboarding").
+		Where("id IN ?", userIds).
+		Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return users, nil
+}

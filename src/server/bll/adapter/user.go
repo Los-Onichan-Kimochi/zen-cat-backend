@@ -604,3 +604,40 @@ func (u *User) GetUserStats() (*schemas.UserStats, *errors.Error) {
 		RecentConnections: recentConnections,
 	}, nil
 }
+
+// GetPostgresqlUsersByIds retrieves multiple users by their IDs
+func (u *User) GetPostgresqlUsersByIds(
+	userIds []uuid.UUID,
+) ([]*schemas.User, *errors.Error) {
+	// If no IDs are provided, return empty slice
+	if len(userIds) == 0 {
+		return make([]*schemas.User, 0), nil
+	}
+
+	userModels, err := u.DaoPostgresql.User.GetUsersByIds(userIds)
+	if err != nil {
+		return nil, &errors.BadRequestError.UserNotCreated
+	}
+
+	// Map models to schemas
+	users := make([]*schemas.User, 0, len(userModels))
+	for _, userModel := range userModels {
+		var secondLastName *string
+		if userModel.SecondLastName != nil {
+			secondLastName = userModel.SecondLastName
+		}
+
+		user := &schemas.User{
+			Id:             userModel.Id,
+			Name:           userModel.Name,
+			FirstLastName:  userModel.FirstLastName,
+			SecondLastName: secondLastName,
+			Email:          userModel.Email,
+			Rol:            schemas.UserRol(userModel.Rol),
+			ImageUrl:       userModel.ImageUrl,
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}

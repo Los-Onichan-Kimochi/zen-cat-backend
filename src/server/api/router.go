@@ -210,6 +210,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	reports := a.Echo.Group("/reports")
 	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
 	reports.GET("/services", a.GetServiceReport)
+	reports.GET("/communities", a.GetCommunityReport)
 
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 
@@ -232,6 +233,8 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	membership.GET("/", a.FetchMemberships)
 	membership.GET("/user/:userId/", a.GetMembershipsByUserId)
 	membership.GET("/community/:communityId/", a.GetMembershipsByCommunityId)
+	membership.GET("/community/:communityId/users", a.GetUsersByCommunityId)
+	membership.GET("/user/:userId/community/:communityId", a.GetMembershipByUserAndCommunity)
 	membership.POST("/", a.CreateMembership)
 	membership.POST("/user/:userId/", a.CreateMembershipForUser)
 	membership.PATCH("/:membershipId/", a.UpdateMembership)
