@@ -1,12 +1,14 @@
 package adapter
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	daoPsql "onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/controller"
+	"onichankimochi.com/astro_cat_backend/src/server/dao/astro_cat_psql/model"
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
@@ -247,4 +249,86 @@ func (r *Reservation) BulkDeletePostgresqlReservations(reservationIds []string) 
 	}
 
 	return nil
+}
+
+// GetServiceReport obtiene reservas, hace preload profundo y agrupa por servicio y fecha
+type ServiceReportParams struct {
+	From    *time.Time
+	To      *time.Time
+	GroupBy string // "day", "week", "month"
+}
+
+type ServiceReportData struct {
+	ServiceType string
+	Total       int
+	Data        []struct {
+		Date  string
+		Count int
+	}
+}
+
+func (r *Reservation) GetServiceReport(params ServiceReportParams) (total int, services []ServiceReportData, err error) {
+	// Construir la consulta base
+	query := r.DaoPostgresql.Reservation.PostgresqlDB.Model(&model.Reservation{})
+	query = query.Preload("Session.CommunityService.Service")
+
+	if params.From != nil {
+		query = query.Where("reservation_time >= ?", *params.From)
+	}
+	if params.To != nil {
+		query = query.Where("reservation_time <= ?", *params.To)
+	}
+
+	var reservations []model.Reservation
+	if err := query.Find(&reservations).Error; err != nil {
+		return 0, nil, err
+	}
+
+	// Agrupar por servicio y fecha
+
+	totals := map[string]int{}
+	grouped := map[string]map[string]int{} // serviceType -> date -> count
+
+	for _, res := range reservations {
+		serviceName := "Desconocido"
+		if res.Session.CommunityService != nil && res.Session.CommunityService.Service.Name != "" {
+			serviceName = res.Session.CommunityService.Service.Name
+		}
+		var dateKey string
+		switch params.GroupBy {
+		case "month":
+			dateKey = res.ReservationTime.Format("2006-01")
+		case "week":
+			y, w := res.ReservationTime.ISOWeek()
+			dateKey = fmt.Sprintf("%d-W%02d", y, w)
+		default:
+			dateKey = res.ReservationTime.Format("2006-01-02")
+		}
+		totals[serviceName]++
+		if grouped[serviceName] == nil {
+			grouped[serviceName] = map[string]int{}
+		}
+		grouped[serviceName][dateKey]++
+		total++
+	}
+
+	// Construir la respuesta
+	for service, dateMap := range grouped {
+		data := []struct {
+			Date  string
+			Count int
+		}{}
+		for date, count := range dateMap {
+			data = append(data, struct {
+				Date  string
+				Count int
+			}{date, count})
+		}
+		services = append(services, ServiceReportData{
+			ServiceType: service,
+			Total:       totals[service],
+			Data:        data,
+		})
+	}
+	return total, services, nil
 }

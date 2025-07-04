@@ -165,6 +165,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
+	communityService.GET("/id/:id/", a.GetCommunityServiceById)
 	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints (admin only)
@@ -204,6 +205,11 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	errorLog.GET("/", a.GetErrorLogs)
 	errorLog.GET("/:auditLogId/", a.GetErrorLogById)
 	errorLog.GET("/stats/", a.GetErrorStats)
+
+	// Reports endpoints (admin only)
+	reports := a.Echo.Group("/reports")
+	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
+	reports.GET("/services", a.GetServiceReport)
 
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 

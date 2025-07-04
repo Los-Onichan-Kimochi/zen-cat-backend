@@ -1066,6 +1066,67 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/community-service/id/{id}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves a community-service association by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Get CommunityService By ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/community-service/{communityId}/": {
             "get": {
                 "security": [
@@ -4701,6 +4762,79 @@ const docTemplateserver = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/services": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Returns aggregated data for service reservations for admin dashboards.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get Service Report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service type (e.g., yoga, citas médicas)",
+                        "name": "serviceType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Group by (day, week, month)",
+                        "name": "groupBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service report data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }

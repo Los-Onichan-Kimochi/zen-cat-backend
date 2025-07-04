@@ -323,3 +323,25 @@ func (r *Reservation) GetReservationsByCommunityIdByUserId(
 
 	return &schemas.Reservations{Reservations: reservations}, nil
 }
+
+// GetServiceReport obtiene el reporte de servicios para el dashboard admin
+type ServiceReportResponse struct {
+	Total    int                            `json:"totalReservations"`
+	Services []bllAdapter.ServiceReportData `json:"services"`
+}
+
+func (r *Reservation) GetServiceReport(from, to *time.Time, groupBy string) (*ServiceReportResponse, *errors.Error) {
+	params := bllAdapter.ServiceReportParams{
+		From:    from,
+		To:      to,
+		GroupBy: groupBy,
+	}
+	total, services, err := r.Adapter.Reservation.GetServiceReport(params)
+	if err != nil {
+		return nil, &errors.InternalServerError.Default
+	}
+	return &ServiceReportResponse{
+		Total:    total,
+		Services: services,
+	}, nil
+}
