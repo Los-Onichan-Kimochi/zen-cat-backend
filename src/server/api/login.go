@@ -135,13 +135,10 @@ func (a *Api) GetCurrentUser(c echo.Context) error {
 func (a *Api) GoogleLogin(c echo.Context) error {
 	// 🔍 Extra para depurar si sigue fallando
 	body, _ := io.ReadAll(c.Request().Body)
-	c.Request().Body = io.NopCloser(bytes.NewBuffer(body)) // 🔁 Restaurar body
-
-	println("🧪 Raw body:", string(body))
+	c.Request().Body = io.NopCloser(bytes.NewBuffer(body))
 
 	var request schemas.GoogleLoginRequest
 	if err := c.Bind(&request); err != nil || request.Token == "" {
-		println("❌ Bind error o token vacío")
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
