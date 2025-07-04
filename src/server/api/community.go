@@ -62,14 +62,17 @@ func (a *Api) GetCommunityWithImage(c echo.Context) error {
 		return errors.HandleError(*err, c)
 	}
 
-	var imageBytes []byte
-	// Try to download image from S3, but don't fail if S3 is not available (e.g., during tests)
+	var imageBytes *[]byte
+	// Try to download image from S3, but don't fail if S3 is not available
 	if response.ImageUrl != "" {
-		downloadedBytes, s3Err := a.S3Service.DownloadFile(schemas.CommunityS3Prefix, response.ImageUrl)
+		downloadedBytes, s3Err := a.S3Service.DownloadFile(
+			schemas.CommunityS3Prefix,
+			response.ImageUrl,
+		)
 		if s3Err == nil {
-			imageBytes = downloadedBytes
+			imageBytes = &downloadedBytes
 		}
-		// If S3 fails, we continue without image bytes (imageBytes will be nil)
+		// If S3 fails, we continue without image bytes
 	}
 
 	return c.JSON(http.StatusOK, schemas.CommunityWithImage{
@@ -123,21 +126,23 @@ func (a *Api) CreateCommunity(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	if request.ImageUrl != "" {
+		request.ImageUrl = a.S3Service.GenerateImageUrl(request.ImageUrl)
+	}
+
 	response, newErr := a.BllController.Community.CreateCommunity(request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
 	}
 
 	// Upload image to S3
-	if request.ImageUrl != "" {
-		err := a.S3Service.UploadFile(
+	if response.ImageUrl != "" && request.ImageBytes != nil {
+		a.S3Service.UploadFile(
 			schemas.CommunityS3Prefix,
-			request.ImageUrl,
-			request.ImageBytes,
+			response.ImageUrl,
+			*request.ImageBytes,
 		)
-		if err != nil {
-			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
-		}
+		// If S3 fails, we continue without image upload
 	}
 
 	return c.JSON(http.StatusCreated, response)
@@ -207,17 +212,21 @@ func (a *Api) UpdateCommunity(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	if request.ImageUrl != nil {
+		*request.ImageUrl = a.S3Service.GenerateImageUrl(*request.ImageUrl)
+	}
+
 	response, newErr := a.BllController.Community.UpdateCommunity(communityId, request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
 	}
 
 	// Upload image to S3 if it exists
-	if request.ImageUrl != nil {
+	if request.ImageUrl != nil && request.ImageBytes != nil {
 		err := a.S3Service.UploadFile(
 			schemas.CommunityS3Prefix,
-			*request.ImageUrl,
-			request.ImageBytes,
+			response.ImageUrl,
+			*request.ImageBytes,
 		)
 		if err != nil {
 			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
