@@ -244,6 +244,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	reservation := a.Echo.Group("/reservation")
 	reservation.Use(mw.JWTMiddleware, mw.ClientOnlyMiddleware) // Apply JWT + Client middleware
 	reservation.GET("/:reservationId/", a.GetReservation)
+	reservation.GET("/:communityId/:userId/", a.GetReservationsByCommunityIdByUserId)
 	reservation.GET("/", a.FetchReservations)
 	reservation.POST("/", a.CreateReservation)
 	reservation.PATCH("/:reservationId/", a.UpdateReservation)

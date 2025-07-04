@@ -16,11 +16,12 @@ const (
 )
 
 type Membership struct {
-	Id          uuid.UUID `gorm:"type:uuid;primaryKey"`
-	Description string
-	StartDate   time.Time
-	EndDate     time.Time
-	Status      MembershipStatus
+	Id               uuid.UUID `gorm:"type:uuid;primaryKey"`
+	Description      string
+	StartDate        time.Time
+	EndDate          time.Time
+	Status           MembershipStatus
+	ReservationsUsed *int
 	AuditFields
 
 	CommunityId uuid.UUID `gorm:"type:uuid"`
