@@ -256,11 +256,12 @@ func (c *Community) GetCommunityReport(params CommunityReportParams) (total int,
 		Preload("User").
 		Preload("Plan")
 
+	// Filtrar por vigencia real de la membresía
 	if params.From != nil {
-		membershipsQuery = membershipsQuery.Where("created_at >= ?", *params.From)
+		membershipsQuery = membershipsQuery.Where("end_date >= ?", *params.From)
 	}
 	if params.To != nil {
-		membershipsQuery = membershipsQuery.Where("created_at <= ?", *params.To)
+		membershipsQuery = membershipsQuery.Where("start_date <= ?", *params.To)
 	}
 
 	var memberships []model.Membership
@@ -348,16 +349,16 @@ func (c *Community) GetCommunityReport(params CommunityReportParams) (total int,
 			communityData[communityId].AnnualPlans++
 		}
 
-		// Agrupar por fecha según el parámetro groupBy
+		// Agrupar por fecha según el parámetro groupBy (usando start_date)
 		var dateKey string
 		switch params.GroupBy {
 		case "month":
-			dateKey = membership.CreatedAt.Format("2006-01")
+			dateKey = membership.StartDate.Format("2006-01")
 		case "week":
-			y, w := membership.CreatedAt.ISOWeek()
+			y, w := membership.StartDate.ISOWeek()
 			dateKey = fmt.Sprintf("%d-W%02d", y, w)
 		default:
-			dateKey = membership.CreatedAt.Format("2006-01-02")
+			dateKey = membership.StartDate.Format("2006-01-02")
 		}
 
 		// Incrementar contadores

@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -1274,47 +1275,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Agregar membresías dummy históricas para reportes
-	monthsBack := 12
-	statuses := []model.MembershipStatus{
-		model.MembershipStatusActive,
-		model.MembershipStatusExpired,
-		model.MembershipStatusCancelled,
-	}
-	for _, community := range communities {
-		for userIdx, user := range users {
-			// Saltar usuarios especiales (SYSTEM y mainUserId)
-			if user.Name == "SYSTEM" || user.Id == mainUserId {
-				continue
-			}
-			for i := 0; i < monthsBack; i++ {
-				start := time.Now().AddDate(0, -i, 0)
-				end := start.AddDate(0, 1, 0)
-				status := statuses[i%len(statuses)]
-				plan := plans[(i+userIdx)%len(plans)]
-				desc := fmt.Sprintf("Dummy Membership %d - %s - %s", i+1, user.Name, community.Name)
-				membership := &model.Membership{
-					Id:          uuid.New(),
-					Description: desc,
-					StartDate:   start,
-					EndDate:     end,
-					Status:      status,
-					AuditFields: model.AuditFields{UpdatedBy: "ADMIN"},
-					CommunityId: community.Id,
-					UserId:      user.Id,
-					PlanId:      plan.Id,
-				}
-				if err := astroCatPsqlDB.Create(membership).Error; err != nil {
-					appLogger.Errorf("Error creating historical dummy membership: %v", err)
-					return
-				}
-			}
-		}
-	}
-
-	// Create dummy community services
+	// Create dummy community services (reducido)
 	communityServices := []*model.CommunityService{
-		// Runners Community services
+		// Runners Community services (solo los principales)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[0].Id, // Runners Community
@@ -1339,63 +1302,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[4].Id,    // Entrenamiento Funcional
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[5].Id,    // Meditación
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[6].Id,    // Pilates
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[7].Id,    // Spinning
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[8].Id,    // Zumba
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[9].Id,    // Terapia Física
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			ServiceId:   services[10].Id,   // Nutrición
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Maternal Care Community services
+		// Maternal Care Community services (solo 2 servicios)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[1].Id, // Maternal Care Community
@@ -1407,28 +1314,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[1].Id, // Maternal Care Community
-			ServiceId:   services[4].Id,    // Entrenamiento Funcional
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[1].Id, // Maternal Care Community
 			ServiceId:   services[5].Id,    // Meditación
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[1].Id, // Maternal Care Community
-			ServiceId:   services[10].Id,   // Nutrición
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Zen Wellness Center services
+		// Zen Wellness Center services (solo 2 servicios)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[2].Id, // Zen Wellness Center
@@ -1445,23 +1336,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[2].Id, // Zen Wellness Center
-			ServiceId:   services[6].Id,    // Pilates
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[2].Id, // Zen Wellness Center
-			ServiceId:   services[10].Id,   // Nutrición
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Fitness Pro Community services
+		// Fitness Pro Community services (solo 2 servicios)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[3].Id, // Fitness Pro Community
@@ -1478,31 +1353,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[3].Id, // Fitness Pro Community
-			ServiceId:   services[7].Id,    // Spinning
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[3].Id, // Fitness Pro Community
-			ServiceId:   services[8].Id,    // Zumba
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[3].Id, // Fitness Pro Community
-			ServiceId:   services[10].Id,   // Nutrición
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Medical Health Network services
+		// Medical Health Network services (solo 1 servicio)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[4].Id, // Medical Health Network
@@ -1511,51 +1362,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[4].Id, // Medical Health Network
-			ServiceId:   services[9].Id,    // Terapia Física
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[4].Id, // Medical Health Network
-			ServiceId:   services[10].Id,   // Nutrición
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Senior Wellness services
+		// Senior Wellness services (solo 1 servicio)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[5].Id, // Senior Wellness
 			ServiceId:   services[0].Id,    // Yoga
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[5].Id, // Senior Wellness
-			ServiceId:   services[1].Id,    // Cita médica
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[5].Id, // Senior Wellness
-			ServiceId:   services[6].Id,    // Pilates
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[5].Id, // Senior Wellness
-			ServiceId:   services[9].Id,    // Terapia Física
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1568,9 +1379,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Create dummy community plans
+	// Create dummy community plans (reducido)
 	communityPlans := []*model.CommunityPlan{
-		// Runners Community plans (all available plans)
+		// Runners Community plans (solo 2 planes principales)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[0].Id, // Runners Community
@@ -1587,40 +1398,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			PlanId:      plans[4].Id,       // Annual Basic Plan ($499.00)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			PlanId:      plans[5].Id,       // Annual Premium Plan ($899.00)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Keep original plans for backward compatibility
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			PlanId:      plans[0].Id,       // Original Monthly Plan ($70.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // Runners Community
-			PlanId:      plans[1].Id,       // Original Annual Plan ($1000.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Maternal Care Community plans
+		// Maternal Care Community plans (solo 1 plan)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[1].Id, // Maternal Care Community
@@ -1629,15 +1407,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[1].Id, // Maternal Care Community
-			PlanId:      plans[1].Id,       // Original Annual Plan
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Zen Wellness Center plans (premium plans)
+		// Zen Wellness Center plans (solo 1 plan)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[2].Id, // Zen Wellness Center
@@ -1646,15 +1416,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[2].Id, // Zen Wellness Center
-			PlanId:      plans[7].Id,       // Premium Annual Plan ($1500.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Fitness Pro Community plans (premium plans)
+		// Fitness Pro Community plans (solo 1 plan)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[3].Id, // Fitness Pro Community
@@ -1663,15 +1425,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[3].Id, // Fitness Pro Community
-			PlanId:      plans[7].Id,       // Premium Annual Plan ($1500.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Medical Health Network plans (basic plans)
+		// Medical Health Network plans (solo 1 plan)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[4].Id, // Medical Health Network
@@ -1680,27 +1434,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[4].Id, // Medical Health Network
-			PlanId:      plans[9].Id,       // Basic Annual Plan ($350.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Senior Wellness plans (basic plans)
+		// Senior Wellness plans (solo 1 plan)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[5].Id, // Senior Wellness
 			PlanId:      plans[8].Id,       // Basic Monthly Plan ($35.0)
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:          uuid.New(),
-			CommunityId: communities[5].Id, // Senior Wellness
-			PlanId:      plans[9].Id,       // Basic Annual Plan ($350.0)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1713,9 +1451,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Create dummy service-professional relationships
+	// Create dummy service-professional relationships (reducido)
 	serviceProfessionals := []*model.ServiceProfessional{
-		// Yoga service with yoga trainers
+		// Yoga service with yoga trainer
 		{
 			Id:             uuid.New(),
 			ServiceId:      services[0].Id,      // Yoga
@@ -1724,23 +1462,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[0].Id,      // Yoga
-			ProfessionalId: professionals[3].Id, // Laura - Advanced Yoga Trainer
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[0].Id,      // Yoga
-			ProfessionalId: professionals[5].Id, // Carmen - Meditación y Mindfulness
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Medical service with doctors
+		// Medical service with doctor
 		{
 			Id:             uuid.New(),
 			ServiceId:      services[1].Id,      // Cita médica
@@ -1749,28 +1471,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[1].Id,      // Cita médica
-			ProfessionalId: professionals[4].Id, // Roberto - General Medicine
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Lactario service (no specific professional needed)
-		// Gym service with gym trainers
+		// Gym service with gym trainer
 		{
 			Id:             uuid.New(),
 			ServiceId:      services[3].Id,      // Gimnasio
 			ProfessionalId: professionals[2].Id, // Pedro - Gym Trainer
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[3].Id,      // Gimnasio
-			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1784,64 +1489,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[4].Id,      // Entrenamiento Funcional
-			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
 		// Meditación service
 		{
 			Id:             uuid.New(),
 			ServiceId:      services[5].Id,      // Meditación
 			ProfessionalId: professionals[5].Id, // Carmen - Meditación y Mindfulness
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Pilates service
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[6].Id,      // Pilates
-			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Spinning service
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[7].Id,      // Spinning
-			ProfessionalId: professionals[8].Id, // Carlos - Spinning y Cardio
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Zumba service
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[8].Id,      // Zumba
-			ProfessionalId: professionals[9].Id, // Lucía - Zumba y Danza
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Terapia Física service
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[9].Id,       // Terapia Física
-			ProfessionalId: professionals[10].Id, // Fernando - Fisioterapia
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Nutrición service
-		{
-			Id:             uuid.New(),
-			ServiceId:      services[10].Id,     // Nutrición
-			ProfessionalId: professionals[7].Id, // Ana - Nutrición Clínica
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1854,9 +1506,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Create dummy service-local relationships
+	// Create dummy service-local relationships (reducido)
 	serviceLocals := []*model.ServiceLocal{
-		// Yoga service available in multiple locations
+		// Yoga service available in 2 locations
 		{
 			Id:        uuid.New(),
 			ServiceId: services[0].Id, // Yoga
@@ -1873,23 +1525,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[0].Id, // Yoga
-			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[0].Id, // Yoga
-			LocalId:   locals[4].Id,   // Studio Zen
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Lactario service in specific locations
+		// Lactario service in 1 location
 		{
 			Id:        uuid.New(),
 			ServiceId: services[2].Id, // Lactario
@@ -1898,15 +1534,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[2].Id, // Lactario
-			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Gym service in specific locations
+		// Gym service in 1 location
 		{
 			Id:        uuid.New(),
 			ServiceId: services[3].Id, // Gimnasio
@@ -1915,95 +1543,11 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[3].Id, // Gimnasio
-			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Functional training in multiple locations
+		// Functional training in 1 location
 		{
 			Id:        uuid.New(),
 			ServiceId: services[4].Id, // Entrenamiento Funcional
 			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[4].Id, // Entrenamiento Funcional
-			LocalId:   locals[3].Id,   // Pabellón B
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Pilates service in multiple locations
-		{
-			Id:        uuid.New(),
-			ServiceId: services[6].Id, // Pilates
-			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[6].Id, // Pilates
-			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Spinning service in gym locations
-		{
-			Id:        uuid.New(),
-			ServiceId: services[7].Id, // Spinning
-			LocalId:   locals[3].Id,   // Pabellón B
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[7].Id, // Spinning
-			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Zumba service in multiple locations
-		{
-			Id:        uuid.New(),
-			ServiceId: services[8].Id, // Zumba
-			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[8].Id, // Zumba
-			LocalId:   locals[3].Id,   // Pabellón B
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		// Terapia Física service in specific locations
-		{
-			Id:        uuid.New(),
-			ServiceId: services[9].Id, // Terapia Física
-			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-		},
-		{
-			Id:        uuid.New(),
-			ServiceId: services[9].Id, // Terapia Física
-			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -2684,6 +2228,100 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			return
 		}
 	}
+
+	// Agregar algunas membresías dummy históricas para reportes (reducido)
+	fmt.Println("[DUMMY] Iniciando generación de membresías históricas...")
+	monthsBack := 6 // Reducido de 12 a 6 meses
+	statusLabels := []struct {
+		status model.MembershipStatus
+		desc   string
+		prob   float64
+	}{
+		{model.MembershipStatusActive, "Active", 0.60},
+		{model.MembershipStatusExpired, "Expired", 0.85},
+		{model.MembershipStatusCancelled, "Cancelled", 1.0},
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	// Solo generar para algunos usuarios y comunidades (no todos)
+	selectedUsers := []int{2, 3, 4, 5, 6} // Solo algunos usuarios
+	selectedCommunities := []int{0, 2, 3} // Solo algunas comunidades
+
+	for _, communityIdx := range selectedCommunities {
+		community := communities[communityIdx]
+		for _, userIdx := range selectedUsers {
+			user := users[userIdx]
+			if user.Name == "SYSTEM" || user.Id == mainUserId {
+				continue
+			}
+			membCount := rand.Intn(3) + 1 // Entre 1 y 3 membresías por usuario por comunidad (reducido)
+			for i := 0; i < membCount; i++ {
+				// Estado aleatorio según distribución
+				r := rand.Float64()
+				var label struct {
+					status model.MembershipStatus
+					desc   string
+					prob   float64
+				}
+				for _, s := range statusLabels {
+					if r <= s.prob {
+						label = s
+						break
+					}
+				}
+				// Fechas aleatorias dentro de los últimos 6 meses
+				monthOffset := rand.Intn(monthsBack)
+				startDay := rand.Intn(20) + 1
+				start := time.Date(time.Now().Year(), time.Now().Month()-time.Month(monthOffset), startDay, 0, 0, 0, 0, time.UTC)
+				duration := rand.Intn(30) + 15 // Entre 15 y 45 días (reducido)
+				end := start.AddDate(0, 0, duration)
+				plan := plans[(userIdx+i+rand.Intn(len(plans)))%len(plans)]
+				desc := fmt.Sprintf("%s Membership - %s - %s - %s", label.desc, user.Name, community.Name, start.Format("2006-01-02"))
+				membership := &model.Membership{
+					Id:          uuid.New(),
+					Description: desc,
+					StartDate:   start,
+					EndDate:     end,
+					Status:      label.status,
+					AuditFields: model.AuditFields{UpdatedBy: "ADMIN"},
+					CommunityId: community.Id,
+					UserId:      user.Id,
+					PlanId:      plan.Id,
+				}
+				if err := astroCatPsqlDB.Create(membership).Error; err != nil {
+					appLogger.Errorf("[DUMMY] Error creando membresía histórica: %v", err)
+				}
+				// Generar pocas reservas dummy para esta membresía
+				if label.status != model.MembershipStatusCancelled {
+					resCount := rand.Intn(3) + 1 // Entre 1 y 3 reservas (reducido)
+					for r := 0; r < resCount; r++ {
+						delta := end.Sub(start)
+						if delta < 24*time.Hour {
+							continue
+						}
+						resTime := start.Add(time.Duration(rand.Int63n(int64(delta))))
+						// Usar una sesión existente
+						sessionId := sessions[rand.Intn(len(sessions))].Id
+						reservation := &model.Reservation{
+							Id:               uuid.New(),
+							Name:             fmt.Sprintf("Dummy Reservation %d - %s", r+1, desc),
+							ReservationTime:  resTime,
+							State:            model.ReservationStateConfirmed,
+							LastModification: time.Now(),
+							UserId:           user.Id,
+							SessionId:        sessionId,
+							MembershipId:     &membership.Id,
+							AuditFields:      model.AuditFields{UpdatedBy: "ADMIN"},
+						}
+						if err := astroCatPsqlDB.Create(reservation).Error; err != nil {
+							appLogger.Errorf("Error creando reserva dummy histórica: %v", err)
+						}
+					}
+				}
+			}
+		}
+	}
+	fmt.Println("[DUMMY] Generación de membresías y reservas históricas reducida finalizada.")
 
 	// Create dummy templates
 	templates := []*model.Template{
