@@ -200,3 +200,37 @@ func (a *Api) BulkDeleteReservations(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+// @Summary 			Fetch Reservations by Community ID and User ID.
+// @Description 		Fetch all reservations for a specific community and user.
+// @Tags 				Reservation
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				communityId path string true "Community ID"
+// @Param 				userId path string true "User ID"
+// @Success 			200 {object} schemas.Reservations "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/reservation/{communityId}/{userId}/ [get]
+func (a *Api) GetReservationsByCommunityIdByUserId(c echo.Context) error {
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	userId, parseErr := uuid.Parse(c.Param("userId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
+	}
+
+	response, err := a.BllController.Reservation.GetReservationsByCommunityIdByUserId(communityId, userId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}

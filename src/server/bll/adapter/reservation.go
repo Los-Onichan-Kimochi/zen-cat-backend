@@ -46,7 +46,21 @@ func (r *Reservation) GetPostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
@@ -75,7 +89,21 @@ func (r *Reservation) FetchPostgresqlReservations(
 			LastModification: reservationModel.LastModification,
 			UserId:           reservationModel.UserId,
 			SessionId:        reservationModel.SessionId,
-			MembershipId:     reservationModel.MembershipId,
+			Session: schemas.Session{
+				Id:                 reservationModel.Session.Id,
+				Title:              reservationModel.Session.Title,
+				Date:               reservationModel.Session.Date,
+				StartTime:          reservationModel.Session.StartTime,
+				EndTime:            reservationModel.Session.EndTime,
+				State:              string(reservationModel.Session.State),
+				RegisteredCount:    reservationModel.Session.RegisteredCount,
+				Capacity:           reservationModel.Session.Capacity,
+				SessionLink:        reservationModel.Session.SessionLink,
+				ProfessionalId:     reservationModel.Session.ProfessionalId,
+				LocalId:            reservationModel.Session.LocalId,
+				CommunityServiceId: reservationModel.Session.CommunityServiceId,
+			},
+			MembershipId: reservationModel.MembershipId,
 		}
 	}
 
@@ -117,7 +145,21 @@ func (r *Reservation) CreatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
@@ -158,7 +200,21 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
@@ -216,6 +272,7 @@ func (r *Reservation) GetServiceReport(params ServiceReportParams) (total int, s
 	query := r.DaoPostgresql.Reservation.PostgresqlDB.Model(&model.Reservation{})
 	query = query.Preload("Session.CommunityService.Service")
 
+	// Filtrar por fecha real de la reserva (reservation_time)
 	if params.From != nil {
 		query = query.Where("reservation_time >= ?", *params.From)
 	}
@@ -228,8 +285,7 @@ func (r *Reservation) GetServiceReport(params ServiceReportParams) (total int, s
 		return 0, nil, err
 	}
 
-	// Agrupar por servicio y fecha
-
+	// Agrupar por fecha real de la reserva
 	totals := map[string]int{}
 	grouped := map[string]map[string]int{} // serviceType -> date -> count
 

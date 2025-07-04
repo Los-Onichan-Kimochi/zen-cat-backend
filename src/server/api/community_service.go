@@ -229,3 +229,31 @@ func (a *Api) FetchCommunityServices(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
+
+// @Summary 			Get CommunityService By ID.
+// @Description 		Retrieves a community-service association by its ID.
+// @Tags 				CommunityService
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				id path string true "Community Service ID"
+// @Success 			200 {object} schemas.CommunityService "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (Association does not exist)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/community-service/id/{id}/ [get]
+func (a *Api) GetCommunityServiceById(c echo.Context) error {
+	id, parseErr := uuid.Parse(c.Param("id"))
+
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityServiceId, c)
+	}
+
+	response, err := a.BllController.CommunityService.GetCommunityServiceById(id)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
