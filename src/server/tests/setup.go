@@ -681,13 +681,15 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	}
 
 	// Create dummy memberships
+	reservationsUsed := 0
 	memberships := []*model.Membership{
 		{
-			Id:          uuid.New(),
-			Description: "Monthly Yoga Membership",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Monthly Yoga Membership",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(0, 1, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: &reservationsUsed,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -696,11 +698,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PlanId:      plans[0].Id,
 		},
 		{
-			Id:          uuid.New(),
-			Description: "Yearly Maternal Membership",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(1, 0, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Yearly Maternal Membership",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(1, 0, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: nil,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -709,11 +712,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PlanId:      plans[1].Id,
 		},
 		{
-			Id:          uuid.New(),
-			Description: "Yearly Wellness Membership",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(1, 0, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Yearly Wellness Membership",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(1, 0, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: nil,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -723,11 +727,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		// Añadir membresías para los demás usuarios
 		{
-			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - María",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Monthly Wellness Membership - María",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(0, 1, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: &reservationsUsed,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -736,11 +741,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PlanId:      plans[0].Id,
 		},
 		{
-			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Carlos",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Monthly Wellness Membership - Carlos",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(0, 1, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: &reservationsUsed,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -749,11 +755,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PlanId:      plans[0].Id,
 		},
 		{
-			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Ana",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Monthly Wellness Membership - Ana",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(0, 1, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: &reservationsUsed,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -762,11 +769,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			PlanId:      plans[0].Id,
 		},
 		{
-			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Luis",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(0, 1, 0),
-			Status:      model.MembershipStatusActive,
+			Id:               uuid.New(),
+			Description:      "Monthly Wellness Membership - Luis",
+			StartDate:        time.Now(),
+			EndDate:          time.Now().AddDate(0, 1, 0),
+			Status:           model.MembershipStatusActive,
+			ReservationsUsed: &reservationsUsed,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},

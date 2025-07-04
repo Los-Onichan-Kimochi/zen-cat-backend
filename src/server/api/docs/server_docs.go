@@ -8532,6 +8532,9 @@ const docTemplateserver = `{
                 "plan_id": {
                     "type": "string"
                 },
+                "reservations_used": {
+                    "type": "integer"
+                },
                 "start_date": {
                     "type": "string"
                 },
@@ -8554,6 +8557,9 @@ const docTemplateserver = `{
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -9010,6 +9016,9 @@ const docTemplateserver = `{
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -9484,6 +9493,9 @@ const docTemplateserver = `{
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"

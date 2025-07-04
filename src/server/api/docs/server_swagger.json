@@ -8525,6 +8525,9 @@
                 "plan_id": {
                     "type": "string"
                 },
+                "reservations_used": {
+                    "type": "integer"
+                },
                 "start_date": {
                     "type": "string"
                 },
@@ -8547,6 +8550,9 @@
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -9003,6 +9009,9 @@
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -9477,6 +9486,9 @@
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"

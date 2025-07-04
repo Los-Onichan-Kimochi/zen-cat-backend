@@ -519,6 +519,8 @@ definitions:
         type: string
       plan_id:
         type: string
+      reservations_used:
+        type: integer
       start_date:
         type: string
       status:
@@ -534,6 +536,8 @@ definitions:
         type: string
       plan_id:
         type: string
+      reservations_used:
+        type: integer
       start_date:
         type: string
       status:
@@ -837,6 +841,8 @@ definitions:
         $ref: '#/definitions/schemas.Plan'
       plan_id:
         type: string
+      reservations_used:
+        type: integer
       start_date:
         type: string
       status:
@@ -1148,6 +1154,8 @@ definitions:
         type: string
       plan_id:
         type: string
+      reservations_used:
+        type: integer
       start_date:
         type: string
       status:

@@ -90,6 +90,7 @@ func (m *Membership) CreateMembership(
 		createMembershipRequest.StartDate,
 		createMembershipRequest.EndDate,
 		createMembershipRequest.Status,
+		createMembershipRequest.ReservationsUsed,
 		createMembershipRequest.CommunityId,
 		createMembershipRequest.UserId,
 		createMembershipRequest.PlanId,
@@ -132,6 +133,7 @@ func (m *Membership) CreateMembershipForUser(
 		createMembershipForUserRequest.StartDate,
 		createMembershipForUserRequest.EndDate,
 		createMembershipForUserRequest.Status,
+		createMembershipForUserRequest.ReservationsUsed,
 		createMembershipForUserRequest.CommunityId,
 		userId, // El userId viene del parámetro de la URL, no del body
 		createMembershipForUserRequest.PlanId,
@@ -180,6 +182,7 @@ func (m *Membership) UpdateMembership(
 		updateMembershipRequest.StartDate,
 		updateMembershipRequest.EndDate,
 		updateMembershipRequest.Status,
+		updateMembershipRequest.ReservationsUsed,
 		updateMembershipRequest.CommunityId,
 		updateMembershipRequest.UserId,
 		updateMembershipRequest.PlanId,
