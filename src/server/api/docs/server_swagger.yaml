@@ -1392,8 +1392,6 @@ definitions:
     type: object
   time.Duration:
     enum:
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1408,8 +1406,6 @@ definitions:
     - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -3405,6 +3401,49 @@ paths:
       summary: Get Memberships by Community ID.
       tags:
       - Membership
+  /membership/community/{communityId}/users:
+    get:
+      consumes:
+      - application/json
+      description: Gets all users who have active memberships in a specific community.
+      parameters:
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Users'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Users by Community ID.
+      tags:
+      - Membership
   /membership/user/{userId}/:
     get:
       consumes:
@@ -3494,6 +3533,54 @@ paths:
       security:
       - JWT: []
       summary: Create Membership for User.
+      tags:
+      - Membership
+  /membership/user/{userId}/community/{communityId}:
+    get:
+      consumes:
+      - application/json
+      description: Gets a membership for a given user ID and community ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Community ID
+        in: path
+        name: communityId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Membership'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Membership by User ID and Community ID.
       tags:
       - Membership
   /onboarding/:

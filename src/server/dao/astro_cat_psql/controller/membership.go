@@ -58,6 +58,19 @@ func (m *Membership) GetMembershipsByCommunityId(communityId uuid.UUID) ([]*mode
 	return memberships, nil
 }
 
+func (m *Membership) GetMembershipByUserAndCommunity(userId uuid.UUID, communityId uuid.UUID) (*model.Membership, error) {
+	var membership model.Membership
+	result := m.PostgresqlDB.Preload("Community").Preload("User").Preload("Plan").
+		Where("user_id = ? AND community_id = ? AND status = ?", userId, communityId, "ACTIVE").
+		First(&membership)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &membership, nil
+}
+
 func (m *Membership) FetchMemberships() ([]*model.Membership, error) {
 	var memberships []*model.Membership
 	result := m.PostgresqlDB.Preload("Community").Preload("User").Preload("Plan").

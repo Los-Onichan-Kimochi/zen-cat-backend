@@ -55,6 +55,18 @@ func (m *Membership) GetPostgresqlMembershipsByUserId(
 	return memberships, nil
 }
 
+func (m *Membership) GetPostgresqlMembershipByUserAndCommunity(
+	userId uuid.UUID,
+	communityId uuid.UUID,
+) (*schemas.Membership, *errors.Error) {
+	membershipModel, err := m.DaoPostgresql.Membership.GetMembershipByUserAndCommunity(userId, communityId)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.MembershipNotFound
+	}
+
+	return m.convertModelToSchema(membershipModel), nil
+}
+
 func (m *Membership) GetPostgresqlMembershipsByCommunityId(
 	communityId uuid.UUID,
 ) ([]*schemas.Membership, *errors.Error) {

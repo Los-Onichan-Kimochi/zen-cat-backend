@@ -244,3 +244,65 @@ func (a *Api) DeleteMembership(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+// @Summary 			Get Users by Community ID.
+// @Description 		Gets all users who have active memberships in a specific community.
+// @Tags 				Membership
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               communityId    path   string  true  "Community ID"
+// @Success 			200 {object} schemas.Users "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/membership/community/{communityId}/users [get]
+func (a *Api) GetUsersByCommunityId(c echo.Context) error {
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	response, err := a.BllController.Membership.GetUsersByCommunityId(communityId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// @Summary 			Get Membership by User ID and Community ID.
+// @Description 		Gets a membership for a given user ID and community ID.
+// @Tags 				Membership
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               userId    path   string  true  "User ID"
+// @Param               communityId    path   string  true  "Community ID"
+// @Success 			200 {object} schemas.Membership "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/membership/user/{userId}/community/{communityId} [get]
+func (a *Api) GetMembershipByUserAndCommunity(c echo.Context) error {
+	userId, parseErr := uuid.Parse(c.Param("userId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidUserId, c)
+	}
+
+	communityId, parseErr := uuid.Parse(c.Param("communityId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidCommunityId, c)
+	}
+
+	response, err := a.BllController.Membership.GetMembershipByUserAndCommunity(userId, communityId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
