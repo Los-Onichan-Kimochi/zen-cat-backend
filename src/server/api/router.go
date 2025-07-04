@@ -114,6 +114,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	user := a.Echo.Group("/user")
 	user.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	user.GET("/:userId/", a.GetUser)
+	user.GET("/:userId/image/", a.GetUserWithImage)
 	user.GET("/", a.FetchUsers)
 	user.GET("/exists", a.CheckUserExists)
 	user.POST("/", a.CreateUser)
@@ -129,6 +130,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	service := a.Echo.Group("/service")
 	service.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	service.GET("/:serviceId/", a.GetService)
+	service.GET("/:serviceId/image/", a.GetServiceWithImage)
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)

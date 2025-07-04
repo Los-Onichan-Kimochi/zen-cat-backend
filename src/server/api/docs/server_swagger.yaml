@@ -650,6 +650,10 @@ definitions:
     properties:
       description:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       is_virtual:
@@ -684,6 +688,10 @@ definitions:
         type: string
       first_last_name:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       memberships:
@@ -1100,6 +1108,23 @@ definitions:
           $ref: '#/definitions/schemas.ServiceProfessional'
         type: array
     type: object
+  schemas.ServiceWithImage:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
+      image_url:
+        type: string
+      is_virtual:
+        type: boolean
+      name:
+        type: string
+    type: object
   schemas.Services:
     properties:
       services:
@@ -1296,6 +1321,10 @@ definitions:
     properties:
       description:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       is_virtual:
@@ -1334,6 +1363,10 @@ definitions:
         type: string
       first_last_name:
         type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
       image_url:
         type: string
       memberships:
@@ -1451,6 +1484,35 @@ definitions:
       total_users:
         type: integer
     type: object
+  schemas.UserWithImage:
+    properties:
+      email:
+        type: string
+      first_last_name:
+        type: string
+      id:
+        type: string
+      image_bytes:
+        items:
+          type: integer
+        type: array
+      image_url:
+        type: string
+      memberships:
+        items:
+          $ref: '#/definitions/schemas.Membership'
+        type: array
+      name:
+        type: string
+      onboarding:
+        $ref: '#/definitions/schemas.Onboarding'
+      password:
+        type: string
+      rol:
+        $ref: '#/definitions/schemas.UserRol'
+      second_last_name:
+        type: string
+    type: object
   schemas.Users:
     properties:
       users:
@@ -1473,6 +1535,7 @@ definitions:
     - 1000000
     - 1000000000
     - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
     - minDuration
@@ -1488,6 +1551,7 @@ definitions:
     - Millisecond
     - Second
     - Minute
+    - Hour
 info:
   contact: {}
   description: AstroCat API sample for clients
@@ -5658,6 +5722,49 @@ paths:
       summary: Update Service.
       tags:
       - Service
+  /service/{serviceId}/image/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a service given its id with image bytes.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ServiceWithImage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Service with image.
+      tags:
+      - Service
   /service/bulk-delete/:
     delete:
       consumes:
@@ -6313,6 +6420,49 @@ paths:
       security:
       - JWT: []
       summary: Update User.
+      tags:
+      - User
+  /user/{userId}/image/:
+    get:
+      consumes:
+      - application/json
+      description: Gets a user given its id with image bytes.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.UserWithImage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get User with image.
       tags:
       - User
   /user/{userId}/role/:

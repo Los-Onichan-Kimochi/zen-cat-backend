@@ -6547,6 +6547,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/service/{serviceId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a service given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Get Service with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/session/": {
             "get": {
                 "security": [
@@ -7808,6 +7875,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/user/{userId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a user given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{userId}/role/": {
             "patch": {
                 "security": [
@@ -8863,6 +8997,12 @@ const docTemplateserver = `{
                 "description": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8914,6 +9054,12 @@ const docTemplateserver = `{
                 },
                 "first_last_name": {
                     "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -9544,6 +9690,32 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.ServiceWithImage": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_virtual": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.Services": {
             "type": "object",
             "properties": {
@@ -9844,6 +10016,12 @@ const docTemplateserver = `{
                 "description": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -9901,6 +10079,12 @@ const docTemplateserver = `{
                 },
                 "first_last_name": {
                     "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -10079,6 +10263,50 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.UserWithImage": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "memberships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Membership"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onboarding": {
+                    "$ref": "#/definitions/schemas.Onboarding"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "rol": {
+                    "$ref": "#/definitions/schemas.UserRol"
+                },
+                "second_last_name": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.Users": {
             "type": "object",
             "properties": {
@@ -10105,7 +10333,8 @@ const docTemplateserver = `{
                 1000,
                 1000000,
                 1000000000,
-                60000000000
+                60000000000,
+                3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
@@ -10120,7 +10349,8 @@ const docTemplateserver = `{
                 "Microsecond",
                 "Millisecond",
                 "Second",
-                "Minute"
+                "Minute",
+                "Hour"
             ]
         }
     }
