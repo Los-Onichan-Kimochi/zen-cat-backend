@@ -83,6 +83,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	professional := a.Echo.Group("/professional")
 	professional.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	professional.GET("/:professionalId/", a.GetProfessional)
+	professional.GET("/:professionalId/image/", a.GetProfessionalWithImage)
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
@@ -94,6 +95,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	local := a.Echo.Group("/local")
 	local.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	local.GET("/:localId/", a.GetLocal)
+	local.GET("/:localId/image/", a.GetLocalWithImage)
 	local.GET("/", a.FetchLocals)
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
@@ -116,6 +118,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	user := a.Echo.Group("/user")
 	user.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	user.GET("/:userId/", a.GetUser)
+	user.GET("/:userId/image/", a.GetUserWithImage)
 	user.GET("/", a.FetchUsers)
 	user.GET("/exists", a.CheckUserExists)
 	user.POST("/", a.CreateUser)
@@ -131,6 +134,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	service := a.Echo.Group("/service")
 	service.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	service.GET("/:serviceId/", a.GetService)
+	service.GET("/:serviceId/image/", a.GetServiceWithImage)
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)

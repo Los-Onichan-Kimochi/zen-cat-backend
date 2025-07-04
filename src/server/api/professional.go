@@ -37,6 +37,50 @@ func (a *Api) GetProfessional(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get Professional with image.
+// @Description 		Gets a professional given its id with image bytes.
+// @Tags 				Professional
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               professionalId    path   string  true  "Professional ID"
+// @Success 			200 {object} schemas.ProfessionalWithImage "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/professional/{professionalId}/image/ [get]
+func (a *Api) GetProfessionalWithImage(c echo.Context) error {
+	professionalId, parseErr := uuid.Parse(c.Param("professionalId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidProfessionalId, c)
+	}
+
+	response, err := a.BllController.Professional.GetProfessional(professionalId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	var imageBytes *[]byte
+	// Try to download image from S3, but don't fail if S3 is not available
+	if response.ImageUrl != "" {
+		downloadedBytes, s3Err := a.S3Service.DownloadFile(
+			schemas.ProfessionalS3Prefix,
+			response.ImageUrl,
+		)
+		if s3Err == nil {
+			imageBytes = &downloadedBytes
+		}
+		// If S3 fails, we continue without image bytes
+	}
+
+	return c.JSON(http.StatusOK, schemas.ProfessionalWithImage{
+		Professional: *response,
+		ImageBytes:   imageBytes,
+	})
+}
+
 // @Summary 			Fetch Professionals.
 // @Description 		Fetch all professionals, filtered by params.
 // @Tags 				Professional
@@ -80,10 +124,26 @@ func (a *Api) CreateProfessional(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
+
+	if request.ImageUrl != "" {
+		request.ImageUrl = a.S3Service.GenerateImageUrl(request.ImageUrl)
+	}
+
 	response, err := a.BllController.Professional.CreateProfessional(request, updateBy)
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}
+
+	// Upload image to S3
+	if response.ImageUrl != "" && request.ImageBytes != nil {
+		a.S3Service.UploadFile(
+			schemas.ProfessionalS3Prefix,
+			response.ImageUrl,
+			*request.ImageBytes,
+		)
+		// If S3 fails, we continue without image upload
+	}
+
 	return c.JSON(http.StatusCreated, response)
 }
 
@@ -114,6 +174,11 @@ func (a *Api) UpdateProfessional(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
+
+	if request.ImageUrl != nil {
+		*request.ImageUrl = a.S3Service.GenerateImageUrl(*request.ImageUrl)
+	}
+
 	response, err := a.BllController.Professional.UpdateProfessional(
 		professionalId,
 		request,
@@ -122,6 +187,19 @@ func (a *Api) UpdateProfessional(c echo.Context) error {
 	if err != nil {
 		return errors.HandleError(*err, c)
 	}
+
+	// Upload image to S3 if it exists
+	if request.ImageUrl != nil && request.ImageBytes != nil {
+		err := a.S3Service.UploadFile(
+			schemas.ProfessionalS3Prefix,
+			response.ImageUrl,
+			*request.ImageBytes,
+		)
+		if err != nil {
+			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+		}
+	}
+
 	return c.JSON(http.StatusOK, response)
 }
 

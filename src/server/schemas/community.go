@@ -16,17 +16,17 @@ type Communities struct {
 }
 
 type CreateCommunityRequest struct {
-	Name       string `json:"name"`
-	Purpose    string `json:"purpose"`
-	ImageUrl   string `json:"image_url"`
-	ImageBytes []byte `json:"image_bytes"`
+	Name       string  `json:"name"`
+	Purpose    string  `json:"purpose"`
+	ImageUrl   string  `json:"image_url"`
+	ImageBytes *[]byte `json:"image_bytes"`
 }
 
 type UpdateCommunityRequest struct {
-	Name     *string `json:"name"`
-	Purpose  *string `json:"purpose"`
-	ImageUrl *string `json:"image_url"`
-	ImageBytes []byte `json:"image_bytes"`
+	Name       *string `json:"name"`
+	Purpose    *string `json:"purpose"`
+	ImageUrl   *string `json:"image_url"`
+	ImageBytes *[]byte `json:"image_bytes"`
 }
 
 type BatchCreateCommunityRequest struct {
@@ -39,5 +39,5 @@ type BulkDeleteCommunityRequest struct {
 
 type CommunityWithImage struct {
 	Community
-	ImageBytes []byte `json:"image_bytes"`
+	ImageBytes *[]byte `json:"image_bytes"`
 }

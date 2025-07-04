@@ -20,15 +20,16 @@ type Locals struct {
 }
 
 type CreateLocalRequest struct {
-	LocalName      string `json:"local_name"`
-	StreetName     string `json:"street_name"`
-	BuildingNumber string `json:"building_number"`
-	District       string `json:"district"`
-	Province       string `json:"province"`
-	Region         string `json:"region"`
-	Reference      string `json:"reference"`
-	Capacity       int    `json:"capacity"`
-	ImageUrl       string `json:"image_url"`
+	LocalName      string  `json:"local_name"`
+	StreetName     string  `json:"street_name"`
+	BuildingNumber string  `json:"building_number"`
+	District       string  `json:"district"`
+	Province       string  `json:"province"`
+	Region         string  `json:"region"`
+	Reference      string  `json:"reference"`
+	Capacity       int     `json:"capacity"`
+	ImageUrl       string  `json:"image_url"`
+	ImageBytes     *[]byte `json:"image_bytes"`
 }
 
 type UpdateLocalRequest struct {
@@ -41,6 +42,7 @@ type UpdateLocalRequest struct {
 	Reference      *string `json:"reference"`
 	Capacity       *int    `json:"capacity"`
 	ImageUrl       *string `json:"image_url"`
+	ImageBytes     *[]byte `json:"image_bytes"`
 }
 
 type BatchCreateLocalRequest struct {
@@ -49,4 +51,9 @@ type BatchCreateLocalRequest struct {
 
 type BulkDeleteLocalRequest struct {
 	Locals []string `json:"locals"`
+}
+
+type LocalWithImage struct {
+	Local
+	ImageBytes *[]byte `json:"image_bytes"`
 }

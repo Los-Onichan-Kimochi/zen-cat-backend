@@ -16,10 +16,11 @@ type Services struct {
 }
 
 type CreateServiceRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ImageUrl    string `json:"image_url"`
-	IsVirtual   bool   `json:"is_virtual"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	ImageUrl    string  `json:"image_url"`
+	IsVirtual   bool    `json:"is_virtual"`
+	ImageBytes  *[]byte `json:"image_bytes"`
 }
 
 type UpdateServiceRequest struct {
@@ -27,8 +28,14 @@ type UpdateServiceRequest struct {
 	Description *string `json:"description"`
 	ImageUrl    *string `json:"image_url"`
 	IsVirtual   *bool   `json:"is_virtual"`
+	ImageBytes  *[]byte `json:"image_bytes"`
 }
 
 type BulkDeleteServiceRequest struct {
 	Services []string `json:"services"`
+}
+
+type ServiceWithImage struct {
+	Service
+	ImageBytes *[]byte `json:"image_bytes"`
 }

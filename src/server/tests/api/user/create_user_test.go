@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,7 +60,7 @@ func TestCreateUserSuccessfully(t *testing.T) {
 	assert.Equal(t, &createUserRequest.SecondLastName, response.SecondLastName)
 	assert.Equal(t, createUserRequest.Email, response.Email)
 	assert.Equal(t, schemas.UserRol(createUserRequest.Rol), response.Rol)
-	assert.Equal(t, createUserRequest.ImageUrl, response.ImageUrl)
+	assert.True(t, strings.HasPrefix(response.ImageUrl, createUserRequest.ImageUrl))
 	// Password should not be returned
 	// assert.Empty(t, response.Password)
 

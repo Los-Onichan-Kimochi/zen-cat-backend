@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -54,12 +55,12 @@ func (s *S3Service) UploadFile(
 	imageBytes []byte,
 ) error {
 	if !s.IsAvailablePrefix(prefix) {
-		s.logger.Errorf("Prefix %s is not available", prefix)
+		s.logger.Errorf("Prefix %s is not available\n", string(prefix))
 		return errors.New("prefix not available")
 	}
 
 	if len(imageBytes) == 0 {
-		s.logger.Infof("No image bytes to upload for %s", objectName)
+		s.logger.Infof("No image bytes to upload for %s/%s\n", string(prefix), objectName)
 		return nil
 	}
 
@@ -74,11 +75,11 @@ func (s *S3Service) UploadFile(
 		Body:   src,
 	})
 	if err != nil {
-		s.logger.Errorf("Error uploading file to S3: %v", err)
+		s.logger.Errorf("Error uploading file to S3: %v\n", err)
 		return err
 	}
 
-	s.logger.Infof("File %s uploaded to S3.", string(prefix)+"/"+objectName)
+	s.logger.Infof("File %s/%s uploaded to S3.\n", string(prefix), objectName)
 
 	return nil
 }
@@ -86,7 +87,7 @@ func (s *S3Service) UploadFile(
 // Downloads a file from S3. It returns the file content as bytes.
 func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]byte, error) {
 	if !s.IsAvailablePrefix(prefix) {
-		s.logger.Errorf("Prefix %s is not available", prefix)
+		s.logger.Errorf("Prefix %s is not available\n", string(prefix))
 		return nil, errors.New("prefix not available")
 	}
 
@@ -99,18 +100,23 @@ func (s *S3Service) DownloadFile(prefix schemas.S3Prefix, objectName string) ([]
 		Key:    aws.String(string(prefix) + "/" + objectName),
 	})
 	if err != nil {
-		s.logger.Errorf("Error downloading file %s from S3: %v", string(prefix)+"/"+objectName, err)
+		s.logger.Errorf(
+			"Error downloading file %s/%s from S3: %v\n",
+			string(prefix),
+			objectName,
+			err,
+		)
 		return nil, err
 	}
 
 	// Read the file content
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		s.logger.Errorf("Error reading file content: %v", err)
+		s.logger.Errorf("Error reading file content: %v\n", err)
 		return nil, err
 	}
 
-	s.logger.Infof("File %s downloaded from S3.", string(prefix)+"/"+objectName)
+	s.logger.Infof("File %s/%s downloaded from S3.\n", string(prefix), objectName)
 
 	return body, nil
 }
@@ -132,4 +138,9 @@ func (s *S3Service) IsAvailablePrefix(prefix schemas.S3Prefix) bool {
 	}
 
 	return false
+}
+
+// Generates a new image url with a timestamp suffix.
+func (s *S3Service) GenerateImageUrl(prevImageUrl string) string {
+	return prevImageUrl + "_" + time.Now().Format("20060102150405")
 }
