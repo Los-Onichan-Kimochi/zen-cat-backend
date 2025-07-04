@@ -8,3 +8,7 @@ type ForgotPasswordResponse struct {
 	Message string `json:"message"`
 	Pin     string `json:"pin"`
 }
+
+type SendPINBySMSRequest struct {
+	Email string `json:"email" validate:"required,email"`
+}

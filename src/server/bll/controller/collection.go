@@ -27,6 +27,7 @@ type ControllerCollection struct {
 	Session             *Session
 	Reservation         *Reservation
 	ForgotPassword      *ForgotPassword
+	Contact             *Contact
 	AuditLog            *AuditLog
 }
 
@@ -56,6 +57,7 @@ func NewControllerCollection(
 	session := NewSessionController(logger, bllAdapter, envSettings)
 	reservation := NewReservationController(logger, bllAdapter, envSettings)
 	forgotPassword := NewForgotPasswordController(logger, bllAdapter, envSettings)
+	contact := NewContactController(logger, bllAdapter, envSettings)
 	auditLog := NewAuditLogController(logger, bllAdapter, envSettings)
 
 	return &ControllerCollection{
@@ -78,6 +80,7 @@ func NewControllerCollection(
 		Session:             session,
 		Reservation:         reservation,
 		ForgotPassword:      forgotPassword,
+		Contact:             contact,
 		AuditLog:            auditLog,
 	}, astroCatPsqlDB
 }

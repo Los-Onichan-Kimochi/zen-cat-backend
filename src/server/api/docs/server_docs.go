@@ -1846,6 +1846,61 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/contact": {
+            "post": {
+                "description": "Enviar un mensaje desde el formulario de contacto público",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Enviar mensaje de contacto",
+                "parameters": [
+                    {
+                        "description": "Información de contacto",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ContactRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mensaje enviado correctamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Campos faltantes o inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Cuerpo de solicitud inválido",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - No se pudo enviar el mensaje",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/error-log/": {
             "get": {
                 "security": [
@@ -2701,6 +2756,64 @@ const docTemplateserver = `{
                     },
                     "401": {
                         "description": "Unauthorized - Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/google/": {
+            "post": {
+                "description": "Authenticate user using Google ID token, returns user info and tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Google Login",
+                "parameters": [
+                    {
+                        "description": "Google Login Request",
+                        "name": "googleLoginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -9045,6 +9158,28 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.ContactRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "opcional",
+                    "type": "string"
+                },
+                "subject": {
+                    "description": "requerido",
+                    "type": "string"
+                }
+            }
+        },
         "schemas.CreateCommunityPlanRequest": {
             "type": "object",
             "required": [
@@ -9554,6 +9689,26 @@ const docTemplateserver = `{
                 "GenderFemale",
                 "GenderOther"
             ]
+        },
+        "schemas.GoogleLoginRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOi..."
+                }
+            }
+        },
+        "schemas.GoogleLoginResponse": {
+            "type": "object",
+            "properties": {
+                "tokens": {
+                    "$ref": "#/definitions/schemas.TokenResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/schemas.User"
+                }
+            }
         },
         "schemas.Local": {
             "type": "object",
@@ -10681,8 +10836,6 @@ const docTemplateserver = `{
         "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -10699,8 +10852,6 @@ const docTemplateserver = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",

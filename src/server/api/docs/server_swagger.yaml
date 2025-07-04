@@ -455,6 +455,21 @@ definitions:
           $ref: '#/definitions/schemas.Session'
         type: array
     type: object
+  schemas.ContactRequest:
+    properties:
+      email:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      phone:
+        description: opcional
+        type: string
+      subject:
+        description: requerido
+        type: string
+    type: object
   schemas.CreateCommunityPlanRequest:
     properties:
       community_id:
@@ -794,6 +809,19 @@ definitions:
     - GenderMale
     - GenderFemale
     - GenderOther
+  schemas.GoogleLoginRequest:
+    properties:
+      token:
+        example: eyJhbGciOi...
+        type: string
+    type: object
+  schemas.GoogleLoginResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/schemas.TokenResponse'
+      user:
+        $ref: '#/definitions/schemas.User'
+    type: object
   schemas.Local:
     properties:
       building_number:
@@ -1534,8 +1562,6 @@ definitions:
     type: object
   time.Duration:
     enum:
-    - -9223372036854775808
-    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1552,8 +1578,6 @@ definitions:
     - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2749,6 +2773,42 @@ paths:
       summary: Bulk Delete Communities.
       tags:
       - Community
+  /contact:
+    post:
+      consumes:
+      - application/json
+      description: Enviar un mensaje desde el formulario de contacto público
+      parameters:
+      - description: Información de contacto
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mensaje enviado correctamente
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Campos faltantes o inválidos
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity - Cuerpo de solicitud inválido
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error - No se pudo enviar el mensaje
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: Enviar mensaje de contacto
+      tags:
+      - Contact
   /error-log/:
     get:
       consumes:
@@ -3311,6 +3371,45 @@ paths:
           schema:
             $ref: '#/definitions/errors.Error'
       summary: User Login
+      tags:
+      - Login
+  /login/google/:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user using Google ID token, returns user info and
+        tokens
+      parameters:
+      - description: Google Login Request
+        in: body
+        name: googleLoginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.GoogleLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/schemas.GoogleLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Unauthorized - Invalid token
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: Google Login
       tags:
       - Login
   /me/:

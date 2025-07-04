@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"context"
 	"time"
+
+	"google.golang.org/api/idtoken"
 
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
@@ -123,6 +126,68 @@ func (l *Login) Register(
 			Rol:            user.Rol,
 			ImageUrl:       user.ImageUrl,
 		},
+		Tokens: tokenResponse,
+	}, nil
+}
+
+func (l *Login) GoogleLogin(
+	ctx context.Context,
+	idToken string,
+) (*schemas.GoogleLoginResponse, *errors.Error) {
+	// 1. Validar token de Google
+	payload, err := idtoken.Validate(ctx, idToken, "")
+	if err != nil {
+		l.Logger.Error("Token de Google inválido:", err)
+		return nil, &errors.AuthenticationError.InvalidAccessToken
+	}
+
+	// 2. Extraer datos del token
+	email, _ := payload.Claims["email"].(string)
+	name, _ := payload.Claims["name"].(string)
+	picture, _ := payload.Claims["picture"].(string)
+
+	// 3. Buscar usuario por email
+	user, userErr := l.Adapter.User.GetPostgresqlUserByEmail(email)
+	if userErr != nil {
+		// 4. Crear usuario si no existe
+		newUser, createErr := l.Adapter.User.CreatePostgresqlUser(
+			name,
+			"",  // firstLastName
+			nil, // secondLastName
+			"",  // password
+			email,
+			string(schemas.UserRolClient),
+			picture,
+			"SYSTEM",
+			nil,
+			nil,
+		)
+		if createErr != nil {
+			l.Logger.Error("Error al crear usuario con Google:", createErr)
+			return nil, &errors.InternalServerError.Default
+		}
+
+		// reconstruir user localmente (porque Create no lo retorna)
+		user = newUser
+	}
+
+	userRoles := []string{string(user.Rol)}
+
+	// 5. Generar tokens JWT
+	tokenResponse, tokenErr := l.Auth.GenerateToken(
+		user.Id,
+		user.Email,
+		user.Password,
+		userRoles,
+		time.Hour*2,
+	)
+	if tokenErr != nil {
+		return nil, tokenErr
+	}
+
+	// 6. Retornar estructura de respuesta
+	return &schemas.GoogleLoginResponse{
+		User:   *user,
 		Tokens: tokenResponse,
 	}, nil
 }

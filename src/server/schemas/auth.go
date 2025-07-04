@@ -64,3 +64,12 @@ type Credentials struct {
 	UserLastName  *string   `json:"user_last_name"`
 	UserImageUrl  string    `json:"user_image_url"`
 }
+
+type GoogleLoginRequest struct {
+	Token string `json:"token" example:"eyJhbGciOi..."`
+}
+
+type GoogleLoginResponse struct {
+	User   User          `json:"user"`
+	Tokens TokenResponse `json:"tokens"`
+}
