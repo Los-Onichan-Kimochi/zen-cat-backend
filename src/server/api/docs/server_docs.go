@@ -10836,12 +10836,6 @@ const docTemplateserver = `{
         "time.Duration": {
             "type": "integer",
             "enum": [
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000,
                 -9223372036854775808,
                 9223372036854775807,
                 1,
@@ -10852,12 +10846,6 @@ const docTemplateserver = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
