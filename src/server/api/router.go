@@ -79,6 +79,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	professional := a.Echo.Group("/professional")
 	professional.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	professional.GET("/:professionalId/", a.GetProfessional)
+	professional.GET("/:professionalId/image/", a.GetProfessionalWithImage)
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
