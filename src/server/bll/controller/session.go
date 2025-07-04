@@ -203,6 +203,40 @@ func (s *Session) UpdateSession(
 		}
 	}
 
+	// If the session is being cancelled, update all related reservations to ANNULLED
+	if req.State != nil && *req.State == "CANCELLED" {
+		// Get all reservations for this session
+		reservations, err := s.Adapter.Reservation.FetchPostgresqlReservations(
+			[]uuid.UUID{},          // No user filter
+			[]uuid.UUID{sessionId}, // Filter by this session
+			[]string{},             // No state filter
+		)
+		if err != nil {
+			s.logger.Warn("Error fetching reservations for session", "error", err)
+			// Continue with session update even if reservation fetch fails
+		} else {
+			// Update each reservation to ANNULLED state
+			annulledState := "ANULLED"
+			for _, reservation := range reservations {
+				_, updateErr := s.Adapter.Reservation.UpdatePostgresqlReservation(
+					reservation.Id,
+					nil,            // No name change
+					nil,            // No reservation time change
+					&annulledState, // Change state to ANNULLED
+					nil,            // No user change
+					nil,            // No session change
+					nil,            // No membership change
+					updatedBy,
+				)
+				if updateErr != nil {
+					s.logger.Warn("Error updating reservation status", "reservationId", reservation.Id, "error", updateErr)
+					// Continue with other reservations even if one fails
+				}
+			}
+			s.logger.Info("Updated reservations to ANNULLED for cancelled session", "sessionId", sessionId, "count", len(reservations))
+		}
+	}
+
 	return s.Adapter.Session.UpdatePostgresqlSession(
 		sessionId,
 		req.Title,
