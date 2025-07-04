@@ -389,6 +389,25 @@ var (
 		},
 	}
 
+	ContactError = struct {
+		MissingFields      Error
+		InvalidEmailFormat Error
+		FailedToSendEmail  Error
+	}{
+		MissingFields: Error{
+			Code:    "CONTACT_ERROR_001",
+			Message: "Name, email and message are required.",
+		},
+		InvalidEmailFormat: Error{
+			Code:    "CONTACT_ERROR_002",
+			Message: "Email format is invalid.",
+		},
+		FailedToSendEmail: Error{
+			Code:    "CONTACT_ERROR_003",
+			Message: "Failed to send contact email.",
+		},
+	}
+
 	// For 401 Unauthorized errors
 	AuthenticationError = struct {
 		UnauthorizedUser    Error
@@ -484,6 +503,7 @@ var (
 		InvalidEmail        Error
 		FailedToSendEmail   Error
 		InvalidOrExpiredPin Error
+		FailedToSendSMS     Error
 	}{
 		InvalidEmail: Error{
 			Code:    "FORGOT_PASSWORD_ERROR_001",
@@ -496,6 +516,10 @@ var (
 		InvalidOrExpiredPin: Error{
 			Code:    "FORGOT_PASSWORD_ERROR_003",
 			Message: "Invalid or expired PIN code",
+		},
+		FailedToSendSMS: Error{
+			Code:    "FORGOT_PASSWORD_ERROR_004",
+			Message: "Failed to send SMS with recovery PIN",
 		},
 	}
 )

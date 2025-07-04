@@ -14,6 +14,7 @@ type Reservation struct {
 	LastModification time.Time  `json:"last_modification"`
 	UserId           uuid.UUID  `json:"user_id"`
 	SessionId        uuid.UUID  `json:"session_id"`
+	Session          Session    `json:"session"`
 	MembershipId     *uuid.UUID `json:"membership_id,omitempty"`
 }
 

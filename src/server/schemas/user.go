@@ -35,6 +35,7 @@ type CreateUserRequest struct {
 	Email          string        `json:"email"`
 	Rol            string        `json:"rol"`
 	ImageUrl       string        `json:"image_url"`
+	ImageBytes     *[]byte       `json:"image_bytes"`
 	Onboarding     *Onboarding   `json:"onboarding,omitempty"`
 	Memberships    []*Membership `json:"memberships,omitempty"`
 }
@@ -47,6 +48,7 @@ type UpdateUserRequest struct {
 	Email          *string       `json:"email"`
 	Rol            *string       `json:"rol"`
 	ImageUrl       *string       `json:"image_url"`
+	ImageBytes     *[]byte       `json:"image_bytes"`
 	Onboarding     *Onboarding   `json:"onboarding,omitempty"`
 	Memberships    []*Membership `json:"memberships,omitempty"`
 }
@@ -59,8 +61,13 @@ type BulkCreateUserRequest struct {
 	Users []*CreateUserRequest `json:"users"`
 }
 
+type UserWithImage struct {
+	User
+	ImageBytes *[]byte `json:"image_bytes"`
+}
+
 type ChangePasswordInput struct {
-	Email       string `json:"email" validate:"required,email"`
+	Email       string `json:"email"        validate:"required,email"`
 	NewPassword string `json:"new_password" validate:"required"`
 }
 

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
@@ -90,4 +92,52 @@ func (c *Community) BulkDeleteCommunities(
 	return c.Adapter.Community.BulkDeletePostgresqlCommunities(
 		bulkDeleteCommunityData.Communities,
 	)
+}
+
+// GetCommunityReport obtiene el reporte de comunidades para el dashboard admin
+type CommunityReportResponse struct {
+	Total       int                              `json:"totalMemberships"`
+	Communities []bllAdapter.CommunityReportData `json:"communities"`
+	// Métricas agregadas
+	Summary struct {
+		TotalActiveMemberships    int `json:"totalActiveMemberships"`
+		TotalExpiredMemberships   int `json:"totalExpiredMemberships"`
+		TotalCancelledMemberships int `json:"totalCancelledMemberships"`
+		TotalActiveUsers          int `json:"totalActiveUsers"`
+		TotalInactiveUsers        int `json:"totalInactiveUsers"`
+		TotalReservations         int `json:"totalReservations"`
+		TotalMonthlyPlans         int `json:"totalMonthlyPlans"`
+		TotalAnnualPlans          int `json:"totalAnnualPlans"`
+	} `json:"summary"`
+}
+
+func (c *Community) GetCommunityReport(from, to *time.Time, groupBy string) (*CommunityReportResponse, *errors.Error) {
+	params := bllAdapter.CommunityReportParams{
+		From:    from,
+		To:      to,
+		GroupBy: groupBy,
+	}
+	total, communities, err := c.Adapter.Community.GetCommunityReport(params)
+	if err != nil {
+		return nil, &errors.InternalServerError.Default
+	}
+
+	// Calcular métricas agregadas
+	response := &CommunityReportResponse{
+		Total:       total,
+		Communities: communities,
+	}
+
+	for _, community := range communities {
+		response.Summary.TotalActiveMemberships += community.ActiveMemberships
+		response.Summary.TotalExpiredMemberships += community.ExpiredMemberships
+		response.Summary.TotalCancelledMemberships += community.CancelledMemberships
+		response.Summary.TotalActiveUsers += community.ActiveUsers
+		response.Summary.TotalInactiveUsers += community.InactiveUsers
+		response.Summary.TotalReservations += community.TotalReservations
+		response.Summary.TotalMonthlyPlans += community.MonthlyPlans
+		response.Summary.TotalAnnualPlans += community.AnnualPlans
+	}
+
+	return response, nil
 }

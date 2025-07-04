@@ -50,6 +50,10 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	a.Echo.POST("/login/", a.Login)
 	a.Echo.POST("/register/", a.Register)
 	a.Echo.POST("/forgot-password/", a.ForgotPassword)
+	a.Echo.POST("/login/google/", a.GoogleLogin)
+
+	// Contact endpoints (public)
+	a.Echo.POST("/contact", a.ContactMessage)
 
 	// ===== PROTECTED ENDPOINTS (JWT Authentication required) =====
 
@@ -79,6 +83,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	professional := a.Echo.Group("/professional")
 	professional.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	professional.GET("/:professionalId/", a.GetProfessional)
+	professional.GET("/:professionalId/image/", a.GetProfessionalWithImage)
 	professional.GET("/", a.FetchProfessionals)
 	professional.POST("/", a.CreateProfessional)
 	professional.PATCH("/:professionalId/", a.UpdateProfessional)
@@ -90,6 +95,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	local := a.Echo.Group("/local")
 	local.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	local.GET("/:localId/", a.GetLocal)
+	local.GET("/:localId/image/", a.GetLocalWithImage)
 	local.GET("/", a.FetchLocals)
 	local.POST("/", a.CreateLocal)
 	local.PATCH("/:localId/", a.UpdateLocal)
@@ -112,6 +118,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	user := a.Echo.Group("/user")
 	user.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	user.GET("/:userId/", a.GetUser)
+	user.GET("/:userId/image/", a.GetUserWithImage)
 	user.GET("/", a.FetchUsers)
 	user.GET("/exists", a.CheckUserExists)
 	user.POST("/", a.CreateUser)
@@ -127,6 +134,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	service := a.Echo.Group("/service")
 	service.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	service.GET("/:serviceId/", a.GetService)
+	service.GET("/:serviceId/image/", a.GetServiceWithImage)
 	service.GET("/", a.FetchServices)
 	service.POST("/", a.CreateService)
 	service.PATCH("/:serviceId/", a.UpdateService)
@@ -165,6 +173,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
+	communityService.GET("/id/:id/", a.GetCommunityServiceById)
 	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints (admin only)
@@ -205,6 +214,12 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	errorLog.GET("/:auditLogId/", a.GetErrorLogById)
 	errorLog.GET("/stats/", a.GetErrorStats)
 
+	// Reports endpoints (admin only)
+	reports := a.Echo.Group("/reports")
+	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
+	reports.GET("/services", a.GetServiceReport)
+	reports.GET("/communities", a.GetCommunityReport)
+
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 
 	// Onboarding endpoints (client only)
@@ -226,6 +241,8 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	membership.GET("/", a.FetchMemberships)
 	membership.GET("/user/:userId/", a.GetMembershipsByUserId)
 	membership.GET("/community/:communityId/", a.GetMembershipsByCommunityId)
+	membership.GET("/community/:communityId/users", a.GetUsersByCommunityId)
+	membership.GET("/user/:userId/community/:communityId", a.GetMembershipByUserAndCommunity)
 	membership.POST("/", a.CreateMembership)
 	membership.POST("/user/:userId/", a.CreateMembershipForUser)
 	membership.PATCH("/:membershipId/", a.UpdateMembership)
@@ -235,6 +252,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	reservation := a.Echo.Group("/reservation")
 	reservation.Use(mw.JWTMiddleware, mw.ClientOnlyMiddleware) // Apply JWT + Client middleware
 	reservation.GET("/:reservationId/", a.GetReservation)
+	reservation.GET("/:communityId/:userId/", a.GetReservationsByCommunityIdByUserId)
 	reservation.GET("/", a.FetchReservations)
 	reservation.POST("/", a.CreateReservation)
 	reservation.PATCH("/:reservationId/", a.UpdateReservation)

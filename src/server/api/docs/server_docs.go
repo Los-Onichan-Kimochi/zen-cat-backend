@@ -1066,6 +1066,67 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/community-service/id/{id}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Retrieves a community-service association by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CommunityService"
+                ],
+                "summary": "Get CommunityService By ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CommunityService"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request (e.g., invalid UUID format)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found (Association does not exist)",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/community-service/{communityId}/": {
             "get": {
                 "security": [
@@ -1778,6 +1839,61 @@ const docTemplateserver = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/contact": {
+            "post": {
+                "description": "Enviar un mensaje desde el formulario de contacto público",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Enviar mensaje de contacto",
+                "parameters": [
+                    {
+                        "description": "Información de contacto",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ContactRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mensaje enviado correctamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Campos faltantes o inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Cuerpo de solicitud inválido",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - No se pudo enviar el mensaje",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -2534,6 +2650,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/local/{localId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a local given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Local"
+                ],
+                "summary": "Get Local with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Local ID",
+                        "name": "localId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.LocalWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/login/": {
             "post": {
                 "description": "Authenticate user with email and password, returns user info and tokens",
@@ -2573,6 +2756,64 @@ const docTemplateserver = `{
                     },
                     "401": {
                         "description": "Unauthorized - Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/login/google/": {
+            "post": {
+                "description": "Authenticate user using Google ID token, returns user info and tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Google Login",
+                "parameters": [
+                    {
+                        "description": "Google Login Request",
+                        "name": "googleLoginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -2824,6 +3065,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/membership/community/{communityId}/users": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets all users who have active memberships in a specific community.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get Users by Community ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Users"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/membership/user/{userId}/": {
             "get": {
                 "security": [
@@ -2928,6 +3236,80 @@ const docTemplateserver = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Membership"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/membership/user/{userId}/community/{communityId}": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a membership for a given user ID and community ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Membership"
+                ],
+                "summary": "Get Membership by User ID and Community ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.Membership"
                         }
@@ -4650,6 +5032,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/professional/{professionalId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a professional given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Professional"
+                ],
+                "summary": "Get Professional with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Professional ID",
+                        "name": "professionalId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ProfessionalWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/register/": {
             "post": {
                 "description": "Register a new user with email and password, returns user info and tokens",
@@ -4701,6 +5150,146 @@ const docTemplateserver = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/communities": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Returns aggregated data for community memberships for admin dashboards.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get Community Report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Group by (day, week, month)",
+                        "name": "groupBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Community report data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reports/services": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Returns aggregated data for service reservations for admin dashboards.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reports"
+                ],
+                "summary": "Get Service Report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service type (e.g., yoga, citas médicas)",
+                        "name": "serviceType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Group by (day, week, month)",
+                        "name": "groupBy",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Service report data",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Admin role required",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -4900,6 +5489,80 @@ const docTemplateserver = `{
                     },
                     "401": {
                         "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/reservation/{communityId}/{userId}/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Fetch all reservations for a specific community and user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reservation"
+                ],
+                "summary": "Fetch Reservations by Community ID and User ID.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Community ID",
+                        "name": "communityId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Reservations"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/errors.Error"
                         }
@@ -6340,6 +7003,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/service/{serviceId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a service given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Get Service with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service ID",
+                        "name": "serviceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ServiceWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/session/": {
             "get": {
                 "security": [
@@ -7601,6 +8331,73 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/user/{userId}/image/": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Gets a user given its id with image bytes.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get User with image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.UserWithImage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or malformed JWT",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{userId}/role/": {
             "patch": {
                 "security": [
@@ -8361,6 +9158,28 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.ContactRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "opcional",
+                    "type": "string"
+                },
+                "subject": {
+                    "description": "requerido",
+                    "type": "string"
+                }
+            }
+        },
         "schemas.CreateCommunityPlanRequest": {
             "type": "object",
             "required": [
@@ -8423,6 +9242,12 @@ const docTemplateserver = `{
                 "district": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8458,6 +9283,9 @@ const docTemplateserver = `{
                 "plan_id": {
                     "type": "string"
                 },
+                "reservations_used": {
+                    "type": "integer"
+                },
                 "start_date": {
                     "type": "string"
                 },
@@ -8480,6 +9308,9 @@ const docTemplateserver = `{
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -8565,6 +9396,12 @@ const docTemplateserver = `{
                 "first_last_name": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8644,6 +9481,12 @@ const docTemplateserver = `{
                 "description": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -8695,6 +9538,12 @@ const docTemplateserver = `{
                 },
                 "first_last_name": {
                     "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -8841,6 +9690,26 @@ const docTemplateserver = `{
                 "GenderOther"
             ]
         },
+        "schemas.GoogleLoginRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOi..."
+                }
+            }
+        },
+        "schemas.GoogleLoginResponse": {
+            "type": "object",
+            "properties": {
+                "tokens": {
+                    "$ref": "#/definitions/schemas.TokenResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/schemas.User"
+                }
+            }
+        },
         "schemas.Local": {
             "type": "object",
             "properties": {
@@ -8855,6 +9724,47 @@ const docTemplateserver = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "local_name": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                },
+                "reference": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "street_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.LocalWithImage": {
+            "type": "object",
+            "properties": {
+                "building_number": {
+                    "type": "string"
+                },
+                "capacity": {
+                    "type": "integer"
+                },
+                "district": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -8937,6 +9847,9 @@ const docTemplateserver = `{
                 "plan_id": {
                     "type": "string"
                 },
+                "reservations_used": {
+                    "type": "integer"
+                },
                 "start_date": {
                     "type": "string"
                 },
@@ -8956,12 +9869,14 @@ const docTemplateserver = `{
             "enum": [
                 "ACTIVE",
                 "EXPIRED",
-                "CANCELLED"
+                "CANCELLED",
+                "ON_HOLD"
             ],
             "x-enum-varnames": [
                 "MembershipStatusActive",
                 "MembershipStatusExpired",
-                "MembershipStatusCancelled"
+                "MembershipStatusCancelled",
+                "MembershipStatusOnHold"
             ]
         },
         "schemas.Memberships": {
@@ -9095,6 +10010,44 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.ProfessionalWithImage": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "second_last_name": {
+                    "type": "string"
+                },
+                "specialty": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.Professionals": {
             "type": "object",
             "properties": {
@@ -9153,6 +10106,9 @@ const docTemplateserver = `{
                 },
                 "reservation_time": {
                     "type": "string"
+                },
+                "session": {
+                    "$ref": "#/definitions/schemas.Session"
                 },
                 "session_id": {
                     "type": "string"
@@ -9243,6 +10199,32 @@ const docTemplateserver = `{
                     "items": {
                         "$ref": "#/definitions/schemas.ServiceProfessional"
                     }
+                }
+            }
+        },
+        "schemas.ServiceWithImage": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "is_virtual": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -9373,6 +10355,12 @@ const docTemplateserver = `{
                 "district": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -9407,6 +10395,9 @@ const docTemplateserver = `{
                 },
                 "plan_id": {
                     "type": "string"
+                },
+                "reservations_used": {
+                    "type": "integer"
                 },
                 "start_date": {
                     "type": "string"
@@ -9485,6 +10476,12 @@ const docTemplateserver = `{
                 "first_last_name": {
                     "type": "string"
                 },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "image_url": {
                     "type": "string"
                 },
@@ -9533,6 +10530,12 @@ const docTemplateserver = `{
             "properties": {
                 "description": {
                     "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -9591,6 +10594,12 @@ const docTemplateserver = `{
                 },
                 "first_last_name": {
                     "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "image_url": {
                     "type": "string"
@@ -9769,6 +10778,50 @@ const docTemplateserver = `{
                 }
             }
         },
+        "schemas.UserWithImage": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_last_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_bytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "memberships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Membership"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "onboarding": {
+                    "$ref": "#/definitions/schemas.Onboarding"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "rol": {
+                    "$ref": "#/definitions/schemas.UserRol"
+                },
+                "second_last_name": {
+                    "type": "string"
+                }
+            }
+        },
         "schemas.Users": {
             "type": "object",
             "properties": {
@@ -9790,23 +10843,11 @@ const docTemplateserver = `{
                 1000000,
                 1000000000,
                 60000000000,
-                3600000000000,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
                 "minDuration",
                 "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
