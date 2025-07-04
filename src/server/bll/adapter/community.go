@@ -7,6 +7,9 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/server/errors"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 
+	"fmt"
+	"time"
+
 	"gorm.io/gorm"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 )
@@ -207,4 +210,220 @@ func (c *Community) BulkDeletePostgresqlCommunities(
 	}
 
 	return nil
+}
+
+// GetCommunityReport obtiene el reporte de comunidades para el dashboard admin
+type CommunityReportParams struct {
+	From    *time.Time
+	To      *time.Time
+	GroupBy string // "day", "week", "month"
+}
+
+type CommunityReportData struct {
+	CommunityId   string
+	CommunityName string
+	Total         int
+	// Métricas por estado
+	ActiveMemberships    int
+	ExpiredMemberships   int
+	CancelledMemberships int
+	// Métricas de engagement
+	ActiveUsers       int // usuarios que han hecho reservas
+	InactiveUsers     int // usuarios sin reservas
+	TotalReservations int
+	// Métricas de planes
+	MonthlyPlans int
+	AnnualPlans  int
+	// Datos temporales
+	Data []struct {
+		Date  string `json:"date"`
+		Count int    `json:"count"`
+	}
+}
+
+func (c *Community) GetCommunityReport(params CommunityReportParams) (total int, communities []CommunityReportData, err error) {
+	// Construir la consulta base para comunidades
+	query := c.DaoPostgresql.Community.PostgresqlDB.Model(&model.Community{})
+
+	var communityModels []model.Community
+	if err := query.Find(&communityModels).Error; err != nil {
+		return 0, nil, err
+	}
+
+	// Obtener membresías para cada comunidad con preload completo
+	membershipsQuery := c.DaoPostgresql.Membership.PostgresqlDB.Model(&model.Membership{}).
+		Preload("Community").
+		Preload("User").
+		Preload("Plan")
+
+	if params.From != nil {
+		membershipsQuery = membershipsQuery.Where("created_at >= ?", *params.From)
+	}
+	if params.To != nil {
+		membershipsQuery = membershipsQuery.Where("created_at <= ?", *params.To)
+	}
+
+	var memberships []model.Membership
+	if err := membershipsQuery.Find(&memberships).Error; err != nil {
+		return 0, nil, err
+	}
+
+	// Obtener reservas para calcular engagement
+	reservationsQuery := c.DaoPostgresql.Reservation.PostgresqlDB.Model(&model.Reservation{}).
+		Preload("Membership.Community")
+
+	if params.From != nil {
+		reservationsQuery = reservationsQuery.Where("reservation_time >= ?", *params.From)
+	}
+	if params.To != nil {
+		reservationsQuery = reservationsQuery.Where("reservation_time <= ?", *params.To)
+	}
+
+	var reservations []model.Reservation
+	if err := reservationsQuery.Find(&reservations).Error; err != nil {
+		return 0, nil, err
+	}
+
+	// Procesar datos por comunidad
+	communityData := make(map[string]*CommunityReportData)
+	userActivity := make(map[string]map[uuid.UUID]bool) // communityId -> userId -> hasReservations
+
+	// Inicializar datos de actividad de usuarios
+	for _, membership := range memberships {
+		communityId := membership.CommunityId.String()
+		if userActivity[communityId] == nil {
+			userActivity[communityId] = make(map[uuid.UUID]bool)
+		}
+	}
+
+	// Procesar reservas para determinar usuarios activos
+	for _, reservation := range reservations {
+		if reservation.Membership != nil {
+			communityId := reservation.Membership.CommunityId.String()
+			userId := reservation.UserId
+			userActivity[communityId][userId] = true
+		}
+	}
+
+	// Procesar membresías
+	for _, membership := range memberships {
+		communityId := membership.CommunityId.String()
+		communityName := membership.Community.Name
+
+		if communityData[communityId] == nil {
+			communityData[communityId] = &CommunityReportData{
+				CommunityId:          communityId,
+				CommunityName:        communityName,
+				Total:                0,
+				ActiveMemberships:    0,
+				ExpiredMemberships:   0,
+				CancelledMemberships: 0,
+				ActiveUsers:          0,
+				InactiveUsers:        0,
+				TotalReservations:    0,
+				MonthlyPlans:         0,
+				AnnualPlans:          0,
+				Data: make([]struct {
+					Date  string `json:"date"`
+					Count int    `json:"count"`
+				}, 0),
+			}
+		}
+
+		// Contar por estado
+		switch membership.Status {
+		case model.MembershipStatusActive:
+			communityData[communityId].ActiveMemberships++
+		case model.MembershipStatusExpired:
+			communityData[communityId].ExpiredMemberships++
+		case model.MembershipStatusCancelled:
+			communityData[communityId].CancelledMemberships++
+		}
+
+		// Contar por tipo de plan
+		switch membership.Plan.Type {
+		case model.PlanTypeMonthly:
+			communityData[communityId].MonthlyPlans++
+		case model.PlanTypeAnual:
+			communityData[communityId].AnnualPlans++
+		}
+
+		// Agrupar por fecha según el parámetro groupBy
+		var dateKey string
+		switch params.GroupBy {
+		case "month":
+			dateKey = membership.CreatedAt.Format("2006-01")
+		case "week":
+			y, w := membership.CreatedAt.ISOWeek()
+			dateKey = fmt.Sprintf("%d-W%02d", y, w)
+		default:
+			dateKey = membership.CreatedAt.Format("2006-01-02")
+		}
+
+		// Incrementar contadores
+		communityData[communityId].Total++
+
+		// Agregar dato por fecha
+		found := false
+		for i, data := range communityData[communityId].Data {
+			if data.Date == dateKey {
+				communityData[communityId].Data[i].Count++
+				found = true
+				break
+			}
+		}
+		if !found {
+			communityData[communityId].Data = append(communityData[communityId].Data, struct {
+				Date  string `json:"date"`
+				Count int    `json:"count"`
+			}{
+				Date:  dateKey,
+				Count: 1,
+			})
+		}
+	}
+
+	// Calcular métricas de engagement y reservas por comunidad
+	for _, reservation := range reservations {
+		if reservation.Membership != nil {
+			communityId := reservation.Membership.CommunityId.String()
+			if communityData[communityId] != nil {
+				communityData[communityId].TotalReservations++
+			}
+		}
+	}
+
+	// Calcular usuarios activos vs inactivos por comunidad
+	for communityId, data := range communityData {
+		activeUsers := 0
+		inactiveUsers := 0
+
+		// Contar usuarios únicos por comunidad
+		userCount := make(map[uuid.UUID]bool)
+		for _, membership := range memberships {
+			if membership.CommunityId.String() == communityId {
+				userCount[membership.UserId] = true
+			}
+		}
+
+		// Determinar si cada usuario está activo
+		for userId := range userCount {
+			if userActivity[communityId][userId] {
+				activeUsers++
+			} else {
+				inactiveUsers++
+			}
+		}
+
+		data.ActiveUsers = activeUsers
+		data.InactiveUsers = inactiveUsers
+	}
+
+	// Construir la respuesta
+	for _, data := range communityData {
+		communities = append(communities, *data)
+		total += data.Total
+	}
+
+	return total, communities, nil
 }

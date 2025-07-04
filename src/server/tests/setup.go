@@ -232,6 +232,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 	reservationLimit := 8
 	reservationLimitBasic := 5
 	reservationLimitPremium := 15
+	reservationLimitUnlimited := 50
 	plans := []*model.Plan{
 		{
 			Id:               uuid.New(),
@@ -288,6 +289,43 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		// Planes premium para diferentes comunidades
+		{
+			Id:               uuid.New(),
+			Fee:              120.0,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitUnlimited,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              1500.0,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              35.0,
+			Type:             model.PlanTypeMonthly,
+			ReservationLimit: &reservationLimitBasic,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Fee:              350.0,
+			Type:             model.PlanTypeAnual,
+			ReservationLimit: nil,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, plan := range plans {
 		if err := astroCatPsqlDB.Create(plan).Error; err != nil {
@@ -317,6 +355,46 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Purpose:             "Comunidad especializada en cuidado maternal y servicios de lactario",
 			ImageUrl:            "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
 			NumberSubscriptions: 75,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.New(),
+			Name:                "Zen Wellness Center",
+			Purpose:             "Centro de bienestar integral con enfoque en meditación, yoga y terapias alternativas",
+			ImageUrl:            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 200,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.New(),
+			Name:                "Fitness Pro Community",
+			Purpose:             "Comunidad de fitness avanzado con entrenamiento personalizado y nutrición",
+			ImageUrl:            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 120,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.New(),
+			Name:                "Medical Health Network",
+			Purpose:             "Red de profesionales de la salud para consultas médicas especializadas",
+			ImageUrl:            "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 85,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:                  uuid.New(),
+			Name:                "Senior Wellness",
+			Purpose:             "Comunidad especializada en bienestar para adultos mayores",
+			ImageUrl:            "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			NumberSubscriptions: 60,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -447,6 +525,137 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		// Usuarios adicionales para más data en reportes
+		{
+			Id:             uuid.New(),
+			Name:           "Sofía",
+			FirstLastName:  "Herrera",
+			SecondLastName: strPtr("Vargas"),
+			Password:       hashedPassword,
+			Email:          "sofia.herrera@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Diego",
+			FirstLastName:  "Torres",
+			SecondLastName: strPtr("Mendoza"),
+			Password:       hashedPassword,
+			Email:          "diego.torres@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Carmen",
+			FirstLastName:  "Silva",
+			SecondLastName: nil,
+			Password:       hashedPassword,
+			Email:          "carmen.silva@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Roberto",
+			FirstLastName:  "Castro",
+			SecondLastName: strPtr("Ríos"),
+			Password:       hashedPassword,
+			Email:          "roberto.castro@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Patricia",
+			FirstLastName:  "Morales",
+			SecondLastName: strPtr("Jiménez"),
+			Password:       hashedPassword,
+			Email:          "patricia.morales@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Fernando",
+			FirstLastName:  "Reyes",
+			SecondLastName: strPtr("Guzmán"),
+			Password:       hashedPassword,
+			Email:          "fernando.reyes@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Lucía",
+			FirstLastName:  "Moreno",
+			SecondLastName: strPtr("Pérez"),
+			Password:       hashedPassword,
+			Email:          "lucia.moreno@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Miguel",
+			FirstLastName:  "Vega",
+			SecondLastName: strPtr("Hidalgo"),
+			Password:       hashedPassword,
+			Email:          "miguel.vega@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Elena",
+			FirstLastName:  "Cruz",
+			SecondLastName: strPtr("Soto"),
+			Password:       hashedPassword,
+			Email:          "elena.cruz@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Javier",
+			FirstLastName:  "Ortiz",
+			SecondLastName: strPtr("Fuentes"),
+			Password:       hashedPassword,
+			Email:          "javier.ortiz@zen-cat.com",
+			Rol:            model.UserRolClient,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, user := range users {
 		if err := astroCatPsqlDB.Create(user).Error; err != nil {
@@ -503,6 +712,67 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Description: "Ejercicios que imitan movimientos de la vida diaria para mejorar fuerza, coordinación y resistencia de manera integral.",
 			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
 			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Servicios adicionales para más variedad en reportes
+		{
+			Id:          uuid.New(),
+			Name:        "Meditación",
+			Description: "Sesiones de meditación guiada para reducir el estrés, mejorar la concentración y encontrar paz interior.",
+			ImageUrl:    "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   true,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Pilates",
+			Description: "Ejercicios de control muscular que mejoran la postura, flexibilidad y fuerza del core.",
+			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Spinning",
+			Description: "Clases de ciclismo indoor de alta intensidad para quemar calorías y mejorar la resistencia cardiovascular.",
+			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Zumba",
+			Description: "Clases de baile fitness que combinan ritmos latinos con ejercicios aeróbicos para una experiencia divertida.",
+			ImageUrl:    "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Terapia Física",
+			Description: "Tratamientos de rehabilitación y terapia física para recuperar movilidad y aliviar dolores.",
+			ImageUrl:    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   false,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			Name:        "Nutrición",
+			Description: "Consultas nutricionales personalizadas para mejorar hábitos alimenticios y alcanzar objetivos de salud.",
+			ImageUrl:    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+			IsVirtual:   true,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -581,6 +851,91 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Specialty:      "Medicina General",
 			Email:          "roberto.diaz@medic.com",
 			PhoneNumber:    "555-0789",
+			Type:           model.ProfessionalTypeMedic,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Profesionales adicionales para más variedad
+		{
+			Id:             uuid.New(),
+			Name:           "Carmen",
+			FirstLastName:  "Vega",
+			SecondLastName: strPtr("Herrera"),
+			Specialty:      "Meditación y Mindfulness",
+			Email:          "carmen.vega@zen.com",
+			PhoneNumber:    "555-1111",
+			Type:           model.ProfessionalTypeYogaTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Miguel",
+			FirstLastName:  "Torres",
+			SecondLastName: strPtr("Ríos"),
+			Specialty:      "Pilates y Rehabilitación",
+			Email:          "miguel.torres@pilates.com",
+			PhoneNumber:    "555-2222",
+			Type:           model.ProfessionalTypeGymTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Ana",
+			FirstLastName:  "Morales",
+			SecondLastName: strPtr("Castro"),
+			Specialty:      "Nutrición Clínica",
+			Email:          "ana.morales@nutricion.com",
+			PhoneNumber:    "555-3333",
+			Type:           model.ProfessionalTypeMedic,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Carlos",
+			FirstLastName:  "Jiménez",
+			SecondLastName: strPtr("Flores"),
+			Specialty:      "Spinning y Cardio",
+			Email:          "carlos.jimenez@spinning.com",
+			PhoneNumber:    "555-4444",
+			Type:           model.ProfessionalTypeGymTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Lucía",
+			FirstLastName:  "Pérez",
+			SecondLastName: strPtr("Guzmán"),
+			Specialty:      "Zumba y Danza",
+			Email:          "lucia.perez@zumba.com",
+			PhoneNumber:    "555-5555",
+			Type:           model.ProfessionalTypeGymTrainer,
+			ImageUrl:       "test-image",
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			Name:           "Fernando",
+			FirstLastName:  "Reyes",
+			SecondLastName: strPtr("Soto"),
+			Specialty:      "Fisioterapia",
+			Email:          "fernando.reyes@fisio.com",
+			PhoneNumber:    "555-6666",
 			Type:           model.ProfessionalTypeMedic,
 			ImageUrl:       "test-image",
 			AuditFields: model.AuditFields{
@@ -680,11 +1035,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Create dummy memberships
+	// Create dummy memberships with different statuses and communities
 	memberships := []*model.Membership{
+		// Runners Community - Active memberships
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Yoga Membership",
+			Description: "Monthly Yoga Membership - Test-1",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
@@ -692,25 +1048,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[0].Id,
-			PlanId:      plans[0].Id,
+			UserId:      users[2].Id, // Test-1
+			PlanId:      plans[2].Id, // Monthly Basic
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Yearly Maternal Membership",
-			StartDate:   time.Now(),
-			EndDate:     time.Now().AddDate(1, 0, 0),
-			Status:      model.MembershipStatusActive,
-			AuditFields: model.AuditFields{
-				UpdatedBy: "ADMIN",
-			},
-			CommunityId: communities[1].Id,
-			UserId:      users[1].Id,
-			PlanId:      plans[1].Id,
-		},
-		{
-			Id:          uuid.New(),
-			Description: "Yearly Wellness Membership",
+			Description: "Premium Annual Membership - Demo User",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(1, 0, 0),
 			Status:      model.MembershipStatusActive,
@@ -718,13 +1061,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[1].Id,
-			PlanId:      plans[1].Id,
+			UserId:      users[1].Id, // Demo User
+			PlanId:      plans[5].Id, // Annual Premium
 		},
-		// Añadir membresías para los demás usuarios
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - María",
+			Description: "Monthly Premium Membership - María",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
@@ -732,12 +1074,12 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[2].Id, // María
-			PlanId:      plans[0].Id,
+			UserId:      users[3].Id, // María
+			PlanId:      plans[3].Id, // Monthly Premium
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Carlos",
+			Description: "Monthly Basic Membership - Carlos",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
@@ -745,12 +1087,25 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[3].Id, // Carlos
-			PlanId:      plans[0].Id,
+			UserId:      users[4].Id, // Carlos
+			PlanId:      plans[2].Id, // Monthly Basic
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Ana",
+			Description: "Annual Basic Membership - Ana",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[5].Id, // Ana
+			PlanId:      plans[4].Id, // Annual Basic
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Monthly Premium Membership - Luis",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
@@ -758,21 +1113,158 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 			CommunityId: communities[0].Id,
-			UserId:      users[4].Id, // Ana
-			PlanId:      plans[0].Id,
+			UserId:      users[6].Id, // Luis
+			PlanId:      plans[3].Id, // Monthly Premium
+		},
+		// Expired memberships
+		{
+			Id:          uuid.New(),
+			Description: "Expired Monthly Membership - Sofía",
+			StartDate:   time.Now().AddDate(0, -2, 0),
+			EndDate:     time.Now().AddDate(0, -1, 0),
+			Status:      model.MembershipStatusExpired,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[7].Id, // Sofía
+			PlanId:      plans[2].Id, // Monthly Basic
 		},
 		{
 			Id:          uuid.New(),
-			Description: "Monthly Wellness Membership - Luis",
+			Description: "Expired Annual Membership - Diego",
+			StartDate:   time.Now().AddDate(-1, 0, 0),
+			EndDate:     time.Now().AddDate(0, -1, 0),
+			Status:      model.MembershipStatusExpired,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[8].Id, // Diego
+			PlanId:      plans[4].Id, // Annual Basic
+		},
+		// Cancelled memberships
+		{
+			Id:          uuid.New(),
+			Description: "Cancelled Monthly Membership - Carmen",
+			StartDate:   time.Now().AddDate(0, -1, 0),
+			EndDate:     time.Now().AddDate(0, 0, 0),
+			Status:      model.MembershipStatusCancelled,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[0].Id,
+			UserId:      users[9].Id, // Carmen
+			PlanId:      plans[2].Id, // Monthly Basic
+		},
+		// Zen Wellness Center memberships
+		{
+			Id:          uuid.New(),
+			Description: "Zen Premium Membership - Roberto",
 			StartDate:   time.Now(),
 			EndDate:     time.Now().AddDate(0, 1, 0),
 			Status:      model.MembershipStatusActive,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
-			CommunityId: communities[0].Id,
-			UserId:      users[5].Id, // Luis
-			PlanId:      plans[0].Id,
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			UserId:      users[10].Id,      // Roberto
+			PlanId:      plans[6].Id,       // Premium Monthly
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Zen Annual Membership - Patricia",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			UserId:      users[11].Id,      // Patricia
+			PlanId:      plans[7].Id,       // Premium Annual
+		},
+		// Fitness Pro Community memberships
+		{
+			Id:          uuid.New(),
+			Description: "Fitness Pro Membership - Fernando",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			UserId:      users[12].Id,      // Fernando
+			PlanId:      plans[6].Id,       // Premium Monthly
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Fitness Pro Membership - Lucía",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			UserId:      users[13].Id,      // Lucía
+			PlanId:      plans[6].Id,       // Premium Monthly
+		},
+		// Medical Health Network memberships
+		{
+			Id:          uuid.New(),
+			Description: "Medical Network Membership - Miguel",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[4].Id, // Medical Health Network
+			UserId:      users[14].Id,      // Miguel
+			PlanId:      plans[8].Id,       // Basic Monthly
+		},
+		{
+			Id:          uuid.New(),
+			Description: "Medical Network Membership - Elena",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(1, 0, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[4].Id, // Medical Health Network
+			UserId:      users[15].Id,      // Elena
+			PlanId:      plans[9].Id,       // Basic Annual
+		},
+		// Senior Wellness memberships
+		{
+			Id:          uuid.New(),
+			Description: "Senior Wellness Membership - Javier",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[5].Id, // Senior Wellness
+			UserId:      users[16].Id,      // Javier
+			PlanId:      plans[8].Id,       // Basic Monthly
+		},
+		// Maternal Care Community memberships
+		{
+			Id:          uuid.New(),
+			Description: "Maternal Care Membership - TestAdmin",
+			StartDate:   time.Now(),
+			EndDate:     time.Now().AddDate(0, 1, 0),
+			Status:      model.MembershipStatusActive,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+			CommunityId: communities[1].Id, // Maternal Care Community
+			UserId:      users[4].Id,       // TestAdmin
+			PlanId:      plans[0].Id,       // Original Monthly
 		},
 	}
 	for _, membership := range memberships {
@@ -784,10 +1276,10 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy community services
 	communityServices := []*model.CommunityService{
-		// Main ZenCat Wellness Community services
+		// Runners Community services
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			CommunityId: communities[0].Id, // Runners Community
 			ServiceId:   services[0].Id,    // Yoga
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -795,7 +1287,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			CommunityId: communities[0].Id, // Runners Community
 			ServiceId:   services[1].Id,    // Cita médica
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
@@ -803,8 +1295,64 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		},
 		{
 			Id:          uuid.New(),
-			CommunityId: communities[0].Id, // ZenCat Wellness Community
+			CommunityId: communities[0].Id, // Runners Community
 			ServiceId:   services[3].Id,    // Gimnasio
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[4].Id,    // Entrenamiento Funcional
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[5].Id,    // Meditación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[6].Id,    // Pilates
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[7].Id,    // Spinning
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[8].Id,    // Zumba
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[9].Id,    // Terapia Física
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[0].Id, // Runners Community
+			ServiceId:   services[10].Id,   // Nutrición
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -826,6 +1374,154 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			ServiceId:   services[5].Id,    // Meditación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			ServiceId:   services[10].Id,   // Nutrición
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Zen Wellness Center services
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			ServiceId:   services[0].Id,    // Yoga
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			ServiceId:   services[5].Id,    // Meditación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			ServiceId:   services[6].Id,    // Pilates
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			ServiceId:   services[10].Id,   // Nutrición
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Fitness Pro Community services
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			ServiceId:   services[3].Id,    // Gimnasio
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			ServiceId:   services[4].Id,    // Entrenamiento Funcional
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			ServiceId:   services[7].Id,    // Spinning
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			ServiceId:   services[8].Id,    // Zumba
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			ServiceId:   services[10].Id,   // Nutrición
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Medical Health Network services
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[4].Id, // Medical Health Network
+			ServiceId:   services[1].Id,    // Cita médica
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[4].Id, // Medical Health Network
+			ServiceId:   services[9].Id,    // Terapia Física
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[4].Id, // Medical Health Network
+			ServiceId:   services[10].Id,   // Nutrición
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Senior Wellness services
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			ServiceId:   services[0].Id,    // Yoga
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			ServiceId:   services[1].Id,    // Cita médica
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			ServiceId:   services[6].Id,    // Pilates
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			ServiceId:   services[9].Id,    // Terapia Física
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 	}
 	for _, cs := range communityServices {
 		if err := astroCatPsqlDB.Create(cs).Error; err != nil {
@@ -836,7 +1532,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 
 	// Create dummy community plans
 	communityPlans := []*model.CommunityPlan{
-		// Runners Community plans (4 total - 2 monthly tiers + 2 annual tiers)
+		// Runners Community plans (all available plans)
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[0].Id, // Runners Community
@@ -886,11 +1582,87 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
-		// Maternal Care Community plan
+		// Maternal Care Community plans
 		{
 			Id:          uuid.New(),
 			CommunityId: communities[1].Id, // Maternal Care Community
-			PlanId:      plans[0].Id,       // Monthly Plan
+			PlanId:      plans[0].Id,       // Original Monthly Plan
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[1].Id, // Maternal Care Community
+			PlanId:      plans[1].Id,       // Original Annual Plan
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Zen Wellness Center plans (premium plans)
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			PlanId:      plans[6].Id,       // Premium Monthly Plan ($120.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[2].Id, // Zen Wellness Center
+			PlanId:      plans[7].Id,       // Premium Annual Plan ($1500.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Fitness Pro Community plans (premium plans)
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			PlanId:      plans[6].Id,       // Premium Monthly Plan ($120.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[3].Id, // Fitness Pro Community
+			PlanId:      plans[7].Id,       // Premium Annual Plan ($1500.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Medical Health Network plans (basic plans)
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[4].Id, // Medical Health Network
+			PlanId:      plans[8].Id,       // Basic Monthly Plan ($35.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[4].Id, // Medical Health Network
+			PlanId:      plans[9].Id,       // Basic Annual Plan ($350.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Senior Wellness plans (basic plans)
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			PlanId:      plans[8].Id,       // Basic Monthly Plan ($35.0)
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:          uuid.New(),
+			CommunityId: communities[5].Id, // Senior Wellness
+			PlanId:      plans[9].Id,       // Basic Annual Plan ($350.0)
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -922,6 +1694,14 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[0].Id,      // Yoga
+			ProfessionalId: professionals[5].Id, // Carmen - Meditación y Mindfulness
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 		// Medical service with doctors
 		{
 			Id:             uuid.New(),
@@ -939,6 +1719,7 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		// Lactario service (no specific professional needed)
 		// Gym service with gym trainers
 		{
 			Id:             uuid.New(),
@@ -948,11 +1729,81 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 				UpdatedBy: "ADMIN",
 			},
 		},
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[3].Id,      // Gimnasio
+			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
 		// Functional training with gym trainer
 		{
 			Id:             uuid.New(),
 			ServiceId:      services[4].Id,      // Entrenamiento Funcional
 			ProfessionalId: professionals[2].Id, // Pedro - Gym Trainer
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[4].Id,      // Entrenamiento Funcional
+			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Meditación service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[5].Id,      // Meditación
+			ProfessionalId: professionals[5].Id, // Carmen - Meditación y Mindfulness
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Pilates service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[6].Id,      // Pilates
+			ProfessionalId: professionals[6].Id, // Miguel - Pilates y Rehabilitación
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Spinning service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[7].Id,      // Spinning
+			ProfessionalId: professionals[8].Id, // Carlos - Spinning y Cardio
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Zumba service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[8].Id,      // Zumba
+			ProfessionalId: professionals[9].Id, // Lucía - Zumba y Danza
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Terapia Física service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[9].Id,       // Terapia Física
+			ProfessionalId: professionals[10].Id, // Fernando - Fisioterapia
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Nutrición service
+		{
+			Id:             uuid.New(),
+			ServiceId:      services[10].Id,     // Nutrición
+			ProfessionalId: professionals[7].Id, // Ana - Nutrición Clínica
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1047,6 +1898,74 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			Id:        uuid.New(),
 			ServiceId: services[4].Id, // Entrenamiento Funcional
 			LocalId:   locals[3].Id,   // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Pilates service in multiple locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[6].Id, // Pilates
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[6].Id, // Pilates
+			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Spinning service in gym locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[7].Id, // Spinning
+			LocalId:   locals[3].Id,   // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[7].Id, // Spinning
+			LocalId:   locals[1].Id,   // Pabellón A - San Juan de Lurigancho
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Zumba service in multiple locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[8].Id, // Zumba
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[8].Id, // Zumba
+			LocalId:   locals[3].Id,   // Pabellón B
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		// Terapia Física service in specific locations
+		{
+			Id:        uuid.New(),
+			ServiceId: services[9].Id, // Terapia Física
+			LocalId:   locals[0].Id,   // Pabellón A - San Miguel
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:        uuid.New(),
+			ServiceId: services[9].Id, // Terapia Física
+			LocalId:   locals[2].Id,   // Pabellón A - Santa María del Carmen
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1300,18 +2219,18 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
-	// Create dummy reservations
+	// Create dummy reservations with extensive data for reports
 	reservations := []*model.Reservation{
-		// Reservations for Morning Yoga (sessions[0])
+		// Reservations for existing sessions (keeping original ones)
 		{
 			Id:               uuid.New(),
-			Name:             "Morning Yoga - Test User",
-			ReservationTime:  baseDate.Add(8 * time.Hour), // Same as session start time
+			Name:             "Morning Yoga - Test-1",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[2].Id, // Test-1
 			SessionId:        sessions[0].Id,
-			MembershipId:     &memberships[0].Id, // Membership for Test-1
+			MembershipId:     &memberships[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1322,9 +2241,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
 			SessionId:        sessions[0].Id,
-			MembershipId:     &memberships[3].Id, // Membership for María
+			MembershipId:     &memberships[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1335,9 +2254,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateAnulled,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
 			SessionId:        sessions[0].Id,
-			MembershipId:     &memberships[4].Id, // Membership for Carlos
+			MembershipId:     &memberships[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1348,9 +2267,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
 			SessionId:        sessions[0].Id,
-			MembershipId:     &memberships[5].Id, // Membership for Ana
+			MembershipId:     &memberships[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1361,24 +2280,24 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
 			SessionId:        sessions[0].Id,
-			MembershipId:     &memberships[6].Id, // Membership for Luis
+			MembershipId:     &memberships[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Evening Gym (sessions[1])
+		// Evening Gym reservations
 		{
 			Id:               uuid.New(),
-			Name:             "Evening Gym - Admin User",
+			Name:             "Evening Gym - Demo User",
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Demo User
 			SessionId:        sessions[1].Id,
-			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
+			MembershipId:     &memberships[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1389,9 +2308,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
 			SessionId:        sessions[1].Id,
-			MembershipId:     &memberships[3].Id, // Membership for María
+			MembershipId:     &memberships[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1402,24 +2321,24 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(18 * time.Hour),
 			State:            model.ReservationStateCancelled,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
 			SessionId:        sessions[1].Id,
-			MembershipId:     &memberships[4].Id, // Membership for Carlos
+			MembershipId:     &memberships[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Advanced Yoga Workshop (sessions[2])
+		// Advanced Yoga Workshop reservations
 		{
 			Id:               uuid.New(),
-			Name:             "Advanced Yoga Workshop - Test User",
+			Name:             "Advanced Yoga Workshop - Test-1",
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[2].Id, // Test-1
 			SessionId:        sessions[2].Id,
-			MembershipId:     &memberships[0].Id, // Membership for Test-1
+			MembershipId:     &memberships[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1430,9 +2349,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
 			SessionId:        sessions[2].Id,
-			MembershipId:     &memberships[3].Id, // Membership for María
+			MembershipId:     &memberships[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1443,9 +2362,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
 			SessionId:        sessions[2].Id,
-			MembershipId:     &memberships[5].Id, // Membership for Ana
+			MembershipId:     &memberships[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1456,39 +2375,39 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(24*time.Hour + 10*time.Hour),
 			State:            model.ReservationStateDone,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
 			SessionId:        sessions[2].Id,
-			MembershipId:     &memberships[6].Id, // Membership for Luis
+			MembershipId:     &memberships[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Personal Training Session (sessions[3])
+		// Personal Training Session
 		{
 			Id:               uuid.New(),
 			Name:             "Personal Training - Carlos",
 			ReservationTime:  baseDate.Add(24*time.Hour + 16*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
 			SessionId:        sessions[3].Id,
-			MembershipId:     &memberships[4].Id, // Membership for Carlos
+			MembershipId:     &memberships[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Medical Consultation (sessions[4])
+		// Medical Consultation
 		{
 			Id:               uuid.New(),
 			Name:             "Medical Consultation - Ana",
 			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
 			SessionId:        sessions[4].Id,
-			MembershipId:     &memberships[5].Id, // Membership for Ana
+			MembershipId:     &memberships[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1499,37 +2418,37 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(48*time.Hour + 14*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
 			SessionId:        sessions[4].Id,
-			MembershipId:     &memberships[6].Id, // Membership for Luis
+			MembershipId:     &memberships[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Weekend Yoga Flow (sessions[5])
+		// Weekend Yoga Flow
 		{
 			Id:               uuid.New(),
-			Name:             "Weekend Yoga Flow - Test User",
+			Name:             "Weekend Yoga Flow - Test-1",
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[2].Id, // Test-1
 			SessionId:        sessions[5].Id,
-			MembershipId:     &memberships[0].Id, // Membership for Test-1
+			MembershipId:     &memberships[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 		{
 			Id:               uuid.New(),
-			Name:             "Weekend Yoga Flow - Admin",
+			Name:             "Weekend Yoga Flow - Demo User",
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Demo User
 			SessionId:        sessions[5].Id,
-			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
+			MembershipId:     &memberships[1].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1540,9 +2459,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
 			SessionId:        sessions[5].Id,
-			MembershipId:     &memberships[3].Id, // Membership for María
+			MembershipId:     &memberships[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1553,9 +2472,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
 			SessionId:        sessions[5].Id,
-			MembershipId:     &memberships[4].Id, // Membership for Carlos
+			MembershipId:     &memberships[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1566,24 +2485,24 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(72*time.Hour + 9*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
 			SessionId:        sessions[5].Id,
-			MembershipId:     &memberships[5].Id, // Membership for Ana
+			MembershipId:     &memberships[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for Strength Training Bootcamp (sessions[6])
+		// Strength Training Bootcamp
 		{
 			Id:               uuid.New(),
-			Name:             "Strength Training Bootcamp - Test User",
+			Name:             "Strength Training Bootcamp - Test-1",
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[0].Id, // Test-1
+			UserId:           users[2].Id, // Test-1
 			SessionId:        sessions[6].Id,
-			MembershipId:     &memberships[0].Id, // Membership for Test-1
+			MembershipId:     &memberships[0].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1594,9 +2513,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[2].Id, // María
+			UserId:           users[3].Id, // María
 			SessionId:        sessions[6].Id,
-			MembershipId:     &memberships[3].Id, // Membership for María
+			MembershipId:     &memberships[2].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1607,9 +2526,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[3].Id, // Carlos
+			UserId:           users[4].Id, // Carlos
 			SessionId:        sessions[6].Id,
-			MembershipId:     &memberships[4].Id, // Membership for Carlos
+			MembershipId:     &memberships[3].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1620,9 +2539,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[4].Id, // Ana
+			UserId:           users[5].Id, // Ana
 			SessionId:        sessions[6].Id,
-			MembershipId:     &memberships[5].Id, // Membership for Ana
+			MembershipId:     &memberships[4].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
@@ -1633,24 +2552,89 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 			ReservationTime:  baseDate.Add(96*time.Hour + 7*time.Hour),
 			State:            model.ReservationStateDone,
 			LastModification: time.Now(),
-			UserId:           users[5].Id, // Luis
+			UserId:           users[6].Id, // Luis
 			SessionId:        sessions[6].Id,
-			MembershipId:     &memberships[6].Id, // Membership for Luis
+			MembershipId:     &memberships[5].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},
 		},
 
-		// Reservations for General Health Checkup (sessions[7])
+		// Additional reservations for other sessions
 		{
 			Id:               uuid.New(),
-			Name:             "General Health Checkup - Admin",
-			ReservationTime:  baseDate.Add(120*time.Hour + 11*time.Hour),
+			Name:             "Gym Session - Demo User",
+			ReservationTime:  baseDate.Add(8 * time.Hour),
 			State:            model.ReservationStateConfirmed,
 			LastModification: time.Now(),
-			UserId:           users[1].Id, // Test-2 (Admin)
+			UserId:           users[1].Id, // Demo User
 			SessionId:        sessions[7].Id,
-			MembershipId:     &memberships[2].Id, // Membership for Test-2 (Admin)
+			MembershipId:     &memberships[1].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Zen Yoga - Roberto",
+			ReservationTime:  baseDate.Add(9 * time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[10].Id, // Roberto
+			SessionId:        sessions[8].Id,
+			MembershipId:     &memberships[10].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Early Morning Yoga - Patricia",
+			ReservationTime:  baseDate.Add(24*time.Hour + 5*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[11].Id, // Patricia
+			SessionId:        sessions[9].Id,
+			MembershipId:     &memberships[11].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Morning Gym - Fernando",
+			ReservationTime:  baseDate.Add(24*time.Hour + 6*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[12].Id, // Fernando
+			SessionId:        sessions[10].Id,
+			MembershipId:     &memberships[12].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Yoga Flow - Lucía",
+			ReservationTime:  baseDate.Add(24*time.Hour + 7*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[13].Id, // Lucía
+			SessionId:        sessions[11].Id,
+			MembershipId:     &memberships[13].Id,
+			AuditFields: model.AuditFields{
+				UpdatedBy: "ADMIN",
+			},
+		},
+		{
+			Id:               uuid.New(),
+			Name:             "Power Training - Miguel",
+			ReservationTime:  baseDate.Add(24*time.Hour + 8*time.Hour),
+			State:            model.ReservationStateConfirmed,
+			LastModification: time.Now(),
+			UserId:           users[14].Id, // Miguel
+			SessionId:        sessions[12].Id,
+			MembershipId:     &memberships[14].Id,
 			AuditFields: model.AuditFields{
 				UpdatedBy: "ADMIN",
 			},

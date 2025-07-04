@@ -209,6 +209,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	reports := a.Echo.Group("/reports")
 	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
 	reports.GET("/services", a.GetServiceReport)
+	reports.GET("/communities", a.GetCommunityReport)
 
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 
