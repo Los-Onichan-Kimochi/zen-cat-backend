@@ -48,6 +48,10 @@ func (m *Membership) GetMembershipsByCommunityId(communityId uuid.UUID) (*schema
 	return &schemas.Memberships{Memberships: memberships}, nil
 }
 
+func (m *Membership) GetMembershipByUserAndCommunity(userId uuid.UUID, communityId uuid.UUID) (*schemas.Membership, *errors.Error) {
+	return m.Adapter.Membership.GetPostgresqlMembershipByUserAndCommunity(userId, communityId)
+}
+
 func (m *Membership) FetchMemberships() (*schemas.Memberships, *errors.Error) {
 	memberships, err := m.Adapter.Membership.FetchPostgresqlMemberships()
 	if err != nil {
@@ -90,6 +94,7 @@ func (m *Membership) CreateMembership(
 		createMembershipRequest.StartDate,
 		createMembershipRequest.EndDate,
 		createMembershipRequest.Status,
+		createMembershipRequest.ReservationsUsed,
 		createMembershipRequest.CommunityId,
 		createMembershipRequest.UserId,
 		createMembershipRequest.PlanId,
@@ -132,6 +137,7 @@ func (m *Membership) CreateMembershipForUser(
 		createMembershipForUserRequest.StartDate,
 		createMembershipForUserRequest.EndDate,
 		createMembershipForUserRequest.Status,
+		createMembershipForUserRequest.ReservationsUsed,
 		createMembershipForUserRequest.CommunityId,
 		userId, // El userId viene del parámetro de la URL, no del body
 		createMembershipForUserRequest.PlanId,
@@ -180,11 +186,49 @@ func (m *Membership) UpdateMembership(
 		updateMembershipRequest.StartDate,
 		updateMembershipRequest.EndDate,
 		updateMembershipRequest.Status,
+		updateMembershipRequest.ReservationsUsed,
 		updateMembershipRequest.CommunityId,
 		updateMembershipRequest.UserId,
 		updateMembershipRequest.PlanId,
 		updatedBy,
 	)
+}
+
+// GetUsersByCommunityId retrieves all users who have active memberships in the specified community
+func (m *Membership) GetUsersByCommunityId(communityId uuid.UUID) (*schemas.Users, *errors.Error) {
+	// First, check if the community exists
+	_, communityErr := m.Adapter.Community.GetPostgresqlCommunity(communityId)
+	if communityErr != nil {
+		return nil, communityErr
+	}
+
+	// Get all memberships for the community
+	memberships, err := m.Adapter.Membership.GetPostgresqlMembershipsByCommunityId(communityId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Early return if no memberships are found
+	if len(memberships) == 0 {
+		return &schemas.Users{Users: make([]*schemas.User, 0)}, nil
+	}
+
+	// Extract user IDs from active memberships
+	var userIds []uuid.UUID
+	for _, membership := range memberships {
+		// Only include active memberships
+		if membership.Status == "ACTIVE" {
+			userIds = append(userIds, membership.UserId)
+		}
+	}
+
+	// Get all users with those IDs
+	users, err := m.Adapter.User.GetPostgresqlUsersByIds(userIds)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Users{Users: users}, nil
 }
 
 func (m *Membership) DeleteMembership(membershipId uuid.UUID) *errors.Error {

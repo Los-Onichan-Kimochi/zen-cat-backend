@@ -185,3 +185,10 @@ func (cs *CommunityService) FetchCommunityServices(
 
 	return &schemas.CommunityServices{CommunityServices: communityServices}, nil
 }
+
+// Gets a specific community-service association by ID.
+func (cs *CommunityService) GetCommunityServiceById(
+	id uuid.UUID,
+) (*schemas.CommunityService, *errors.Error) {
+	return cs.Adapter.CommunityService.GetPostgresqlCommunityServiceById(id)
+}

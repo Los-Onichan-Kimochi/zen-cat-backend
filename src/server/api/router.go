@@ -169,6 +169,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
+	communityService.GET("/id/:id/", a.GetCommunityServiceById)
 	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints (admin only)
@@ -209,6 +210,12 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	errorLog.GET("/:auditLogId/", a.GetErrorLogById)
 	errorLog.GET("/stats/", a.GetErrorStats)
 
+	// Reports endpoints (admin only)
+	reports := a.Echo.Group("/reports")
+	reports.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware)
+	reports.GET("/services", a.GetServiceReport)
+	reports.GET("/communities", a.GetCommunityReport)
+
 	// ===== CLIENT ENDPOINTS (Client role required) =====
 
 	// Onboarding endpoints (client only)
@@ -230,6 +237,8 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	membership.GET("/", a.FetchMemberships)
 	membership.GET("/user/:userId/", a.GetMembershipsByUserId)
 	membership.GET("/community/:communityId/", a.GetMembershipsByCommunityId)
+	membership.GET("/community/:communityId/users", a.GetUsersByCommunityId)
+	membership.GET("/user/:userId/community/:communityId", a.GetMembershipByUserAndCommunity)
 	membership.POST("/", a.CreateMembership)
 	membership.POST("/user/:userId/", a.CreateMembershipForUser)
 	membership.PATCH("/:membershipId/", a.UpdateMembership)
@@ -239,6 +248,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	reservation := a.Echo.Group("/reservation")
 	reservation.Use(mw.JWTMiddleware, mw.ClientOnlyMiddleware) // Apply JWT + Client middleware
 	reservation.GET("/:reservationId/", a.GetReservation)
+	reservation.GET("/:communityId/:userId/", a.GetReservationsByCommunityIdByUserId)
 	reservation.GET("/", a.FetchReservations)
 	reservation.POST("/", a.CreateReservation)
 	reservation.PATCH("/:reservationId/", a.UpdateReservation)
