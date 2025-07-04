@@ -216,6 +216,7 @@ func (r *Reservation) GetServiceReport(params ServiceReportParams) (total int, s
 	query := r.DaoPostgresql.Reservation.PostgresqlDB.Model(&model.Reservation{})
 	query = query.Preload("Session.CommunityService.Service")
 
+	// Filtrar por fecha real de la reserva (reservation_time)
 	if params.From != nil {
 		query = query.Where("reservation_time >= ?", *params.From)
 	}
@@ -228,8 +229,7 @@ func (r *Reservation) GetServiceReport(params ServiceReportParams) (total int, s
 		return 0, nil, err
 	}
 
-	// Agrupar por servicio y fecha
-
+	// Agrupar por fecha real de la reserva
 	totals := map[string]int{}
 	grouped := map[string]map[string]int{} // serviceType -> date -> count
 

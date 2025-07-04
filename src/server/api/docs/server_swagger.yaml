@@ -1397,7 +1397,6 @@ definitions:
     - 1000000
     - 1000000000
     - 60000000000
-    - 3600000000000
     - 1
     - 1000
     - 1000000
@@ -1411,7 +1410,6 @@ definitions:
     - Millisecond
     - Second
     - Minute
-    - Hour
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -4573,6 +4571,49 @@ paths:
       summary: User Registration
       tags:
       - Login
+  /reports/communities:
+    get:
+      consumes:
+      - application/json
+      description: Returns aggregated data for community memberships for admin dashboards.
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: from
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: to
+        type: string
+      - description: Group by (day, week, month)
+        in: query
+        name: groupBy
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Community report data
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "403":
+          description: Forbidden - Admin role required
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get Community Report
+      tags:
+      - Reports
   /reports/services:
     get:
       consumes:
