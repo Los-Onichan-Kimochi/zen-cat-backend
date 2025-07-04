@@ -389,6 +389,25 @@ var (
 		},
 	}
 
+	ContactError = struct {
+		MissingFields      Error
+		InvalidEmailFormat Error
+		FailedToSendEmail  Error
+	}{
+		MissingFields: Error{
+			Code:    "CONTACT_ERROR_001",
+			Message: "Name, email and message are required.",
+		},
+		InvalidEmailFormat: Error{
+			Code:    "CONTACT_ERROR_002",
+			Message: "Email format is invalid.",
+		},
+		FailedToSendEmail: Error{
+			Code:    "CONTACT_ERROR_003",
+			Message: "Failed to send contact email.",
+		},
+	}
+
 	// For 401 Unauthorized errors
 	AuthenticationError = struct {
 		UnauthorizedUser    Error

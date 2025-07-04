@@ -1785,6 +1785,61 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/contact": {
+            "post": {
+                "description": "Enviar un mensaje desde el formulario de contacto público",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Enviar mensaje de contacto",
+                "parameters": [
+                    {
+                        "description": "Información de contacto",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ContactRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mensaje enviado correctamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Campos faltantes o inválidos",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity - Cuerpo de solicitud inválido",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - No se pudo enviar el mensaje",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/error-log/": {
             "get": {
                 "security": [
@@ -8416,6 +8471,28 @@ const docTemplateserver = `{
                     "items": {
                         "$ref": "#/definitions/schemas.Session"
                     }
+                }
+            }
+        },
+        "schemas.ContactRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "opcional",
+                    "type": "string"
+                },
+                "subject": {
+                    "description": "requerido",
+                    "type": "string"
                 }
             }
         },

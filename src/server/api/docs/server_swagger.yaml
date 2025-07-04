@@ -455,6 +455,21 @@ definitions:
           $ref: '#/definitions/schemas.Session'
         type: array
     type: object
+  schemas.ContactRequest:
+    properties:
+      email:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      phone:
+        description: opcional
+        type: string
+      subject:
+        description: requerido
+        type: string
+    type: object
   schemas.CreateCommunityPlanRequest:
     properties:
       community_id:
@@ -2573,6 +2588,42 @@ paths:
       summary: Bulk Delete Communities.
       tags:
       - Community
+  /contact:
+    post:
+      consumes:
+      - application/json
+      description: Enviar un mensaje desde el formulario de contacto público
+      parameters:
+      - description: Información de contacto
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.ContactRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Mensaje enviado correctamente
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Campos faltantes o inválidos
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "422":
+          description: Unprocessable Entity - Cuerpo de solicitud inválido
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error - No se pudo enviar el mensaje
+          schema:
+            $ref: '#/definitions/errors.Error'
+      summary: Enviar mensaje de contacto
+      tags:
+      - Contact
   /error-log/:
     get:
       consumes:
