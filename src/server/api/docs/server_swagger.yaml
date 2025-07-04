@@ -1402,6 +1402,8 @@ definitions:
     type: object
   time.Duration:
     enum:
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1410,6 +1412,8 @@ definitions:
     - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
