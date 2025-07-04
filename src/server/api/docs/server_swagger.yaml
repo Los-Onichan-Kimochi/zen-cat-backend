@@ -857,11 +857,13 @@ definitions:
     - ACTIVE
     - EXPIRED
     - CANCELLED
+    - ON_HOLD
     type: string
     x-enum-varnames:
     - MembershipStatusActive
     - MembershipStatusExpired
     - MembershipStatusCancelled
+    - MembershipStatusOnHold
   schemas.Memberships:
     properties:
       memberships:
@@ -1402,35 +1404,23 @@ definitions:
     type: object
   time.Duration:
     enum:
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
     - 1000000000
     - 60000000000
-<<<<<<< HEAD
-=======
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
->>>>>>> main
     - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
     - Second
     - Minute
-<<<<<<< HEAD
-=======
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
->>>>>>> main
     - Hour
 info:
   contact: {}

@@ -9381,12 +9381,14 @@ const docTemplateserver = `{
             "enum": [
                 "ACTIVE",
                 "EXPIRED",
-                "CANCELLED"
+                "CANCELLED",
+                "ON_HOLD"
             ],
             "x-enum-varnames": [
                 "MembershipStatusActive",
                 "MembershipStatusExpired",
-                "MembershipStatusCancelled"
+                "MembershipStatusCancelled",
+                "MembershipStatusOnHold"
             ]
         },
         "schemas.Memberships": {
@@ -10214,11 +10216,8 @@ const docTemplateserver = `{
         "time.Duration": {
             "type": "integer",
             "enum": [
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -10227,11 +10226,8 @@ const docTemplateserver = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
