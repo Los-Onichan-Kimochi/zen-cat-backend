@@ -6,6 +6,7 @@ import (
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/api/services"
 	"onichankimochi.com/astro_cat_backend/src/server/bll/controller"
+	"onichankimochi.com/astro_cat_backend/src/server/jobs"
 	"onichankimochi.com/astro_cat_backend/src/server/schemas"
 )
 
@@ -44,6 +45,11 @@ func NewApi(
 // @description AstroCat API sample for clients
 // @BasePath /
 func RunService(envSettings *schemas.EnvSettings, logger logging.Logger) {
-	api, _ := NewApi(logger, envSettings)
+	api, db := NewApi(logger, envSettings)
+
+	// Iniciar job que caduca membresías cada día a las 00:15
+	expirer := jobs.NewMembershipExpirer(logger, db)
+	expirer.Start()
+
 	api.RunApi(envSettings)
 }
