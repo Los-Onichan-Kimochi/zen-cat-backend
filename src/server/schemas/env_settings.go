@@ -4,6 +4,8 @@ import (
 	"os"
 	"strconv"
 
+	"gorm.io/gorm"
+
 	"github.com/joho/godotenv"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	"onichankimochi.com/astro_cat_backend/src/server/utils/env"
@@ -51,6 +53,9 @@ type EnvSettings struct {
 	TwilioAccountSid  string
 	TwilioAuthToken   string
 	TwilioPhoneNumber string
+
+	// GORM connection
+	DB *gorm.DB
 }
 
 // Create a new env settings defined on .env file

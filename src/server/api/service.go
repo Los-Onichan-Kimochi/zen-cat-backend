@@ -38,6 +38,50 @@ func (a *Api) GetService(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get Service with image.
+// @Description 		Gets a service given its id with image bytes.
+// @Tags 				Service
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param               serviceId    path   string  true  "Service ID"
+// @Success 			200 {object} schemas.ServiceWithImage "OK"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/service/{serviceId}/image/ [get]
+func (a *Api) GetServiceWithImage(c echo.Context) error {
+	serviceId, parseErr := uuid.Parse(c.Param("serviceId"))
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidServiceId, c)
+	}
+
+	response, err := a.BllController.Service.GetService(serviceId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	var imageBytes *[]byte
+	// Try to download image from S3, but don't fail if S3 is not available
+	if response.ImageUrl != "" {
+		downloadedBytes, s3Err := a.S3Service.DownloadFile(
+			schemas.ServiceS3Prefix,
+			response.ImageUrl,
+		)
+		if s3Err == nil {
+			imageBytes = &downloadedBytes
+		}
+		// If S3 fails, we continue without image bytes
+	}
+
+	return c.JSON(http.StatusOK, schemas.ServiceWithImage{
+		Service:    *response,
+		ImageBytes: imageBytes,
+	})
+}
+
 // @Summary 			Fetch Services.
 // @Description 		Fetch all services, filtered by params.
 // @Tags 				Service
@@ -91,9 +135,23 @@ func (a *Api) CreateService(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	if request.ImageUrl != "" {
+		request.ImageUrl = a.S3Service.GenerateImageUrl(request.ImageUrl)
+	}
+
 	response, newErr := a.BllController.Service.CreateService(request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
+	}
+
+	// Upload image to S3
+	if response.ImageUrl != "" && request.ImageBytes != nil {
+		a.S3Service.UploadFile(
+			schemas.ServiceS3Prefix,
+			response.ImageUrl,
+			*request.ImageBytes,
+		)
+		// If S3 fails, we continue without image upload
 	}
 
 	return c.JSON(http.StatusCreated, response)
@@ -128,9 +186,25 @@ func (a *Api) UpdateService(c echo.Context) error {
 		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
 	}
 
+	if request.ImageUrl != nil {
+		*request.ImageUrl = a.S3Service.GenerateImageUrl(*request.ImageUrl)
+	}
+
 	response, newErr := a.BllController.Service.UpdateService(serviceId, request, updatedBy)
 	if newErr != nil {
 		return errors.HandleError(*newErr, c)
+	}
+
+	// Upload image to S3 if it exists
+	if request.ImageUrl != nil && request.ImageBytes != nil {
+		err := a.S3Service.UploadFile(
+			schemas.ServiceS3Prefix,
+			response.ImageUrl,
+			*request.ImageBytes,
+		)
+		if err != nil {
+			return errors.HandleError(errors.InternalServerError.FailedToUploadImage, c)
+		}
 	}
 
 	return c.JSON(http.StatusOK, response)

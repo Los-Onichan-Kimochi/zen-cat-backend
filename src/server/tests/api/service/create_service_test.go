@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,7 +50,7 @@ func TestCreateServiceSuccessfully(t *testing.T) {
 	assert.NotEmpty(t, response.Id)
 	assert.Equal(t, createServiceRequest.Name, response.Name)
 	assert.Equal(t, createServiceRequest.Description, response.Description)
-	assert.Equal(t, createServiceRequest.ImageUrl, response.ImageUrl)
+	assert.True(t, strings.HasPrefix(response.ImageUrl, createServiceRequest.ImageUrl))
 	assert.Equal(t, createServiceRequest.IsVirtual, response.IsVirtual)
 }
 
