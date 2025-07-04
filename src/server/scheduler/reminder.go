@@ -20,15 +20,10 @@ type Reminder struct {
 
 // Esta función es llamada desde main.go como goroutine
 func StartDailyReminderJob(env *schemas.EnvSettings) {
-	loc, err := time.LoadLocation("America/Lima")
-	if err != nil {
-		log.Fatalf("Error cargando zona horaria: %v", err)
-	}
+	c := cron.New()
 
-	c := cron.New(cron.WithLocation(loc))
-
-	// Ejecutar todos los días a las 6:30 AM hora Lima
-	_, err = c.AddFunc("*/1 * * * *", func() {
+	// Ejecutar todos los días a las 6:00 AM hora Lima
+	_, err := c.AddFunc("0 7 * * *", func() {
 		log.Println("📬 [CRON] Ejecutando recordatorios diarios de sesiones...")
 		SendRemindersForToday(env)
 	})
