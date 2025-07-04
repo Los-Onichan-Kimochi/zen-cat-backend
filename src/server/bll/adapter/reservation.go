@@ -44,7 +44,21 @@ func (r *Reservation) GetPostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
@@ -73,7 +87,21 @@ func (r *Reservation) FetchPostgresqlReservations(
 			LastModification: reservationModel.LastModification,
 			UserId:           reservationModel.UserId,
 			SessionId:        reservationModel.SessionId,
-			MembershipId:     reservationModel.MembershipId,
+			Session: schemas.Session{
+				Id:                 reservationModel.Session.Id,
+				Title:              reservationModel.Session.Title,
+				Date:               reservationModel.Session.Date,
+				StartTime:          reservationModel.Session.StartTime,
+				EndTime:            reservationModel.Session.EndTime,
+				State:              string(reservationModel.Session.State),
+				RegisteredCount:    reservationModel.Session.RegisteredCount,
+				Capacity:           reservationModel.Session.Capacity,
+				SessionLink:        reservationModel.Session.SessionLink,
+				ProfessionalId:     reservationModel.Session.ProfessionalId,
+				LocalId:            reservationModel.Session.LocalId,
+				CommunityServiceId: reservationModel.Session.CommunityServiceId,
+			},
+			MembershipId: reservationModel.MembershipId,
 		}
 	}
 
@@ -115,7 +143,21 @@ func (r *Reservation) CreatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
@@ -156,7 +198,21 @@ func (r *Reservation) UpdatePostgresqlReservation(
 		LastModification: reservationModel.LastModification,
 		UserId:           reservationModel.UserId,
 		SessionId:        reservationModel.SessionId,
-		MembershipId:     reservationModel.MembershipId,
+		Session: schemas.Session{
+			Id:                 reservationModel.Session.Id,
+			Title:              reservationModel.Session.Title,
+			Date:               reservationModel.Session.Date,
+			StartTime:          reservationModel.Session.StartTime,
+			EndTime:            reservationModel.Session.EndTime,
+			State:              string(reservationModel.Session.State),
+			RegisteredCount:    reservationModel.Session.RegisteredCount,
+			Capacity:           reservationModel.Session.Capacity,
+			SessionLink:        reservationModel.Session.SessionLink,
+			ProfessionalId:     reservationModel.Session.ProfessionalId,
+			LocalId:            reservationModel.Session.LocalId,
+			CommunityServiceId: reservationModel.Session.CommunityServiceId,
+		},
+		MembershipId: reservationModel.MembershipId,
 	}, nil
 }
 
