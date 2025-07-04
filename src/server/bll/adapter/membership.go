@@ -102,6 +102,7 @@ func (m *Membership) CreatePostgresqlMembership(
 	startDate time.Time,
 	endDate time.Time,
 	status schemas.MembershipStatus,
+	reservationsUsed *int,
 	communityId uuid.UUID,
 	userId uuid.UUID,
 	planId uuid.UUID,
@@ -112,14 +113,15 @@ func (m *Membership) CreatePostgresqlMembership(
 	}
 
 	membershipModel := &model.Membership{
-		Id:          uuid.New(),
-		Description: description,
-		StartDate:   startDate,
-		EndDate:     endDate,
-		Status:      model.MembershipStatus(status),
-		CommunityId: communityId,
-		UserId:      userId,
-		PlanId:      planId,
+		Id:               uuid.New(),
+		Description:      description,
+		StartDate:        startDate,
+		EndDate:          endDate,
+		Status:           model.MembershipStatus(status),
+		ReservationsUsed: reservationsUsed,
+		CommunityId:      communityId,
+		UserId:           userId,
+		PlanId:           planId,
 		AuditFields: model.AuditFields{
 			UpdatedBy: updatedBy,
 		},
@@ -144,6 +146,7 @@ func (m *Membership) UpdatePostgresqlMembership(
 	startDate *time.Time,
 	endDate *time.Time,
 	status *schemas.MembershipStatus,
+	reservationsUsed *int,
 	communityId *uuid.UUID,
 	userId *uuid.UUID,
 	planId *uuid.UUID,
@@ -171,6 +174,9 @@ func (m *Membership) UpdatePostgresqlMembership(
 	}
 	if status != nil {
 		existingMembership.Status = model.MembershipStatus(*status)
+	}
+	if reservationsUsed != nil {
+		existingMembership.ReservationsUsed = reservationsUsed
 	}
 	if communityId != nil {
 		existingMembership.CommunityId = *communityId
@@ -210,12 +216,13 @@ func (m *Membership) DeletePostgresqlMembership(membershipId uuid.UUID) *errors.
 // Función helper para convertir model a schema
 func (m *Membership) convertModelToSchema(membershipModel *model.Membership) *schemas.Membership {
 	return &schemas.Membership{
-		Id:          membershipModel.Id,
-		Description: membershipModel.Description,
-		StartDate:   membershipModel.StartDate,
-		EndDate:     membershipModel.EndDate,
-		Status:      schemas.MembershipStatus(membershipModel.Status),
-		CommunityId: membershipModel.CommunityId,
+		Id:               membershipModel.Id,
+		Description:      membershipModel.Description,
+		StartDate:        membershipModel.StartDate,
+		EndDate:          membershipModel.EndDate,
+		Status:           schemas.MembershipStatus(membershipModel.Status),
+		ReservationsUsed: membershipModel.ReservationsUsed,
+		CommunityId:      membershipModel.CommunityId,
 		Community: schemas.Community{
 			Id:                  membershipModel.Community.Id,
 			Name:                membershipModel.Community.Name,

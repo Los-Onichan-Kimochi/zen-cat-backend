@@ -252,6 +252,78 @@ func (r *Reservation) hasTimeOverlap(start1, end1, start2, end2 time.Time) bool 
 	return start1.Before(end2) && end1.After(start2)
 }
 
+// GetReservationsByCommunityIdByUserId obtiene las reservas de un usuario para una comunidad específica
+func (r *Reservation) GetReservationsByCommunityIdByUserId(
+	communityId uuid.UUID,
+	userId uuid.UUID,
+) (*schemas.Reservations, *errors.Error) {
+	// Verificar que la comunidad existe
+	_, communityErr := r.Adapter.Community.GetPostgresqlCommunity(communityId)
+	if communityErr != nil {
+		return nil, communityErr
+	}
+
+	// Verificar que el usuario existe
+	_, userErr := r.Adapter.User.GetPostgresqlUser(userId)
+	if userErr != nil {
+		return nil, userErr
+	}
+
+	// 1. Obtener los servicios de la comunidad
+	communityServices, err := r.Adapter.CommunityService.FetchPostgresqlCommunityServices(
+		&communityId,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Si no hay servicios para esta comunidad, devolver una lista vacía
+	if len(communityServices) == 0 {
+		return &schemas.Reservations{Reservations: []*schemas.Reservation{}}, nil
+	}
+
+	// 2. Extraer los IDs de servicios de comunidad
+	communityServiceIds := make([]uuid.UUID, len(communityServices))
+	for i, cs := range communityServices {
+		communityServiceIds[i] = cs.Id
+	}
+
+	// 3. Obtener las sesiones asociadas a estos servicios de comunidad
+	sessions, sessionsErr := r.Adapter.Session.FetchPostgresqlSessions(
+		[]uuid.UUID{}, // No filtrar por profesional
+		[]uuid.UUID{}, // No filtrar por local
+		communityServiceIds,
+		[]string{}, // Todos los estados
+	)
+	if sessionsErr != nil {
+		return nil, sessionsErr
+	}
+
+	// Si no hay sesiones, devolver una lista vacía
+	if len(sessions) == 0 {
+		return &schemas.Reservations{Reservations: []*schemas.Reservation{}}, nil
+	}
+
+	// 4. Extraer los IDs de sesión
+	sessionIds := make([]uuid.UUID, len(sessions))
+	for i, session := range sessions {
+		sessionIds[i] = session.Id
+	}
+
+	// 5. Obtener las reservas para estas sesiones y este usuario
+	reservations, reservationsErr := r.Adapter.Reservation.FetchPostgresqlReservations(
+		[]uuid.UUID{userId},
+		sessionIds,
+		[]string{}, // Todos los estados
+	)
+	if reservationsErr != nil {
+		return nil, reservationsErr
+	}
+
+	return &schemas.Reservations{Reservations: reservations}, nil
+}
+
 // GetServiceReport obtiene el reporte de servicios para el dashboard admin
 type ServiceReportResponse struct {
 	Total    int                            `json:"totalReservations"`

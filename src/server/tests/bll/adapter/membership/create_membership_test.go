@@ -22,6 +22,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_Success(t *testing.T) {
 	startDate := time.Now()
 	endDate := startDate.AddDate(1, 0, 0) // One year later
 	status := schemas.MembershipStatusActive
+	reservationsUsed := 0
 
 	// WHEN: CreatePostgresqlMembership is called
 	result, err := membershipAdapter.CreatePostgresqlMembership(
@@ -29,6 +30,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_Success(t *testing.T) {
 		startDate,
 		endDate,
 		status,
+		&reservationsUsed,
 		community.Id,
 		user.Id,
 		plan.Id,
@@ -60,6 +62,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_EmptyUpdatedBy(t *testing.
 	startDate := time.Now()
 	endDate := startDate.AddDate(1, 0, 0)
 	status := schemas.MembershipStatusActive
+	reservationsUsed := 0
 
 	// WHEN: CreatePostgresqlMembership is called
 	result, err := membershipAdapter.CreatePostgresqlMembership(
@@ -67,6 +70,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_EmptyUpdatedBy(t *testing.
 		startDate,
 		endDate,
 		status,
+		&reservationsUsed,
 		community.Id,
 		user.Id,
 		plan.Id,
@@ -91,6 +95,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_ExpiredStatus(t *testing.T
 	startDate := time.Now()
 	endDate := startDate.AddDate(0, 6, 0) // Six months later
 	status := schemas.MembershipStatusExpired
+	reservationsUsed := 0
 
 	// WHEN: CreatePostgresqlMembership is called
 	result, err := membershipAdapter.CreatePostgresqlMembership(
@@ -98,6 +103,7 @@ func TestMembershipAdapter_CreatePostgresqlMembership_ExpiredStatus(t *testing.T
 		startDate,
 		endDate,
 		status,
+		&reservationsUsed,
 		community.Id,
 		user.Id,
 		plan.Id,
