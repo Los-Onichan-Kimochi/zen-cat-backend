@@ -28,7 +28,7 @@ func StartDailyReminderJob(env *schemas.EnvSettings) {
 	c := cron.New(cron.WithLocation(loc))
 
 	// Ejecutar todos los días a las 6:30 AM hora Lima
-	_, err = c.AddFunc("30 6 * * *", func() {
+	_, err = c.AddFunc("*/1 * * * *", func() {
 		log.Println("📬 [CRON] Ejecutando recordatorios diarios de sesiones...")
 		SendRemindersForToday(env)
 	})
@@ -46,11 +46,11 @@ func SendRemindersForToday(env *schemas.EnvSettings) {
 
 	var reminders []Reminder
 
-	err := env.DB.Table("reservations r").
+	err := env.DB.Table("astro_cat_reservation r").
 		Select(`u.email as user_email, u.name as user_name, r.name as session_name, r.reservation_time as session_time`).
-		Joins("JOIN users u ON u.id = r.user_id").
+		Joins("JOIN astro_cat_user u ON u.id = r.user_id").
 		Where("DATE(r.reservation_time) = ?", today).
-		Where("r.state = ?", "ONGOING").
+		Where("r.state = ?", "CONFIRMED").
 		Scan(&reminders).Error
 	if err != nil {
 		log.Printf("Error obteniendo reservas: %v", err)
