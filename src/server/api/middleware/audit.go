@@ -55,7 +55,9 @@ func (a *Middleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		// For login/register requests, extract email from request body before processing
 		var loginEmail string
 		if method == "POST" && (strings.Contains(path, "/login") || strings.Contains(path, "/register")) {
-			loginEmail = extractEmailFromLoginRequest(c, path)
+			bodyBytes, _ := io.ReadAll(c.Request().Body)
+			c.Request().Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+			loginEmail = extractEmailFromLoginBody(bodyBytes, path)
 		}
 
 		// Try to get user credentials from JWT
@@ -155,33 +157,19 @@ func (a *Middleware) AuditMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// extractEmailFromLoginRequest extracts email from login/register request body
-func extractEmailFromLoginRequest(c echo.Context, path string) string {
-	// Read the request body
-	body, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		return ""
-	}
-
-	// Restore the request body for the actual handler
-	c.Request().Body = io.NopCloser(bytes.NewReader(body))
-
-	// Try to parse as login request
+func extractEmailFromLoginBody(body []byte, path string) string {
 	if strings.Contains(path, "/login") {
 		var loginReq schemas.LoginRequest
 		if err := json.Unmarshal(body, &loginReq); err == nil {
 			return loginReq.Email
 		}
 	}
-
-	// Try to parse as register request
 	if strings.Contains(path, "/register") {
 		var registerReq schemas.RegisterRequest
 		if err := json.Unmarshal(body, &registerReq); err == nil {
 			return registerReq.Email
 		}
 	}
-
 	return ""
 }
 

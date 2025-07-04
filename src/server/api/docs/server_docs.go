@@ -2592,6 +2592,64 @@ const docTemplateserver = `{
                 }
             }
         },
+        "/login/google/": {
+            "post": {
+                "description": "Authenticate user using Google ID token, returns user info and tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "summary": "Google Login",
+                "parameters": [
+                    {
+                        "description": "Google Login Request",
+                        "name": "googleLoginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.GoogleLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid token",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/me/": {
             "get": {
                 "security": [
@@ -8841,6 +8899,26 @@ const docTemplateserver = `{
                 "GenderOther"
             ]
         },
+        "schemas.GoogleLoginRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOi..."
+                }
+            }
+        },
+        "schemas.GoogleLoginResponse": {
+            "type": "object",
+            "properties": {
+                "tokens": {
+                    "$ref": "#/definitions/schemas.TokenResponse"
+                },
+                "user": {
+                    "$ref": "#/definitions/schemas.User"
+                }
+            }
+        },
         "schemas.Local": {
             "type": "object",
             "properties": {
@@ -9783,8 +9861,6 @@ const docTemplateserver = `{
         "time.Duration": {
             "type": "integer",
             "enum": [
-                -9223372036854775808,
-                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -9799,8 +9875,6 @@ const docTemplateserver = `{
                 3600000000000
             ],
             "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
