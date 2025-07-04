@@ -1392,6 +1392,8 @@ definitions:
     type: object
   time.Duration:
     enum:
+    - -9223372036854775808
+    - 9223372036854775807
     - 1
     - 1000
     - 1000000
@@ -1405,6 +1407,8 @@ definitions:
     - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
     - Nanosecond
     - Microsecond
     - Millisecond
@@ -2218,6 +2222,45 @@ paths:
       security:
       - JWT: []
       summary: Bulk Delete CommunityServices.
+      tags:
+      - CommunityService
+  /community-service/id/{id}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a community-service association by its ID.
+      parameters:
+      - description: Community Service ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.CommunityService'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (Association does not exist)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get CommunityService By ID.
       tags:
       - CommunityService
   /community/:

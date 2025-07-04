@@ -165,6 +165,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	communityService.DELETE("/:communityId/:serviceId/", a.DeleteCommunityService)
 	communityService.POST("/bulk-create/", a.BulkCreateCommunityServices)
 	communityService.GET("/", a.FetchCommunityServices)
+	communityService.GET("/id/:id/", a.GetCommunityServiceById)
 	communityService.DELETE("/bulk-delete/", a.BulkDeleteCommunityServices)
 
 	// ServiceLocal endpoints (admin only)
