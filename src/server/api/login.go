@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -115,4 +117,35 @@ func (a *Api) GetCurrentUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, userProfile)
+}
+
+// GoogleLogin 		godoc
+// @Summary 			Google Login
+// @Description 		Authenticate user using Google ID token, returns user info and tokens
+// @Tags 				Login
+// @Accept 				json
+// @Produce 			json
+// @Param               googleLoginRequest  body   schemas.GoogleLoginRequest  true  "Google Login Request"
+// @Success 			200 {object} schemas.GoogleLoginResponse "Login successful"
+// @Failure 			400 {object} errors.Error "Bad Request"
+// @Failure 			401 {object} errors.Error "Unauthorized - Invalid token"
+// @Failure 			422 {object} errors.Error "Unprocessable Entity"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/login/google/ [post]
+func (a *Api) GoogleLogin(c echo.Context) error {
+	// 🔍 Extra para depurar si sigue fallando
+	body, _ := io.ReadAll(c.Request().Body)
+	c.Request().Body = io.NopCloser(bytes.NewBuffer(body))
+
+	var request schemas.GoogleLoginRequest
+	if err := c.Bind(&request); err != nil || request.Token == "" {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidRequestBody, c)
+	}
+
+	response, err := a.BllController.Login.GoogleLogin(c.Request().Context(), request.Token)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

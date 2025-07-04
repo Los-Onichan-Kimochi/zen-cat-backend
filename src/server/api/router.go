@@ -50,6 +50,10 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	a.Echo.POST("/login/", a.Login)
 	a.Echo.POST("/register/", a.Register)
 	a.Echo.POST("/forgot-password/", a.ForgotPassword)
+	a.Echo.POST("/login/google/", a.GoogleLogin)
+
+	// Contact endpoints (public)
+	a.Echo.POST("/contact", a.ContactMessage)
 
 	// ===== PROTECTED ENDPOINTS (JWT Authentication required) =====
 
