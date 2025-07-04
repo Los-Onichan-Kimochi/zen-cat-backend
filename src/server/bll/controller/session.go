@@ -215,7 +215,7 @@ func (s *Session) UpdateSession(
 			s.logger.Warn("Error fetching reservations for session", "error", err)
 			// Continue with session update even if reservation fetch fails
 		} else {
-			// Update each reservation to ANNULLED state
+			// Update each reservation to ANULLED state
 			annulledState := "ANULLED"
 			for _, reservation := range reservations {
 				_, updateErr := s.Adapter.Reservation.UpdatePostgresqlReservation(
