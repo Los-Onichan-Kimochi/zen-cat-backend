@@ -1274,6 +1274,44 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		}
 	}
 
+	// Agregar membresías dummy históricas para reportes
+	monthsBack := 12
+	statuses := []model.MembershipStatus{
+		model.MembershipStatusActive,
+		model.MembershipStatusExpired,
+		model.MembershipStatusCancelled,
+	}
+	for _, community := range communities {
+		for userIdx, user := range users {
+			// Saltar usuarios especiales (SYSTEM y mainUserId)
+			if user.Name == "SYSTEM" || user.Id == mainUserId {
+				continue
+			}
+			for i := 0; i < monthsBack; i++ {
+				start := time.Now().AddDate(0, -i, 0)
+				end := start.AddDate(0, 1, 0)
+				status := statuses[i%len(statuses)]
+				plan := plans[(i+userIdx)%len(plans)]
+				desc := fmt.Sprintf("Dummy Membership %d - %s - %s", i+1, user.Name, community.Name)
+				membership := &model.Membership{
+					Id:          uuid.New(),
+					Description: desc,
+					StartDate:   start,
+					EndDate:     end,
+					Status:      status,
+					AuditFields: model.AuditFields{UpdatedBy: "ADMIN"},
+					CommunityId: community.Id,
+					UserId:      user.Id,
+					PlanId:      plan.Id,
+				}
+				if err := astroCatPsqlDB.Create(membership).Error; err != nil {
+					appLogger.Errorf("Error creating historical dummy membership: %v", err)
+					return
+				}
+			}
+		}
+	}
+
 	// Create dummy community services
 	communityServices := []*model.CommunityService{
 		// Runners Community services
