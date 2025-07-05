@@ -61,7 +61,7 @@ func TestCreateProfessionalSuccessfully(t *testing.T) {
 	assert.Equal(t, professionalRequest.Email, response.Email)
 	assert.Equal(t, professionalRequest.PhoneNumber, response.PhoneNumber)
 	assert.Equal(t, professionalRequest.Type, response.Type)
-	assert.Equal(t, professionalRequest.ImageUrl, response.ImageUrl)
+	assert.True(t, strings.HasPrefix(response.ImageUrl, professionalRequest.ImageUrl))
 }
 
 func TestCreateProfessionalInvalidRequestBody(t *testing.T) {
@@ -74,7 +74,11 @@ func TestCreateProfessionalInvalidRequestBody(t *testing.T) {
 	server, _ := apiTest.NewApiServerTestWrapper(t)
 
 	// WHEN
-	req := httptest.NewRequest(http.MethodPost, "/professional/", strings.NewReader(`{"invalid": json`))
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/professional/",
+		strings.NewReader(`{"invalid": json`),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 

@@ -16,6 +16,11 @@ type Reminder struct {
 	UserName    string
 	SessionName string
 	SessionTime time.Time
+	SessionLink string
+	LocalName   string
+	StreetName  string
+	BuildingNum string
+	District    string
 }
 
 // Esta función es llamada desde main.go como goroutine
@@ -42,10 +47,21 @@ func SendRemindersForToday(env *schemas.EnvSettings) {
 	var reminders []Reminder
 
 	err := env.DB.Table("astro_cat_reservation r").
-		Select(`u.email as user_email, u.name as user_name, r.name as session_name, r.reservation_time as session_time`).
+		Select(`
+		u.email AS user_email,
+		u.name AS user_name,
+		r.name AS session_name,
+		r.reservation_time AS session_time,
+		s.session_link,
+		l.local_name,
+		l.street_name,
+		l.building_number,
+		l.district
+	`).
 		Joins("JOIN astro_cat_user u ON u.id = r.user_id").
-		Where("DATE(r.reservation_time) = ?", today).
-		Where("r.state = ?", "CONFIRMED").
+		Joins("JOIN astro_cat_session s ON s.id = r.session_id").
+		Joins("LEFT JOIN astro_cat_local l ON l.id = s.local_id").
+		Where("DATE(r.reservation_time) = ? AND r.state = ?", today, "CONFIRMED").
 		Scan(&reminders).Error
 	if err != nil {
 		log.Printf("Error obteniendo reservas: %v", err)
@@ -58,24 +74,43 @@ func SendRemindersForToday(env *schemas.EnvSettings) {
 	}
 
 	for _, r := range reminders {
+		var tipoInfo string
+		var linkInfo string
+
+		if r.SessionLink != "" {
+			tipoInfo = "🌐 Tipo: Virtual"
+			linkInfo = fmt.Sprintf("\n\n🔗 Enlace de acceso: %s", r.SessionLink)
+		} else {
+			tipoInfo = fmt.Sprintf(
+				"📍 Lugar: %s, %s %s, %s",
+				r.LocalName,
+				r.StreetName,
+				r.BuildingNum,
+				r.District,
+			)
+		}
+
 		body := fmt.Sprintf(`Hola %s,
 
 Este es un recordatorio de tu sesión de hoy:
 
 🧘 Sesión: %s
 🕘 Hora: %s
+%s%s
 
 Gracias por ser parte de ZenCat 🌿`,
 			r.UserName,
 			r.SessionName,
 			r.SessionTime.Format("15:04"),
+			tipoInfo,
+			linkInfo,
 		)
 
 		err := utils.SendEmail(env, r.UserEmail, "Recordatorio de tu sesión en ZenCat", body)
 		if err != nil {
-			log.Printf("Error enviando correo a %s: %v", r.UserEmail, err)
+			log.Printf("❌ Error enviando correo a %s: %v", r.UserEmail, err)
 		} else {
-			log.Printf("Correo enviado a %s", r.UserEmail)
+			log.Printf("✅ Correo enviado a %s", r.UserEmail)
 		}
 	}
 }

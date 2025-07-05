@@ -152,7 +152,7 @@ func TestCreateSessionTimeConflict(t *testing.T) {
 	/*
 		GIVEN: A session already exists at the same time and professional
 		WHEN:  POST /session/ is called with conflicting time
-		THEN:  A HTTP_201_CREATED status should be returned (API allows conflicts)
+		THEN:  A HTTP_409_CONFLICT status should be returned
 	*/
 	// GIVEN
 	server, db := apiTest.NewApiServerTestWrapper(t)
@@ -197,5 +197,5 @@ func TestCreateSessionTimeConflict(t *testing.T) {
 	server.Echo.ServeHTTP(rec, req)
 
 	// THEN
-	assert.Equal(t, http.StatusCreated, rec.Code)
+	assert.Equal(t, http.StatusConflict, rec.Code)
 }

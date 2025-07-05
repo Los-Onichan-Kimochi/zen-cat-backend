@@ -120,11 +120,13 @@ func (r *Reservation) CreateReservation(
 	}
 
 	// Validate that the membership exists if provided
+	var membershipToUpdate *schemas.Membership
 	if createReservationData.MembershipId != nil {
-		_, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*createReservationData.MembershipId)
+		membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*createReservationData.MembershipId)
 		if membershipErr != nil {
 			return nil, membershipErr
 		}
+		membershipToUpdate = membership
 	}
 
 	// Check for user reservation conflicts (user cannot be in two sessions at the same time)
@@ -173,7 +175,8 @@ func (r *Reservation) CreateReservation(
 		updatedBy,
 	)
 
-	return r.Adapter.Reservation.CreatePostgresqlReservation(
+	// Create the reservation
+	newReservation, createErr := r.Adapter.Reservation.CreatePostgresqlReservation(
 		createReservationData.Name,
 		createReservationData.ReservationTime,
 		createReservationData.State,
@@ -182,6 +185,36 @@ func (r *Reservation) CreateReservation(
 		createReservationData.MembershipId,
 		updatedBy,
 	)
+
+	if createErr != nil {
+		return nil, createErr
+	}
+
+	// Incrementar reservations_used de la membership si existe y si no es ilimitada (null)
+	if membershipToUpdate != nil && membershipToUpdate.ReservationsUsed != nil && createReservationData.State == "CONFIRMED" {
+		currentUsed := *membershipToUpdate.ReservationsUsed
+		newUsed := currentUsed + 1
+
+		_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+			*createReservationData.MembershipId,
+			nil,
+			nil,
+			nil,
+			nil,
+			&newUsed,
+			nil,
+			nil,
+			nil,
+			updatedBy,
+		)
+
+		if updateErr != nil {
+			r.logger.Error("Failed to update reservations_used for membership", updateErr)
+			// No devolvemos error para no afectar la creación de la reserva
+		}
+	}
+
+	return newReservation, nil
 }
 
 // Updates a reservation.
@@ -190,6 +223,12 @@ func (r *Reservation) UpdateReservation(
 	updateReservationData schemas.UpdateReservationRequest,
 	updatedBy string,
 ) (*schemas.Reservation, *errors.Error) {
+	// Obtener la reserva actual para comparar estados
+	currentReservation, getErr := r.Adapter.Reservation.GetPostgresqlReservation(reservationId)
+	if getErr != nil {
+		return nil, getErr
+	}
+
 	// Validate that the user exists if provided
 	if updateReservationData.UserId != nil {
 		_, userErr := r.Adapter.User.GetPostgresqlUser(*updateReservationData.UserId)
@@ -206,15 +245,50 @@ func (r *Reservation) UpdateReservation(
 		}
 	}
 
-	// Validate that the membership exists if provided
+	// Verificar si hay un cambio de membresía
+	var oldMembershipId *uuid.UUID
+	var newMembershipId *uuid.UUID
+
+	oldMembershipId = currentReservation.MembershipId
 	if updateReservationData.MembershipId != nil {
-		_, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*updateReservationData.MembershipId)
+		newMembershipId = updateReservationData.MembershipId
+	} else {
+		newMembershipId = oldMembershipId
+	}
+
+	// Validate that the membership exists if provided
+	var oldMembership *schemas.Membership
+	var newMembership *schemas.Membership
+
+	if oldMembershipId != nil {
+		membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*oldMembershipId)
 		if membershipErr != nil {
 			return nil, membershipErr
 		}
+		oldMembership = membership
 	}
 
-	return r.Adapter.Reservation.UpdatePostgresqlReservation(
+	if newMembershipId != nil && (oldMembershipId == nil || *newMembershipId != *oldMembershipId) {
+		membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*newMembershipId)
+		if membershipErr != nil {
+			return nil, membershipErr
+		}
+		newMembership = membership
+	} else if newMembershipId != nil {
+		newMembership = oldMembership
+	}
+
+	// Verificar si hay un cambio de estado
+	oldState := currentReservation.State
+	var newState string
+	if updateReservationData.State != nil {
+		newState = *updateReservationData.State
+	} else {
+		newState = oldState
+	}
+
+	// Realizar la actualización de la reserva
+	updatedReservation, updateErr := r.Adapter.Reservation.UpdatePostgresqlReservation(
 		reservationId,
 		updateReservationData.Name,
 		updateReservationData.ReservationTime,
@@ -224,10 +298,169 @@ func (r *Reservation) UpdateReservation(
 		updateReservationData.MembershipId,
 		updatedBy,
 	)
+
+	if updateErr != nil {
+		return nil, updateErr
+	}
+
+	// Actualizar el contador de reservas usadas en la membresía según los cambios de estado
+
+	// Caso 1: Estado cambia de confirmado a anulado o cancelado
+	if oldState == "CONFIRMED" && (newState == "ANULLED" || newState == "CANCELLED") {
+		// Decrementar contador si la membresía tiene un contador (no es ilimitada)
+		if oldMembership != nil && oldMembership.ReservationsUsed != nil {
+			currentUsed := *oldMembership.ReservationsUsed
+			newUsed := currentUsed - 1
+			if newUsed < 0 {
+				newUsed = 0
+			}
+
+			_, membershipErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+				*oldMembershipId,
+				nil,
+				nil,
+				nil,
+				nil,
+				&newUsed,
+				nil,
+				nil,
+				nil,
+				updatedBy,
+			)
+
+			if membershipErr != nil {
+				r.logger.Error("Failed to decrement reservations_used for membership", membershipErr)
+				// No devolvemos error para no afectar la actualización de la reserva
+			}
+		}
+	}
+
+	// Caso 2: Estado cambia de anulado o cancelado a confirmado
+	if (oldState == "ANULLED" || oldState == "CANCELLED") && newState == "CONFIRMED" {
+		// Incrementar contador si la nueva membresía tiene un contador (no es ilimitada)
+		if newMembership != nil && newMembership.ReservationsUsed != nil {
+			currentUsed := *newMembership.ReservationsUsed
+			newUsed := currentUsed + 1
+
+			_, membershipErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+				*newMembershipId,
+				nil,
+				nil,
+				nil,
+				nil,
+				&newUsed,
+				nil,
+				nil,
+				nil,
+				updatedBy,
+			)
+
+			if membershipErr != nil {
+				r.logger.Error("Failed to increment reservations_used for membership", membershipErr)
+				// No devolvemos error para no afectar la actualización de la reserva
+			}
+		}
+	}
+
+	// Caso 3: Cambio de membresía manteniendo estado confirmado
+	if oldState == "CONFIRMED" && newState == "CONFIRMED" &&
+		oldMembershipId != nil && newMembershipId != nil &&
+		*oldMembershipId != *newMembershipId {
+
+		// Decrementar contador en la membresía antigua si no es ilimitada
+		if oldMembership != nil && oldMembership.ReservationsUsed != nil {
+			currentUsed := *oldMembership.ReservationsUsed
+			newUsed := currentUsed - 1
+			if newUsed < 0 {
+				newUsed = 0
+			}
+
+			_, membershipErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+				*oldMembershipId,
+				nil,
+				nil,
+				nil,
+				nil,
+				&newUsed,
+				nil,
+				nil,
+				nil,
+				updatedBy,
+			)
+
+			if membershipErr != nil {
+				r.logger.Error("Failed to decrement reservations_used for old membership", membershipErr)
+			}
+		}
+
+		// Incrementar contador en la nueva membresía si no es ilimitada
+		if newMembership != nil && newMembership.ReservationsUsed != nil {
+			currentUsed := *newMembership.ReservationsUsed
+			newUsed := currentUsed + 1
+
+			_, membershipErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+				*newMembershipId,
+				nil,
+				nil,
+				nil,
+				nil,
+				&newUsed,
+				nil,
+				nil,
+				nil,
+				updatedBy,
+			)
+
+			if membershipErr != nil {
+				r.logger.Error("Failed to increment reservations_used for new membership", membershipErr)
+			}
+		}
+	}
+
+	return updatedReservation, nil
 }
 
 // Deletes a reservation.
 func (r *Reservation) DeleteReservation(reservationId uuid.UUID) *errors.Error {
+	// Obtener la reserva antes de eliminarla para obtener info de la membresía
+	currentReservation, getErr := r.Adapter.Reservation.GetPostgresqlReservation(reservationId)
+	if getErr != nil {
+		return getErr
+	}
+
+	// Si la reserva está confirmada y tiene membresía asociada, decrementar contador
+	if currentReservation.State == "CONFIRMED" && currentReservation.MembershipId != nil {
+		// Obtener la membresía actual
+		membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*currentReservation.MembershipId)
+		if membershipErr == nil && membership.ReservationsUsed != nil {
+			// Decrementar el contador si no es membresía ilimitada
+			currentUsed := *membership.ReservationsUsed
+			newUsed := currentUsed - 1
+			if newUsed < 0 {
+				newUsed = 0
+			}
+
+			// Actualizar la membresía
+			_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+				*currentReservation.MembershipId,
+				nil,
+				nil,
+				nil,
+				nil,
+				&newUsed,
+				nil,
+				nil,
+				nil,
+				"SYSTEM", // En caso de eliminación, usamos SYSTEM como updatedBy
+			)
+
+			if updateErr != nil {
+				r.logger.Error("Failed to decrement reservations_used on reservation delete", updateErr)
+				// No devolvemos error para no afectar la eliminación de la reserva
+			}
+		}
+	}
+
 	return r.Adapter.Reservation.DeletePostgresqlReservation(reservationId)
 }
 
@@ -235,6 +468,60 @@ func (r *Reservation) DeleteReservation(reservationId uuid.UUID) *errors.Error {
 func (r *Reservation) BulkDeleteReservations(
 	bulkDeleteReservationData schemas.BulkDeleteReservationRequest,
 ) *errors.Error {
+	// Convertir las IDs de string a UUID
+	uuidIds := make([]uuid.UUID, 0, len(bulkDeleteReservationData.Reservations))
+	for _, idStr := range bulkDeleteReservationData.Reservations {
+		id, err := uuid.Parse(idStr)
+		if err != nil {
+			return &errors.UnprocessableEntityError.InvalidReservationId
+		}
+		uuidIds = append(uuidIds, id)
+	}
+
+	// Para cada reserva confirmada, decrementar el contador de la membresía
+	for _, reservationId := range uuidIds {
+		// Obtener la reserva antes de eliminarla
+		reservation, getErr := r.Adapter.Reservation.GetPostgresqlReservation(reservationId)
+		if getErr != nil {
+			// Ignorar errores y continuar con las siguientes
+			r.logger.Error("Failed to get reservation for bulk delete", getErr)
+			continue
+		}
+
+		// Si está confirmada y tiene membresía, decrementar contador
+		if reservation.State == "CONFIRMED" && reservation.MembershipId != nil {
+			// Obtener la membresía
+			membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*reservation.MembershipId)
+			if membershipErr == nil && membership.ReservationsUsed != nil {
+				// Decrementar el contador si no es ilimitada
+				currentUsed := *membership.ReservationsUsed
+				newUsed := currentUsed - 1
+				if newUsed < 0 {
+					newUsed = 0
+				}
+
+				// Actualizar la membresía
+				_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+					*reservation.MembershipId,
+					nil,
+					nil,
+					nil,
+					nil,
+					&newUsed,
+					nil,
+					nil,
+					nil,
+					"SYSTEM", // En caso de eliminación en bloque, usamos SYSTEM como updatedBy
+				)
+
+				if updateErr != nil {
+					r.logger.Error("Failed to decrement reservations_used on bulk delete", updateErr)
+					// Continuar con la siguiente reserva
+				}
+			}
+		}
+	}
+
 	return r.Adapter.Reservation.BulkDeletePostgresqlReservations(
 		bulkDeleteReservationData.Reservations,
 	)

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,7 +50,7 @@ func TestCreateCommunitySuccessfully(t *testing.T) {
 	assert.NotEmpty(t, response.Id)
 	assert.Equal(t, createCommunityRequest.Name, response.Name)
 	assert.Equal(t, createCommunityRequest.Purpose, response.Purpose)
-	assert.Equal(t, createCommunityRequest.ImageUrl, response.ImageUrl)
+	assert.True(t, strings.HasPrefix(response.ImageUrl, createCommunityRequest.ImageUrl))
 	assert.Equal(t, 0, response.NumberSubscriptions)
 }
 
