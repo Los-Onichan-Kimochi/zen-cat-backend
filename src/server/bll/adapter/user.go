@@ -40,11 +40,12 @@ func (u *User) GetPostgresqlUser(
 	var memberships []*schemas.Membership
 	for _, m := range userModel.Memberships {
 		memberships = append(memberships, &schemas.Membership{
-			Id:          m.Id,
-			Description: m.Description,
-			StartDate:   m.StartDate,
-			EndDate:     m.EndDate,
-			Status:      schemas.MembershipStatus(m.Status),
+			Id:               m.Id,
+			Description:      m.Description,
+			StartDate:        m.StartDate,
+			EndDate:          m.EndDate,
+			Status:           schemas.MembershipStatus(m.Status),
+			ReservationsUsed: m.ReservationsUsed,
 			Community: schemas.Community{
 				Id:                  m.Community.Id,
 				Name:                m.Community.Name,
@@ -104,11 +105,12 @@ func (u *User) GetPostgresqlUserByEmail(
 	var memberships []*schemas.Membership
 	for _, m := range userModel.Memberships {
 		memberships = append(memberships, &schemas.Membership{
-			Id:          m.Id,
-			Description: m.Description,
-			StartDate:   m.StartDate,
-			EndDate:     m.EndDate,
-			Status:      schemas.MembershipStatus(m.Status),
+			Id:               m.Id,
+			Description:      m.Description,
+			StartDate:        m.StartDate,
+			EndDate:          m.EndDate,
+			Status:           schemas.MembershipStatus(m.Status),
+			ReservationsUsed: m.ReservationsUsed,
 			Community: schemas.Community{
 				Id:                  m.Community.Id,
 				Name:                m.Community.Name,
@@ -167,11 +169,12 @@ func (u *User) FetchPostgresqlUsers() ([]*schemas.User, *errors.Error) {
 		var memberships []*schemas.Membership
 		for _, m := range userModel.Memberships {
 			memberships = append(memberships, &schemas.Membership{
-				Id:          m.Id,
-				Description: m.Description,
-				StartDate:   m.StartDate,
-				EndDate:     m.EndDate,
-				Status:      schemas.MembershipStatus(m.Status),
+				Id:               m.Id,
+				Description:      m.Description,
+				StartDate:        m.StartDate,
+				EndDate:          m.EndDate,
+				Status:           schemas.MembershipStatus(m.Status),
+				ReservationsUsed: m.ReservationsUsed,
 				Community: schemas.Community{
 					Id:                  m.Community.Id,
 					Name:                m.Community.Name,
@@ -449,11 +452,12 @@ func (u *User) BulkCreatePostgresqlUser(
 		var memberships []*schemas.Membership
 		for _, m := range userModel.Memberships {
 			memberships = append(memberships, &schemas.Membership{
-				Id:          m.Id,
-				Description: m.Description,
-				StartDate:   m.StartDate,
-				EndDate:     m.EndDate,
-				Status:      schemas.MembershipStatus(m.Status),
+				Id:               m.Id,
+				Description:      m.Description,
+				StartDate:        m.StartDate,
+				EndDate:          m.EndDate,
+				Status:           schemas.MembershipStatus(m.Status),
+				ReservationsUsed: m.ReservationsUsed,
 				Community: schemas.Community{
 					Id:                  m.Community.Id,
 					Name:                m.Community.Name,
