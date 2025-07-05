@@ -33,8 +33,8 @@ func InitDevMode() {
 	fmt.Print("¿Ejecutar en modo desarrollo? (omite autenticación JWT) [y/N]: ")
 	input, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Println("Error leyendo entrada, ejecutando en modo producción...")
-		SetDevMode(false)
+		fmt.Println("Error leyendo entrada, ejecutando en modo DEV...")
+		SetDevMode(true)
 		return
 	}
 
