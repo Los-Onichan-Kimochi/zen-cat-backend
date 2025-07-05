@@ -1677,9 +1677,9 @@ func createDummyData(appLogger logging.Logger, astroCatPsqlDB *gorm.DB) {
 		{
 			Id:                 uuid.New(),
 			Title:              "Weekend Yoga Flow",
-			Date:               baseDate.Add(72 * time.Hour),              // 3 days from now
-			StartTime:          baseDate.Add(72*time.Hour + 9*time.Hour),  // 9:00 AM
-			EndTime:            baseDate.Add(72*time.Hour + 10*time.Hour), // 10:00 AM
+			Date:               baseDate.Add(72 * time.Hour),                               // 3 days from now
+			StartTime:          baseDate.Add(72*time.Hour + 15*time.Hour + 30*time.Minute), // 3:30 PM
+			EndTime:            baseDate.Add(72*time.Hour + 16*time.Hour + 45*time.Minute), // 4:45 PM
 			State:              model.SessionStateScheduled,
 			RegisteredCount:    5, // Test-1, Admin, María, Carlos, Ana
 			Capacity:           15,
