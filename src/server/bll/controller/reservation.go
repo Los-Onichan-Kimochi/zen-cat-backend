@@ -157,23 +157,29 @@ func (r *Reservation) CreateReservation(
 		}
 	}
 
-	// Modify `registered_count` field of the session
-	session.RegisteredCount++
-	_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
-		createReservationData.SessionId,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
-		&session.RegisteredCount,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
-		updatedBy,
-	)
+	// Modify `registered_count` field of the session only if the reservation is CONFIRMED
+	if createReservationData.State == "CONFIRMED" {
+		session.RegisteredCount++
+		_, sessionErr = r.Adapter.Session.UpdatePostgresqlSession(
+			createReservationData.SessionId,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			&session.RegisteredCount,
+			nil,
+			nil,
+			nil,
+			nil,
+			nil,
+			updatedBy,
+		)
+		if sessionErr != nil {
+			r.logger.Error("Failed to increment registered_count for session", sessionErr)
+			// Continue with reservation creation even if session update fails
+		}
+	}
 
 	// Create the reservation
 	newReservation, createErr := r.Adapter.Reservation.CreatePostgresqlReservation(
@@ -307,6 +313,30 @@ func (r *Reservation) UpdateReservation(
 
 	// Caso 1: Estado cambia de confirmado a anulado o cancelado
 	if oldState == "CONFIRMED" && (newState == "ANULLED" || newState == "CANCELLED") {
+		// Decrementar registered_count de la sesión
+		session, sessionErr := r.Adapter.Session.GetPostgresqlSession(currentReservation.SessionId)
+		if sessionErr == nil && session.RegisteredCount > 0 {
+			session.RegisteredCount--
+			_, updateSessionErr := r.Adapter.Session.UpdatePostgresqlSession(
+				currentReservation.SessionId,
+				nil, // title
+				nil, // date
+				nil, // start_time
+				nil, // end_time
+				nil, // state
+				&session.RegisteredCount, // decrementar contador
+				nil, // capacity
+				nil, // session_link
+				nil, // professional_id
+				nil, // local_id
+				nil, // community_service_id
+				updatedBy,
+			)
+			if updateSessionErr != nil {
+				r.logger.Error("Failed to decrement registered_count for session", updateSessionErr)
+			}
+		}
+
 		// Decrementar contador si la membresía tiene un contador (no es ilimitada)
 		if oldMembership != nil && oldMembership.ReservationsUsed != nil {
 			currentUsed := *oldMembership.ReservationsUsed
@@ -337,6 +367,30 @@ func (r *Reservation) UpdateReservation(
 
 	// Caso 2: Estado cambia de anulado o cancelado a confirmado
 	if (oldState == "ANULLED" || oldState == "CANCELLED") && newState == "CONFIRMED" {
+		// Incrementar registered_count de la sesión
+		session, sessionErr := r.Adapter.Session.GetPostgresqlSession(currentReservation.SessionId)
+		if sessionErr == nil {
+			session.RegisteredCount++
+			_, updateSessionErr := r.Adapter.Session.UpdatePostgresqlSession(
+				currentReservation.SessionId,
+				nil, // title
+				nil, // date
+				nil, // start_time
+				nil, // end_time
+				nil, // state
+				&session.RegisteredCount, // incrementar contador
+				nil, // capacity
+				nil, // session_link
+				nil, // professional_id
+				nil, // local_id
+				nil, // community_service_id
+				updatedBy,
+			)
+			if updateSessionErr != nil {
+				r.logger.Error("Failed to increment registered_count for session", updateSessionErr)
+			}
+		}
+
 		// Incrementar contador si la nueva membresía tiene un contador (no es ilimitada)
 		if newMembership != nil && newMembership.ReservationsUsed != nil {
 			currentUsed := *newMembership.ReservationsUsed
@@ -428,35 +482,62 @@ func (r *Reservation) DeleteReservation(reservationId uuid.UUID) *errors.Error {
 		return getErr
 	}
 
-	// Si la reserva está confirmada y tiene membresía asociada, decrementar contador
-	if currentReservation.State == "CONFIRMED" && currentReservation.MembershipId != nil {
-		// Obtener la membresía actual
-		membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*currentReservation.MembershipId)
-		if membershipErr == nil && membership.ReservationsUsed != nil {
-			// Decrementar el contador si no es membresía ilimitada
-			currentUsed := *membership.ReservationsUsed
-			newUsed := currentUsed - 1
-			if newUsed < 0 {
-				newUsed = 0
-			}
-
-			// Actualizar la membresía
-			_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
-				*currentReservation.MembershipId,
-				nil,
-				nil,
-				nil,
-				nil,
-				&newUsed,
-				nil,
-				nil,
-				nil,
+	// Si la reserva está confirmada, decrementar registered_count y membresía
+	if currentReservation.State == "CONFIRMED" {
+		// Decrementar registered_count de la sesión
+		session, sessionErr := r.Adapter.Session.GetPostgresqlSession(currentReservation.SessionId)
+		if sessionErr == nil && session.RegisteredCount > 0 {
+			session.RegisteredCount--
+			_, updateSessionErr := r.Adapter.Session.UpdatePostgresqlSession(
+				currentReservation.SessionId,
+				nil, // title
+				nil, // date
+				nil, // start_time
+				nil, // end_time
+				nil, // state
+				&session.RegisteredCount, // decrementar contador
+				nil, // capacity
+				nil, // session_link
+				nil, // professional_id
+				nil, // local_id
+				nil, // community_service_id
 				"SYSTEM", // En caso de eliminación, usamos SYSTEM como updatedBy
 			)
+			if updateSessionErr != nil {
+				r.logger.Error("Failed to decrement registered_count on reservation delete", updateSessionErr)
+			}
+		}
 
-			if updateErr != nil {
-				r.logger.Error("Failed to decrement reservations_used on reservation delete", updateErr)
-				// No devolvemos error para no afectar la eliminación de la reserva
+		// Decrementar contador de membresía si tiene una asociada
+		if currentReservation.MembershipId != nil {
+			// Obtener la membresía actual
+			membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*currentReservation.MembershipId)
+			if membershipErr == nil && membership.ReservationsUsed != nil {
+				// Decrementar el contador si no es membresía ilimitada
+				currentUsed := *membership.ReservationsUsed
+				newUsed := currentUsed - 1
+				if newUsed < 0 {
+					newUsed = 0
+				}
+
+				// Actualizar la membresía
+				_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+					*currentReservation.MembershipId,
+					nil,
+					nil,
+					nil,
+					nil,
+					&newUsed,
+					nil,
+					nil,
+					nil,
+					"SYSTEM", // En caso de eliminación, usamos SYSTEM como updatedBy
+				)
+
+				if updateErr != nil {
+					r.logger.Error("Failed to decrement reservations_used on reservation delete", updateErr)
+					// No devolvemos error para no afectar la eliminación de la reserva
+				}
 			}
 		}
 	}
@@ -488,35 +569,62 @@ func (r *Reservation) BulkDeleteReservations(
 			continue
 		}
 
-		// Si está confirmada y tiene membresía, decrementar contador
-		if reservation.State == "CONFIRMED" && reservation.MembershipId != nil {
-			// Obtener la membresía
-			membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*reservation.MembershipId)
-			if membershipErr == nil && membership.ReservationsUsed != nil {
-				// Decrementar el contador si no es ilimitada
-				currentUsed := *membership.ReservationsUsed
-				newUsed := currentUsed - 1
-				if newUsed < 0 {
-					newUsed = 0
-				}
-
-				// Actualizar la membresía
-				_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
-					*reservation.MembershipId,
-					nil,
-					nil,
-					nil,
-					nil,
-					&newUsed,
-					nil,
-					nil,
-					nil,
+		// Si está confirmada, decrementar registered_count y membresía
+		if reservation.State == "CONFIRMED" {
+			// Decrementar registered_count de la sesión
+			session, sessionErr := r.Adapter.Session.GetPostgresqlSession(reservation.SessionId)
+			if sessionErr == nil && session.RegisteredCount > 0 {
+				session.RegisteredCount--
+				_, updateSessionErr := r.Adapter.Session.UpdatePostgresqlSession(
+					reservation.SessionId,
+					nil, // title
+					nil, // date
+					nil, // start_time
+					nil, // end_time
+					nil, // state
+					&session.RegisteredCount, // decrementar contador
+					nil, // capacity
+					nil, // session_link
+					nil, // professional_id
+					nil, // local_id
+					nil, // community_service_id
 					"SYSTEM", // En caso de eliminación en bloque, usamos SYSTEM como updatedBy
 				)
+				if updateSessionErr != nil {
+					r.logger.Error("Failed to decrement registered_count on bulk delete", updateSessionErr)
+				}
+			}
 
-				if updateErr != nil {
-					r.logger.Error("Failed to decrement reservations_used on bulk delete", updateErr)
-					// Continuar con la siguiente reserva
+			// Decrementar contador de membresía si tiene una asociada
+			if reservation.MembershipId != nil {
+				// Obtener la membresía
+				membership, membershipErr := r.Adapter.Membership.GetPostgresqlMembership(*reservation.MembershipId)
+				if membershipErr == nil && membership.ReservationsUsed != nil {
+					// Decrementar el contador si no es ilimitada
+					currentUsed := *membership.ReservationsUsed
+					newUsed := currentUsed - 1
+					if newUsed < 0 {
+						newUsed = 0
+					}
+
+					// Actualizar la membresía
+					_, updateErr := r.Adapter.Membership.UpdatePostgresqlMembership(
+						*reservation.MembershipId,
+						nil,
+						nil,
+						nil,
+						nil,
+						&newUsed,
+						nil,
+						nil,
+						nil,
+						"SYSTEM", // En caso de eliminación en bloque, usamos SYSTEM como updatedBy
+					)
+
+					if updateErr != nil {
+						r.logger.Error("Failed to decrement reservations_used on bulk delete", updateErr)
+						// Continuar con la siguiente reserva
+					}
 				}
 			}
 		}
