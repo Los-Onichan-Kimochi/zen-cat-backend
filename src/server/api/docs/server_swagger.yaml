@@ -928,13 +928,13 @@ definitions:
     - ACTIVE
     - EXPIRED
     - CANCELLED
-    - ON_HOLD
+    - SUSPENDED
     type: string
     x-enum-varnames:
     - MembershipStatusActive
     - MembershipStatusExpired
     - MembershipStatusCancelled
-    - MembershipStatusOnHold
+    - MembershipStatusSuspended
   schemas.Memberships:
     properties:
       memberships:
@@ -1570,24 +1570,8 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
     type: integer
     x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -5406,6 +5390,46 @@ paths:
       summary: Create ServiceLocal.
       tags:
       - ServiceLocal
+  /service-local/{serviceId}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all locals that are linked to a given service, based
+        on the service ID.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Locals'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (No locals associated with the given service ID)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get all locals associated with a specific service.
+      tags:
+      - ServiceLocal
   /service-local/{serviceId}/{localId}/:
     delete:
       consumes:
@@ -5671,6 +5695,47 @@ paths:
       security:
       - JWT: []
       summary: Create ServiceProfessional.
+      tags:
+      - ServiceProfessional
+  /service-professional/{serviceId}/:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all professionals that are linked to a given service,
+        based on the service ID.
+      parameters:
+      - description: Service ID
+        in: path
+        name: serviceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Professionals'
+        "400":
+          description: Bad Request (e.g., invalid UUID format)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "401":
+          description: Missing or malformed JWT
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "404":
+          description: Not Found (No professionals associated with the given service
+            ID)
+          schema:
+            $ref: '#/definitions/errors.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.Error'
+      security:
+      - JWT: []
+      summary: Get all professionals associated with a specific service.
       tags:
       - ServiceProfessional
   /service-professional/{serviceId}/{professionalId}/:

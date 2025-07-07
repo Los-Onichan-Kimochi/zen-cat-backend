@@ -181,6 +181,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	serviceLocal.Use(mw.JWTMiddleware, mw.AdminOnlyMiddleware) // Apply JWT + Admin middleware
 	serviceLocal.POST("/", a.CreateServiceLocal)
 	serviceLocal.GET("/:serviceId/:localId/", a.GetServiceLocal)
+	serviceLocal.GET("/:serviceId/", a.GetLocalsByServiceId)
 	serviceLocal.DELETE("/:serviceId/:localId/", a.DeleteServiceLocal)
 	serviceLocal.POST("/bulk/", a.BulkCreateServiceLocals)
 	serviceLocal.GET("/", a.FetchServiceLocals)
@@ -194,6 +195,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	) // Apply JWT + Admin middleware
 	serviceProfessional.POST("/", a.CreateServiceProfessional)
 	serviceProfessional.GET("/:serviceId/:professionalId/", a.GetServiceProfessional)
+	serviceProfessional.GET("/:serviceId/", a.GetProfessionalsByServiceId)
 	serviceProfessional.DELETE("/:serviceId/:professionalId/", a.DeleteServiceProfessional)
 	serviceProfessional.POST("/bulk/", a.BulkCreateServiceProfessionals)
 	serviceProfessional.GET("/", a.FetchServiceProfessionals)

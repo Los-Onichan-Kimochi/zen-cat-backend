@@ -44,6 +44,39 @@ func (cp *ServiceProfessional) GetServiceProfessional(
 	return &serviceProfessional, nil
 }
 
+// Fetch all service-professional associations, filtered by
+//
+//   - `serviceId` if provided.
+func (cp *ServiceProfessional) GetProfessionalsByServiceId(
+	serviceId uuid.UUID,
+) ([]*model.Professional, error) {
+	var serviceProfessionals []*model.ServiceProfessional
+
+	// Realizamos la consulta en la base de datos para obtener las asociaciones de servicio y profesional
+	query := cp.PostgresqlDB.Model(&model.ServiceProfessional{})
+
+	query = query.Where("service_id = ?", serviceId)
+
+	// Ejecutamos la consulta y almacenamos las asociaciones
+	if err := query.Find(&serviceProfessionals).Error; err != nil {
+		return nil, err
+	}
+
+	// Obtenemos los IDs de los profesionales asociados
+	var professionalIds []uuid.UUID
+	for _, serviceProfessional := range serviceProfessionals {
+		professionalIds = append(professionalIds, serviceProfessional.ProfessionalId)
+	}
+
+	// Ahora realizamos una segunda consulta para obtener los servicios
+	var professionals []*model.Professional
+	if err := cp.PostgresqlDB.Where("id IN (?)", professionalIds).Find(&professionals).Error; err != nil {
+		return nil, err
+	}
+
+	return professionals, nil
+}
+
 // Deletes a specific service-professional association.
 func (cp *ServiceProfessional) DeleteServiceProfessional(
 	serviceId uuid.UUID,

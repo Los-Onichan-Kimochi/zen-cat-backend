@@ -75,6 +75,18 @@ func (cp *ServiceProfessional) GetServiceProfessional(
 	return cp.Adapter.ServiceProfessional.GetPostgresqlServiceProfessional(serviceId, professionalId)
 }
 
+// Todo: Add a comment
+func (cp *ServiceProfessional) GetProfessionalsByServiceId(
+	serviceId uuid.UUID,
+) (*schemas.Professionals, *errors.Error) {
+	professionals, err := cp.Adapter.ServiceProfessional.GetPostgresqlProfessionalsByServiceId(serviceId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Professionals{Professionals: professionals}, nil
+}
+
 // Deletes a specific service-professional association.
 func (cp *ServiceProfessional) DeleteServiceProfessional(
 	serviceIdString string,

@@ -75,6 +75,18 @@ func (cp *ServiceLocal) GetServiceLocal(
 	return cp.Adapter.ServiceLocal.GetPostgresqlServiceLocal(serviceId, localId)
 }
 
+// Todo: Add a comment
+func (cp *ServiceLocal) GetLocalsByServiceId(
+	serviceId uuid.UUID,
+) (*schemas.Locals, *errors.Error) {
+	locals, err := cp.Adapter.ServiceLocal.GetPostgresqlLocalsByServiceId(serviceId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &schemas.Locals{Locals: locals}, nil
+}
+
 // Deletes a specific service-local association.
 func (cp *ServiceLocal) DeleteServiceLocal(
 	serviceIdString string,
