@@ -1572,8 +1572,24 @@ definitions:
     - 1000000000
     - 60000000000
     - 3600000000000
+    - -9223372036854775808
+    - 9223372036854775807
+    - 1
+    - 1000
+    - 1000000
+    - 1000000000
+    - 60000000000
+    - 3600000000000
     type: integer
     x-enum-varnames:
+    - minDuration
+    - maxDuration
+    - Nanosecond
+    - Microsecond
+    - Millisecond
+    - Second
+    - Minute
+    - Hour
     - minDuration
     - maxDuration
     - Nanosecond
@@ -2981,17 +2997,19 @@ paths:
     get:
       consumes:
       - application/json
-      description: Verify connection in swagger
+      description: Check the health status of the API
       produces:
       - application/json
       responses:
         "200":
-          description: ok
+          description: API is healthy
           schema:
-            type: string
+            additionalProperties:
+              type: string
+            type: object
       summary: Health Check
       tags:
-      - Health Check
+      - Health
   /local/:
     get:
       consumes:

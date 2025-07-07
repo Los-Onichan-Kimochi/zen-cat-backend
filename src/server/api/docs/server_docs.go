@@ -2178,7 +2178,7 @@ const docTemplateserver = `{
         },
         "/health-check/": {
             "get": {
-                "description": "Verify connection in swagger",
+                "description": "Check the health status of the API",
                 "consumes": [
                     "application/json"
                 ],
@@ -2186,14 +2186,17 @@ const docTemplateserver = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Health Check"
+                    "Health"
                 ],
                 "summary": "Health Check",
                 "responses": {
                     "200": {
-                        "description": "ok",
+                        "description": "API is healthy",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -10968,9 +10971,25 @@ const docTemplateserver = `{
                 1000000,
                 1000000000,
                 60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour",
                 "minDuration",
                 "maxDuration",
                 "Nanosecond",
