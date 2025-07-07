@@ -219,7 +219,6 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 
 	// User management (admin and client)
 	userMixed := a.Echo.Group("/user")
-	userMixed.Use(mw.JWTMiddleware, mw.AdminOrClientMiddleware)
 	userMixed.POST("/change-password/", a.ChangePassword)
 
 	// Service management (admin only)
