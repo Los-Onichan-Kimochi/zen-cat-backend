@@ -74,6 +74,34 @@ func (a *Api) GetServiceLocal(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get all locals associated with a specific service.
+// @Description 		Retrieves all locals that are linked to a given service, based on the service ID.
+// @Tags 				ServiceLocal
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				serviceId path string true "Service ID"
+// @Success 			200 {object} schemas.Locals "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (No locals associated with the given service ID)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/service-local/{serviceId}/ [get]
+func (a *Api) GetLocalsByServiceId(c echo.Context) error {
+	serviceId, parseErr := uuid.Parse(c.Param("serviceId"))
+
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidServiceId, c)
+	}
+
+	response, err := a.BllController.ServiceLocal.GetLocalsByServiceId(serviceId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 // @Summary 			Delete ServiceLocal.
 // @Description 		Deletes a specific service-local association.
 // @Tags 				ServiceLocal

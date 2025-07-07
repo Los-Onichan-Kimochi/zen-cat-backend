@@ -125,7 +125,10 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 
 	// Community Service associations (both admin and client need to read)
 	communityServiceMixed := a.Echo.Group("/community-service")
-	communityServiceMixed.Use(mw.JWTMiddleware, mw.AdminOrClientMiddleware) // Admin or Client required
+	communityServiceMixed.Use(
+		mw.JWTMiddleware,
+		mw.AdminOrClientMiddleware,
+	) // Admin or Client required
 	communityServiceMixed.GET("/:communityId/:serviceId/", a.GetCommunityService)
 
 	// Service Local associations (both admin and client need to read)
@@ -135,7 +138,10 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 
 	// Service Professional associations (both admin and client need to read)
 	serviceProfessionalMixed := a.Echo.Group("/service-professional")
-	serviceProfessionalMixed.Use(mw.JWTMiddleware, mw.AdminOrClientMiddleware) // Admin or Client required
+	serviceProfessionalMixed.Use(
+		mw.JWTMiddleware,
+		mw.AdminOrClientMiddleware,
+	) // Admin or Client required
 	serviceProfessionalMixed.GET("/:serviceId/:professionalId/", a.GetServiceProfessional)
 
 	// Membership endpoints that both admin and client need
@@ -304,7 +310,6 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	membership.POST("/user/:userId/", a.CreateMembershipForUser)
 	membership.PATCH("/:membershipId/", a.UpdateMembership)
 	membership.DELETE("/:membershipId/", a.DeleteMembership)
-
 }
 
 func (a *Api) RunApi(envSettings *schemas.EnvSettings) {

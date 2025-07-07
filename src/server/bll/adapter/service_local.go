@@ -39,9 +39,9 @@ func (cp *ServiceLocal) CreatePostgresqlServiceLocal(
 	}
 
 	serviceLocalModel := &model.ServiceLocal{
-		Id:          uuid.New(),
+		Id:        uuid.New(),
 		ServiceId: serviceId,
-		LocalId:      localId,
+		LocalId:   localId,
 		AuditFields: model.AuditFields{
 			UpdatedBy: updatedBy,
 		},
@@ -53,9 +53,9 @@ func (cp *ServiceLocal) CreatePostgresqlServiceLocal(
 	}
 
 	return &schemas.ServiceLocal{
-		Id:          serviceLocalModel.Id,
+		Id:        serviceLocalModel.Id,
 		ServiceId: serviceLocalModel.ServiceId,
-		LocalId:      serviceLocalModel.LocalId,
+		LocalId:   serviceLocalModel.LocalId,
 	}, nil
 }
 
@@ -70,10 +70,40 @@ func (cp *ServiceLocal) GetPostgresqlServiceLocal(
 	}
 
 	return &schemas.ServiceLocal{
-		Id:          associationModel.Id,
+		Id:        associationModel.Id,
 		ServiceId: associationModel.ServiceId,
-		LocalId:      associationModel.LocalId,
+		LocalId:   associationModel.LocalId,
 	}, nil
+}
+
+// Todo: add comment
+func (cp *ServiceLocal) GetPostgresqlLocalsByServiceId(
+	serviceId uuid.UUID,
+) ([]*schemas.Local, *errors.Error) {
+	localsModel, err := cp.DaoPostgresql.ServiceLocal.GetLocalsByServiceId(
+		serviceId,
+	)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.ServiceLocalNotFound
+	}
+
+	locals := make([]*schemas.Local, len(localsModel))
+	for i, localModel := range localsModel {
+		locals[i] = &schemas.Local{
+			Id:             localModel.Id,
+			LocalName:      localModel.LocalName,
+			StreetName:     localModel.StreetName,
+			BuildingNumber: localModel.BuildingNumber,
+			District:       localModel.District,
+			Province:       localModel.Province,
+			Region:         localModel.Region,
+			Reference:      localModel.Reference,
+			Capacity:       localModel.Capacity,
+			ImageUrl:       localModel.ImageUrl,
+		}
+	}
+
+	return locals, nil
 }
 
 // Deletes a specific service-local association from postgresql DB.
@@ -101,9 +131,9 @@ func (cp *ServiceLocal) BulkCreatePostgresqlServiceLocals(
 	serviceLocalModels := make([]*model.ServiceLocal, len(serviceLocals))
 	for i, serviceLocal := range serviceLocals {
 		serviceLocalModels[i] = &model.ServiceLocal{
-			Id:          uuid.New(),
+			Id:        uuid.New(),
 			ServiceId: serviceLocal.ServiceId,
-			LocalId:      serviceLocal.LocalId,
+			LocalId:   serviceLocal.LocalId,
 			AuditFields: model.AuditFields{
 				UpdatedBy: updatedBy,
 			},
@@ -120,9 +150,9 @@ func (cp *ServiceLocal) BulkCreatePostgresqlServiceLocals(
 	serviceLocalsResponse := make([]*schemas.ServiceLocal, len(serviceLocals))
 	for i, serviceLocal := range serviceLocalModels {
 		serviceLocalsResponse[i] = &schemas.ServiceLocal{
-			Id:          serviceLocal.Id,
+			Id:        serviceLocal.Id,
 			ServiceId: serviceLocal.ServiceId,
-			LocalId:      serviceLocal.LocalId,
+			LocalId:   serviceLocal.LocalId,
 		}
 	}
 
@@ -145,9 +175,9 @@ func (cp *ServiceLocal) FetchPostgresqlServiceLocals(
 	serviceLocals := make([]*schemas.ServiceLocal, len(serviceLocalModels))
 	for i, serviceLocal := range serviceLocalModels {
 		serviceLocals[i] = &schemas.ServiceLocal{
-			Id:          serviceLocal.Id,
+			Id:        serviceLocal.Id,
 			ServiceId: serviceLocal.ServiceId,
-			LocalId:      serviceLocal.LocalId,
+			LocalId:   serviceLocal.LocalId,
 		}
 	}
 
@@ -171,7 +201,7 @@ func (cp *ServiceLocal) BulkDeletePostgresqlServiceLocals(
 
 		serviceLocalModels[i] = &model.ServiceLocal{
 			ServiceId: serviceLocal.ServiceId,
-			LocalId:      serviceLocal.LocalId,
+			LocalId:   serviceLocal.LocalId,
 		}
 	}
 
@@ -181,4 +211,3 @@ func (cp *ServiceLocal) BulkDeletePostgresqlServiceLocals(
 
 	return nil
 }
-
