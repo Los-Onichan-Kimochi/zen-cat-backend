@@ -211,9 +211,13 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	user.DELETE("/:userId/", a.DeleteUser)
 	user.POST("/bulk-create/", a.BulkCreateUsers)
 	user.DELETE("/bulk-delete/", a.BulkDeleteUsers)
-	user.POST("/change-password/", a.ChangePassword)
 	user.PATCH("/:userId/role/", a.ChangeUserRole)
 	user.GET("/stats/", a.GetUserStats)
+
+	// User management (admin and client)
+	userMixed := a.Echo.Group("/user")
+	userMixed.Use(mw.JWTMiddleware, mw.AdminOrClientMiddleware)
+	userMixed.POST("/change-password/", a.ChangePassword)
 
 	// Service management (admin only)
 	service := a.Echo.Group("/service")
