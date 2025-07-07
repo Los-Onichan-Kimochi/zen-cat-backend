@@ -95,3 +95,37 @@ func (a *Middleware) ClientOnlyMiddleware(next echo.HandlerFunc) echo.HandlerFun
 		return next(c)
 	}
 }
+
+// AdminOrClientMiddleware validates that the user has either administrator or client role
+func (a *Middleware) AdminOrClientMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// Verificar si está en modo desarrollo
+		if config.GetDevMode() || a.EnvSettings.DisableAuthForTests {
+			// En modo desarrollo, omitir la validación de roles
+			a.Logger.Debugln("🔓 Modo desarrollo: Omitiendo validación de rol admin o cliente")
+			return next(c)
+		}
+
+		// Validar JWT token y obtener credenciales
+		_, credentials, authError := a.BllController.Auth.AccessTokenValidation(c)
+		if authError != nil {
+			return errors.HandleError(*authError, c)
+		}
+
+		// Verificar que el usuario tenga rol de administrador o cliente
+		hasValidRole := false
+		for _, role := range credentials.UserRoles {
+			if role == string(schemas.UserRolAdmin) || role == string(schemas.UserRolClient) {
+				hasValidRole = true
+				break
+			}
+		}
+
+		if !hasValidRole {
+			return errors.HandleError(errors.ForbiddenError.InsufficientPrivileges, c)
+		}
+
+		// Si la validación pasa, continuar al siguiente handler
+		return next(c)
+	}
+}
