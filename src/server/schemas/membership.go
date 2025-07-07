@@ -12,7 +12,7 @@ const (
 	MembershipStatusActive    MembershipStatus = "ACTIVE"
 	MembershipStatusExpired   MembershipStatus = "EXPIRED"
 	MembershipStatusCancelled MembershipStatus = "CANCELLED"
-	MembershipStatusOnHold    MembershipStatus = "ON_HOLD"
+	MembershipStatusSuspended MembershipStatus = "SUSPENDED"
 )
 
 type Membership struct {
