@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"onichankimochi.com/astro_cat_backend/src/logging"
 	bllAdapter "onichankimochi.com/astro_cat_backend/src/server/bll/adapter"
@@ -151,9 +153,46 @@ func (m *Membership) UpdateMembership(
 	updatedBy string,
 ) (*schemas.Membership, *errors.Error) {
 	// Validar que la membership existe antes de actualizar
-	_, membershipErr := m.Adapter.Membership.GetPostgresqlMembership(membershipId)
+	existingMembership, membershipErr := m.Adapter.Membership.GetPostgresqlMembership(membershipId)
 	if membershipErr != nil {
 		return nil, membershipErr
+	}
+
+	// Handle membership suspension logic
+	if updateMembershipRequest.Status != nil {
+		oldStatus := existingMembership.Status
+		newStatus := *updateMembershipRequest.Status
+
+		// ACTIVE -> SUSPENDED: Create a new suspension record.
+		if oldStatus == schemas.MembershipStatusActive && newStatus == schemas.MembershipStatusSuspended {
+			_, err := m.Adapter.MembershipSuspension.CreatePostgresqlMembershipSuspension(membershipId)
+			if err != nil {
+				// Log the error but don't block the main operation
+				m.logger.Errorf("failed to create membership suspension record: %v", err)
+			}
+		}
+
+		// SUSPENDED -> ACTIVE: Close the suspension record and extend the membership.
+		if oldStatus == schemas.MembershipStatusSuspended && newStatus == schemas.MembershipStatusActive {
+			suspension, err := m.Adapter.MembershipSuspension.GetLatestOpenPostgresqlMembershipSuspension(membershipId)
+			if err == nil && suspension != nil {
+				// Calculate duration and new end date
+				now := time.Now()
+				duration := now.Sub(suspension.SuspendedAt)
+				newEndDate := existingMembership.EndDate.Add(duration)
+
+				// Update the request so the new end date is saved
+				updateMembershipRequest.EndDate = &newEndDate
+
+				// Close the suspension record
+				suspension.ResumedAt = &now
+				_, updateErr := m.Adapter.MembershipSuspension.UpdatePostgresqlMembershipSuspension(suspension)
+				if updateErr != nil {
+					// Log the error but don't block the main operation
+					m.logger.Errorf("failed to close membership suspension record: %v", updateErr)
+				}
+			}
+		}
 	}
 
 	// Si se está actualizando el usuario, validar que existe

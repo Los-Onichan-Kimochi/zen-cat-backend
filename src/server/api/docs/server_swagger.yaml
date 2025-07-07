@@ -166,6 +166,8 @@ definitions:
     properties:
       date:
         type: string
+      exclude_session_id:
+        type: string
       local_id:
         type: string
       professional_id:
@@ -6454,7 +6456,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Get availability information for a specific date.
+      description: Get availability information for a specific date, optionally excluding
+        a specific session.
       parameters:
       - description: Availability Request
         in: body

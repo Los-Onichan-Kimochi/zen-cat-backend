@@ -7366,7 +7366,7 @@ const docTemplateserver = `{
                         "JWT": []
                     }
                 ],
-                "description": "Get availability information for a specific date.",
+                "description": "Get availability information for a specific date, optionally excluding a specific session.",
                 "consumes": [
                     "application/json"
                 ],
@@ -8827,6 +8827,9 @@ const docTemplateserver = `{
             "type": "object",
             "properties": {
                 "date": {
+                    "type": "string"
+                },
+                "exclude_session_id": {
                     "type": "string"
                 },
                 "local_id": {
