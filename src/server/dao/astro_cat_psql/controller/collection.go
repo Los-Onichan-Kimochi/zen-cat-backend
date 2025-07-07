@@ -12,22 +12,23 @@ import (
 )
 
 type AstroCatPsqlCollection struct {
-	Logger              logging.Logger
-	Community           *Community
-	Professional        *Professional
-	Local               *Local
-	User                *User
-	Onboarding          *Onboarding
-	Membership          *Membership
-	Service             *Service
-	Plan                *Plan
-	CommunityPlan       *CommunityPlan
-	CommunityService    *CommunityService
-	ServiceLocal        *ServiceLocal
-	ServiceProfessional *ServiceProfessional
-	Session             *Session
-	Reservation         *Reservation
-	AuditLog            *AuditLog
+	Logger               logging.Logger
+	Community            *Community
+	Professional         *Professional
+	Local                *Local
+	User                 *User
+	Onboarding           *Onboarding
+	Membership           *Membership
+	Service              *Service
+	Plan                 *Plan
+	CommunityPlan        *CommunityPlan
+	CommunityService     *CommunityService
+	ServiceLocal         *ServiceLocal
+	ServiceProfessional  *ServiceProfessional
+	Session              *Session
+	Reservation          *Reservation
+	AuditLog             *AuditLog
+	MembershipSuspension *MembershipSuspension
 }
 
 // Create dao controller collection
@@ -54,22 +55,23 @@ func NewAstroCatPsqlCollection(
 	createTables(postgresqlDB)
 
 	return &AstroCatPsqlCollection{
-		Logger:              logger,
-		Community:           NewCommunityController(logger, postgresqlDB),
-		Professional:        NewProfessionalController(logger, postgresqlDB),
-		Local:               NewLocalController(logger, postgresqlDB),
-		User:                NewUserController(logger, postgresqlDB),
-		Onboarding:          NewOnboardingController(logger, postgresqlDB),
-		Membership:          NewMembershipController(logger, postgresqlDB),
-		Service:             NewServiceController(logger, postgresqlDB),
-		Plan:                NewPlanController(logger, postgresqlDB),
-		CommunityPlan:       NewCommunityPlanController(logger, postgresqlDB),
-		CommunityService:    NewCommunityServiceController(logger, postgresqlDB),
-		ServiceLocal:        NewServiceLocalController(logger, postgresqlDB),
-		ServiceProfessional: NewServiceProfessionalController(logger, postgresqlDB),
-		Session:             NewSessionController(logger, postgresqlDB),
-		Reservation:         NewReservationController(logger, postgresqlDB),
-		AuditLog:            NewAuditLogController(logger, postgresqlDB),
+		Logger:               logger,
+		Community:            NewCommunityController(logger, postgresqlDB),
+		Professional:         NewProfessionalController(logger, postgresqlDB),
+		Local:                NewLocalController(logger, postgresqlDB),
+		User:                 NewUserController(logger, postgresqlDB),
+		Onboarding:           NewOnboardingController(logger, postgresqlDB),
+		Membership:           NewMembershipController(logger, postgresqlDB),
+		Service:              NewServiceController(logger, postgresqlDB),
+		Plan:                 NewPlanController(logger, postgresqlDB),
+		CommunityPlan:        NewCommunityPlanController(logger, postgresqlDB),
+		CommunityService:     NewCommunityServiceController(logger, postgresqlDB),
+		ServiceLocal:         NewServiceLocalController(logger, postgresqlDB),
+		ServiceProfessional:  NewServiceProfessionalController(logger, postgresqlDB),
+		Session:              NewSessionController(logger, postgresqlDB),
+		Reservation:          NewReservationController(logger, postgresqlDB),
+		AuditLog:             NewAuditLogController(logger, postgresqlDB),
+		MembershipSuspension: NewMembershipSuspensionController(logger, postgresqlDB),
 	}, postgresqlDB
 }
 
@@ -132,6 +134,13 @@ func createTables(astroCatPsqlDB *gorm.DB) {
 		panic(err)
 	}
 	fmt.Println("Membership table created successfully")
+
+	fmt.Println("Creating MembershipSuspension table...")
+	if err := astroCatPsqlDB.AutoMigrate(&model.MembershipSuspension{}); err != nil {
+		fmt.Printf("Error creating MembershipSuspension table: %v\n", err)
+		panic(err)
+	}
+	fmt.Println("MembershipSuspension table created successfully")
 
 	fmt.Println("Creating Service table...")
 	if err := astroCatPsqlDB.AutoMigrate(&model.Service{}); err != nil {
@@ -208,6 +217,7 @@ func dropAllTables(astroCatPsqlDB *gorm.DB) {
 		"sessions",
 		"templates",
 		"onboardings",
+		"membership_suspensions",
 		"memberships",
 		"users",
 		"communities",
