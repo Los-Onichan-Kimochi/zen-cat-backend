@@ -80,7 +80,7 @@ func (m *Membership) CreateMembership(
 	}
 
 	// Validar que el plan existe
-	_, planErr := m.Adapter.Plan.GetPostgresqlPlan(createMembershipRequest.PlanId)
+	plan, planErr := m.Adapter.Plan.GetPostgresqlPlan(createMembershipRequest.PlanId)
 	if planErr != nil {
 		return nil, planErr
 	}
@@ -91,12 +91,23 @@ func (m *Membership) CreateMembership(
 		return nil, communityPlanErr
 	}
 
+	// Determinar el valor inicial de ReservationsUsed basado en el ReservationLimit del plan
+	var reservationsUsed *int
+	if plan.ReservationLimit != nil {
+		// Si el plan tiene límite de reservas, inicializar ReservationsUsed en 0
+		initialValue := 0
+		reservationsUsed = &initialValue
+	} else {
+		// Si el plan es ilimitado (ReservationLimit es nil), ReservationsUsed también debe ser nil
+		reservationsUsed = nil
+	}
+
 	return m.Adapter.Membership.CreatePostgresqlMembership(
 		createMembershipRequest.Description,
 		createMembershipRequest.StartDate,
 		createMembershipRequest.EndDate,
 		createMembershipRequest.Status,
-		createMembershipRequest.ReservationsUsed,
+		reservationsUsed, // Usar el valor calculado en lugar del valor del request
 		createMembershipRequest.CommunityId,
 		createMembershipRequest.UserId,
 		createMembershipRequest.PlanId,
@@ -123,7 +134,7 @@ func (m *Membership) CreateMembershipForUser(
 	}
 
 	// Validar que el plan existe
-	_, planErr := m.Adapter.Plan.GetPostgresqlPlan(createMembershipForUserRequest.PlanId)
+	plan, planErr := m.Adapter.Plan.GetPostgresqlPlan(createMembershipForUserRequest.PlanId)
 	if planErr != nil {
 		return nil, planErr
 	}
@@ -134,12 +145,23 @@ func (m *Membership) CreateMembershipForUser(
 		return nil, communityPlanErr
 	}
 
+	// Determinar el valor inicial de ReservationsUsed basado en el ReservationLimit del plan
+	var reservationsUsed *int
+	if plan.ReservationLimit != nil {
+		// Si el plan tiene límite de reservas, inicializar ReservationsUsed en 0
+		initialValue := 0
+		reservationsUsed = &initialValue
+	} else {
+		// Si el plan es ilimitado (ReservationLimit es nil), ReservationsUsed también debe ser nil
+		reservationsUsed = nil
+	}
+
 	return m.Adapter.Membership.CreatePostgresqlMembership(
 		createMembershipForUserRequest.Description,
 		createMembershipForUserRequest.StartDate,
 		createMembershipForUserRequest.EndDate,
 		createMembershipForUserRequest.Status,
-		createMembershipForUserRequest.ReservationsUsed,
+		reservationsUsed, // Usar el valor calculado en lugar del valor del request
 		createMembershipForUserRequest.CommunityId,
 		userId, // El userId viene del parámetro de la URL, no del body
 		createMembershipForUserRequest.PlanId,
