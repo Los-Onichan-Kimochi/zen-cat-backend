@@ -95,9 +95,11 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 
 	// Service Locals
 	a.Echo.GET("/service-local/", a.FetchServiceLocals)
+	a.Echo.GET("/service-local/:serviceId/", a.GetLocalsByServiceId)
 
 	// Service Professionals
 	a.Echo.GET("/service-professional/", a.FetchServiceProfessionals)
+	a.Echo.GET("/service-professional/:serviceId/", a.GetProfessionalsByServiceId)
 
 	// ===== AUTHENTICATED ENDPOINTS (JWT required, any authenticated user) =====
 
@@ -147,6 +149,7 @@ func (a *Api) RegisterRoutes(envSettings *schemas.EnvSettings) {
 	// Membership endpoints that both admin and client need
 	membershipMixed := a.Echo.Group("/membership")
 	membershipMixed.Use(mw.JWTMiddleware, mw.AdminOrClientMiddleware) // Admin or Client required
+	membershipMixed.GET("/user/:userId/", a.GetMembershipsByUserId)
 	membershipMixed.GET("/community/:communityId/users", a.GetUsersByCommunityId)
 	membershipMixed.GET("/user/:userId/community/:communityId", a.GetMembershipByUserAndCommunity)
 
