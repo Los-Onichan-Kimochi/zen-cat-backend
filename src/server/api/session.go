@@ -70,7 +70,7 @@ func (a *Api) FetchSessions(c echo.Context) error {
 	if localIdsString != "" {
 		localIds = strings.Split(localIdsString, ",")
 	}
-	
+
 	communityServiceIds := []string{}
 	if communityServiceIdsString != "" {
 		communityServiceIds = strings.Split(communityServiceIdsString, ",")
@@ -274,7 +274,7 @@ func (a *Api) CheckSessionConflicts(c echo.Context) error {
 }
 
 // @Summary 			Get Day Availability.
-// @Description 		Get availability information for a specific date.
+// @Description 		Get availability information for a specific date, optionally excluding a specific session.
 // @Tags 				Session
 // @Accept 				json
 // @Produce 			json

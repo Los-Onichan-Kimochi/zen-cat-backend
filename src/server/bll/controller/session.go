@@ -182,6 +182,7 @@ func (s *Session) UpdateSession(
 			ProfessionalId:     checkProfessionalId,
 			LocalId:            checkLocalId,
 			CommunityServiceId: currentSession.CommunityServiceId,
+			ExcludeId:          &sessionId, // Exclude the current session from conflict checks
 		}
 
 		conflictResult, conflictErr := s.CheckConflicts(conflictCheck)
@@ -488,6 +489,11 @@ func (s *Session) GetAvailability(
 	for _, session := range sessions {
 		// Skip cancelled or completed sessions
 		if session.State == "CANCELLED" || session.State == "COMPLETED" {
+			continue
+		}
+
+		// Skip the excluded session if provided
+		if req.ExcludeSessionId != nil && session.Id == *req.ExcludeSessionId {
 			continue
 		}
 
