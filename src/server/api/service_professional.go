@@ -74,6 +74,34 @@ func (a *Api) GetServiceProfessional(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
+// @Summary 			Get all professionals associated with a specific service.
+// @Description 		Retrieves all professionals that are linked to a given service, based on the service ID.
+// @Tags 				ServiceProfessional
+// @Accept 				json
+// @Produce 			json
+// @Security			JWT
+// @Param 				serviceId path string true "Service ID"
+// @Success 			200 {object} schemas.Professionals "OK"
+// @Failure 			400 {object} errors.Error "Bad Request (e.g., invalid UUID format)"
+// @Failure 			401 {object} errors.Error "Missing or malformed JWT"
+// @Failure 			404 {object} errors.Error "Not Found (No professionals associated with the given service ID)"
+// @Failure 			500 {object} errors.Error "Internal Server Error"
+// @Router 				/service-professional/{serviceId}/ [get]
+func (a *Api) GetProfessionalsByServiceId(c echo.Context) error {
+	serviceId, parseErr := uuid.Parse(c.Param("serviceId"))
+
+	if parseErr != nil {
+		return errors.HandleError(errors.UnprocessableEntityError.InvalidServiceId, c)
+	}
+
+	response, err := a.BllController.ServiceProfessional.GetProfessionalsByServiceId(serviceId)
+	if err != nil {
+		return errors.HandleError(*err, c)
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 // @Summary 			Delete ServiceProfessional.
 // @Description 		Deletes a specific service-professional association.
 // @Tags 				ServiceProfessional
@@ -191,4 +219,3 @@ func (a *Api) BulkDeleteServiceProfessionals(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
-

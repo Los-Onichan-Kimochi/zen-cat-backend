@@ -39,9 +39,9 @@ func (cp *ServiceProfessional) CreatePostgresqlServiceProfessional(
 	}
 
 	serviceProfessionalModel := &model.ServiceProfessional{
-		Id:          uuid.New(),
-		ServiceId: serviceId,
-		ProfessionalId:      professionalId,
+		Id:             uuid.New(),
+		ServiceId:      serviceId,
+		ProfessionalId: professionalId,
 		AuditFields: model.AuditFields{
 			UpdatedBy: updatedBy,
 		},
@@ -53,9 +53,9 @@ func (cp *ServiceProfessional) CreatePostgresqlServiceProfessional(
 	}
 
 	return &schemas.ServiceProfessional{
-		Id:          serviceProfessionalModel.Id,
-		ServiceId: serviceProfessionalModel.ServiceId,
-		ProfessionalId:      serviceProfessionalModel.ProfessionalId,
+		Id:             serviceProfessionalModel.Id,
+		ServiceId:      serviceProfessionalModel.ServiceId,
+		ProfessionalId: serviceProfessionalModel.ProfessionalId,
 	}, nil
 }
 
@@ -70,10 +70,39 @@ func (cp *ServiceProfessional) GetPostgresqlServiceProfessional(
 	}
 
 	return &schemas.ServiceProfessional{
-		Id:          associationModel.Id,
-		ServiceId: associationModel.ServiceId,
-		ProfessionalId:      associationModel.ProfessionalId,
+		Id:             associationModel.Id,
+		ServiceId:      associationModel.ServiceId,
+		ProfessionalId: associationModel.ProfessionalId,
 	}, nil
+}
+
+// Todo: add comment
+func (cp *ServiceProfessional) GetPostgresqlProfessionalsByServiceId(
+	serviceId uuid.UUID,
+) ([]*schemas.Professional, *errors.Error) {
+	professionalsModel, err := cp.DaoPostgresql.ServiceProfessional.GetProfessionalsByServiceId(
+		serviceId,
+	)
+	if err != nil {
+		return nil, &errors.ObjectNotFoundError.ServiceProfessionalNotFound
+	}
+
+	professionals := make([]*schemas.Professional, len(professionalsModel))
+	for i, professionalModel := range professionalsModel {
+		professionals[i] = &schemas.Professional{
+			Id:             professionalModel.Id,
+			Name:           professionalModel.Name,
+			FirstLastName:  professionalModel.FirstLastName,
+			SecondLastName: professionalModel.SecondLastName,
+			Specialty:      professionalModel.Specialty,
+			Email:          professionalModel.Email,
+			PhoneNumber:    professionalModel.PhoneNumber,
+			Type:           string(professionalModel.Type),
+			ImageUrl:       professionalModel.ImageUrl,
+		}
+	}
+
+	return professionals, nil
 }
 
 // Deletes a specific service-professional association from postgresql DB.
@@ -101,9 +130,9 @@ func (cp *ServiceProfessional) BulkCreatePostgresqlServiceProfessionals(
 	serviceProfessionalModels := make([]*model.ServiceProfessional, len(serviceProfessionals))
 	for i, serviceProfessional := range serviceProfessionals {
 		serviceProfessionalModels[i] = &model.ServiceProfessional{
-			Id:          uuid.New(),
-			ServiceId: serviceProfessional.ServiceId,
-			ProfessionalId:      serviceProfessional.ProfessionalId,
+			Id:             uuid.New(),
+			ServiceId:      serviceProfessional.ServiceId,
+			ProfessionalId: serviceProfessional.ProfessionalId,
 			AuditFields: model.AuditFields{
 				UpdatedBy: updatedBy,
 			},
@@ -120,9 +149,9 @@ func (cp *ServiceProfessional) BulkCreatePostgresqlServiceProfessionals(
 	serviceProfessionalsResponse := make([]*schemas.ServiceProfessional, len(serviceProfessionals))
 	for i, serviceProfessional := range serviceProfessionalModels {
 		serviceProfessionalsResponse[i] = &schemas.ServiceProfessional{
-			Id:          serviceProfessional.Id,
-			ServiceId: serviceProfessional.ServiceId,
-			ProfessionalId:      serviceProfessional.ProfessionalId,
+			Id:             serviceProfessional.Id,
+			ServiceId:      serviceProfessional.ServiceId,
+			ProfessionalId: serviceProfessional.ProfessionalId,
 		}
 	}
 
@@ -145,9 +174,9 @@ func (cp *ServiceProfessional) FetchPostgresqlServiceProfessionals(
 	serviceProfessionals := make([]*schemas.ServiceProfessional, len(serviceProfessionalModels))
 	for i, serviceProfessional := range serviceProfessionalModels {
 		serviceProfessionals[i] = &schemas.ServiceProfessional{
-			Id:          serviceProfessional.Id,
-			ServiceId: serviceProfessional.ServiceId,
-			ProfessionalId:      serviceProfessional.ProfessionalId,
+			Id:             serviceProfessional.Id,
+			ServiceId:      serviceProfessional.ServiceId,
+			ProfessionalId: serviceProfessional.ProfessionalId,
 		}
 	}
 
@@ -170,8 +199,8 @@ func (cp *ServiceProfessional) BulkDeletePostgresqlServiceProfessionals(
 		}
 
 		serviceProfessionalModels[i] = &model.ServiceProfessional{
-			ServiceId: serviceProfessional.ServiceId,
-			ProfessionalId:      serviceProfessional.ProfessionalId,
+			ServiceId:      serviceProfessional.ServiceId,
+			ProfessionalId: serviceProfessional.ProfessionalId,
 		}
 	}
 
@@ -181,4 +210,3 @@ func (cp *ServiceProfessional) BulkDeletePostgresqlServiceProfessionals(
 
 	return nil
 }
-

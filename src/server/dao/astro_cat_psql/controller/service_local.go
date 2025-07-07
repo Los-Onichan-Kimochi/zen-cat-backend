@@ -44,6 +44,39 @@ func (cp *ServiceLocal) GetServiceLocal(
 	return &serviceLocal, nil
 }
 
+// Fetch all service-local associations, filtered by
+//
+//   - `serviceId` if provided.
+func (cp *ServiceLocal) GetLocalsByServiceId(
+	serviceId uuid.UUID,
+) ([]*model.Local, error) {
+	var serviceLocals []*model.ServiceLocal
+
+	// Realizamos la consulta en la base de datos para obtener las asociaciones de servicio y profesional
+	query := cp.PostgresqlDB.Model(&model.ServiceLocal{})
+
+	query = query.Where("service_id = ?", serviceId)
+
+	// Ejecutamos la consulta y almacenamos las asociaciones
+	if err := query.Find(&serviceLocals).Error; err != nil {
+		return nil, err
+	}
+
+	// Obtenemos los IDs de los profesionales asociados
+	var localIds []uuid.UUID
+	for _, serviceLocal := range serviceLocals {
+		localIds = append(localIds, serviceLocal.LocalId)
+	}
+
+	// Ahora realizamos una segunda consulta para obtener los servicios
+	var locals []*model.Local
+	if err := cp.PostgresqlDB.Where("id IN (?)", localIds).Find(&locals).Error; err != nil {
+		return nil, err
+	}
+
+	return locals, nil
+}
+
 // Deletes a specific service-local association.
 func (cp *ServiceLocal) DeleteServiceLocal(
 	serviceId uuid.UUID,
