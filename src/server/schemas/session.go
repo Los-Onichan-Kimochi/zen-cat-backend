@@ -76,9 +76,10 @@ type ConflictResult struct {
 }
 
 type AvailabilityRequest struct {
-	Date           time.Time  `json:"date"`
-	ProfessionalId *uuid.UUID `json:"professional_id"`
-	LocalId        *uuid.UUID `json:"local_id"`
+	Date             time.Time  `json:"date"`
+	ProfessionalId   *uuid.UUID `json:"professional_id"`
+	LocalId          *uuid.UUID `json:"local_id"`
+	ExcludeSessionId *uuid.UUID `json:"exclude_session_id"`
 }
 
 type TimeSlot struct {
