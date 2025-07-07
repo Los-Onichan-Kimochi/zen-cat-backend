@@ -18,12 +18,22 @@ func GetDevMode() bool {
 }
 
 func InitDevMode() {
+	// Check if we're in a production environment (Railway, etc.)
+	// Comentado para permitir modo desarrollo en deploy
+	if os.Getenv("RAILWAY_ENVIRONMENT") != "" || os.Getenv("PORT") != "" {
+		// In production, default to production mode
+		SetDevMode(false)
+		fmt.Println("🔒 Modo producción activado - Autenticación JWT habilitada")
+		return
+	}
+
+	// Only prompt in local development
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Print("¿Ejecutar en modo desarrollo? (omite autenticación JWT) [y/N]: ")
 	input, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Println("Error leyendo entrada, ejecutando en modo producción...")
+		fmt.Println("Error leyendo entrada, ejecutando en modo PROD...")
 		SetDevMode(false)
 		return
 	}

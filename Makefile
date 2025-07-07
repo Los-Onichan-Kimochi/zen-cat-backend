@@ -23,7 +23,7 @@ test-go:
 
 test-go-sum:
 	gotestsum --format pkgname  -- -p 1 -count=1 ./src/server/tests/...
-	
+
 # Runners
 run:
 	cd src/server && go run main.go
@@ -35,3 +35,20 @@ swag-docs:
 # S3 test
 s3-test:
 	cd src/server/tests/s3_test && go run s3.go
+
+# Railway deployment commands
+railway-build:
+	@./scripts/build-for-railway.sh
+
+railway-deploy:
+	@echo "🚀 Deploying to Railway..."
+	@echo "📝 Make sure you have Railway CLI installed and are logged in"
+	@echo "📝 Run: railway up"
+
+railway-logs:
+	@echo "📋 Viewing Railway logs..."
+	@echo "📝 Run: railway logs"
+
+railway-vars:
+	@echo "🔧 Railway environment variables:"
+	@echo "📝 Run: railway variables"
